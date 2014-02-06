@@ -1,3 +1,9 @@
-<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="0" measuredH="0" mockupW="0" mockupH="0">
-  <controls/>
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1088" measuredH="996" mockupW="899" mockupH="790">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::SiteMap" x="189" y="206" w="-1" h="-1" measuredW="899" measuredH="790" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Sign%20In%0A-%20Home%0A--%20Request%20Task%20Flow%0A--%20Accept%20Task%20Flow%0A---%20Home%20Task%20View%0A----%20Accept%0A-----%20%3F%0A----%20More%20details%0A-----%20Task%20Details%0A------%20Profile%20Details%0A------%20Accept%0A------%20Accept%20w/%20New%20Bid%0A------%20No%20Thanks%0A-%20Settings</text>
+      </controlProperties>
+    </control>
+  </controls>
 </mockup>

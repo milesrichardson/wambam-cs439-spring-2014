@@ -97,36 +97,31 @@
         <text>More%20Details</text>
       </controlProperties>
     </control>
-    <control controlID="25" controlTypeID="com.balsamiq.mockups::Tooltip" x="60" y="20" w="-1" h="-1" measuredW="98" measuredH="33" zOrder="16" locked="false" isInGroup="-1">
-      <controlProperties>
-        <tooltipDirection>SE</tooltipDirection>
-      </controlProperties>
-    </control>
-    <control controlID="30" controlTypeID="com.balsamiq.mockups::Label" x="59" y="424" w="-1" h="-1" measuredW="29" measuredH="26" zOrder="17" locked="false" isInGroup="-1">
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::Label" x="59" y="424" w="-1" h="-1" measuredW="29" measuredH="26" zOrder="16" locked="false" isInGroup="-1">
       <controlProperties>
         <size>18</size>
         <text>Bid%3A</text>
       </controlProperties>
     </control>
-    <control controlID="31" controlTypeID="com.balsamiq.mockups::Label" x="98" y="424" w="-1" h="-1" measuredW="47" measuredH="26" zOrder="18" locked="false" isInGroup="-1">
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::Label" x="98" y="424" w="-1" h="-1" measuredW="47" measuredH="26" zOrder="17" locked="false" isInGroup="-1">
       <controlProperties>
         <size>18</size>
         <text>%245.50</text>
       </controlProperties>
     </control>
-    <control controlID="32" controlTypeID="com.balsamiq.mockups::Label" x="160" y="424" w="-1" h="-1" measuredW="44" measuredH="26" zOrder="19" locked="false" isInGroup="-1">
+    <control controlID="32" controlTypeID="com.balsamiq.mockups::Label" x="160" y="424" w="-1" h="-1" measuredW="44" measuredH="26" zOrder="18" locked="false" isInGroup="-1">
       <controlProperties>
         <size>18</size>
         <text>Time%3A</text>
       </controlProperties>
     </control>
-    <control controlID="33" controlTypeID="com.balsamiq.mockups::Label" x="209" y="424" w="-1" h="-1" measuredW="61" measuredH="26" zOrder="20" locked="false" isInGroup="-1">
+    <control controlID="33" controlTypeID="com.balsamiq.mockups::Label" x="209" y="424" w="-1" h="-1" measuredW="61" measuredH="26" zOrder="19" locked="false" isInGroup="-1">
       <controlProperties>
         <size>18</size>
         <text>15%20mins</text>
       </controlProperties>
     </control>
-    <control controlID="35" controlTypeID="com.balsamiq.mockups::Label" x="64" y="398" w="-1" h="-1" measuredW="207" measuredH="26" zOrder="21" locked="false" isInGroup="-1">
+    <control controlID="35" controlTypeID="com.balsamiq.mockups::Label" x="64" y="398" w="-1" h="-1" measuredW="207" measuredH="26" zOrder="20" locked="false" isInGroup="-1">
       <controlProperties>
         <size>18</size>
         <text>Deliver%20from%20gheav%20to%20TD</text>
