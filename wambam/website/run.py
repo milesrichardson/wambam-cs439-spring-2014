@@ -11,7 +11,16 @@ def hello():
       
 @app.route("/addtask")
 def index():
-    print render_template('submittedtask.html')
+    return render_template('submittedtask.html')
+
+@app.route("/dotask")
+def execute():
+    return render_template('taskserver.html')
+
+@app.route("/confirmphone", methods=['POST'])
+def confirm():
+    phone = request.form['phonenumber']
+    return render_template('confirmation.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
