@@ -1,11 +1,13 @@
 import flask
 import flask.ext.sqlalchemy
 import flask.ext.restless
+import uuid
 
 # Create the Flask application and the Flask-SQLAlchemy object.
+db_name = uuid.uuid1().hex
 app = flask.Flask(__name__)
 app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test2.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + db_name + '.db'
 db = flask.ext.sqlalchemy.SQLAlchemy(app)
 
 
@@ -14,6 +16,9 @@ account_task = db.Table('account_task',
     db.Column('task_id', db.Integer, db.ForeignKey('task.id')),
     db.Column('status', db.Enum('active', 'inactive')),
 )
+
+class Shit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
 
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +49,9 @@ class Task(db.Model):
 # Create the database tables.
 db.create_all()
 
+poo = Shit()
+db.session.add(poo)
+
 miles = Account(
     phone="1231231234",
     online=True,
@@ -68,7 +76,7 @@ task1 = Task(
     long_title="",
     bid=0.0,
     expiration_datetime=None,
-    status='unassigned')
+    status='expired')
 
 # task2 = Task(
 #     id="2234",
@@ -96,6 +104,7 @@ manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 
 manager.create_api(Account, methods=['GET', 'POST', 'DELETE'])
 manager.create_api(Task, methods=['GET', 'POST', 'DELETE'])
+manager.create_api(Shit, methods=['GET', 'POST', 'DELETE'])
 
 # start the flask loop
 app.run()
