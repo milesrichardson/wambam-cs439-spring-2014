@@ -1,45 +1,110 @@
 import flask
 import flask.ext.sqlalchemy
 import flask.ext.restless
+import uuid
 
 # Create the Flask application and the Flask-SQLAlchemy object.
+db_name = uuid.uuid1().hex
 app = flask.Flask(__name__)
 app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + db_name + '.db'
 db = flask.ext.sqlalchemy.SQLAlchemy(app)
 
-# Create your Flask-SQLALchemy models as usual but with the following two
-# (reasonable) restrictions:
-#   1. They must have an id column of type Integer.
-#   2. They must have an __init__ method which accepts keyword arguments for
-#      all columns (the constructor in flask.ext.sqlalchemy.SQLAlchemy.Model
-#      supplies such a method, so you don't need to declare a new one).
-class Person(db.Model):
+
+account_task = db.Table('account_task',
+    db.Column('account_id', db.Integer, db.ForeignKey('account.id')),
+    db.Column('task_id', db.Integer, db.ForeignKey('task.id')),
+    db.Column('status', db.Enum('active', 'inactive')),
+)
+
+class Shit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode, unique=True)
-    birth_date = db.Column(db.Date)
 
-
-class Computer(db.Model):
+class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode, unique=True)
-    vendor = db.Column(db.Unicode)
-    purchase_time = db.Column(db.DateTime)
-    owner_id = db.Column(db.Integer, db.ForeignKey('person.id'))
-    owner = db.relationship('Person', backref=db.backref('computers',
-                                                         lazy='dynamic'))
+    phone = db.Column(db.String(20))
+    online = db.Column(db.Boolean)
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
 
+    fulfiller_tasks = db.relationship('Task', secondary=account_task,
+                            backref=db.backref('acounts', lazy='dynamic'))
+
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    requestor_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    coordinates = db.Column(db.String(255))
+    short_title = db.Column(db.String(255))
+    long_title = db.Column(db.Text)
+    bid = db.Column(db.Float())
+    expiration_datetime = db.Column(db.DateTime)
+    status = db.Column(db.Enum('unassigned', 'in_progress', 'canceled',
+                               'completed', 'expired',
+                               name='task_status_types'))
+
+    fulfiller_accounts = db.relationship('Account', secondary=account_task,
+                            backref=db.backref('tasks', lazy='dynamic'))
 
 # Create the database tables.
 db.create_all()
+
+poo = Shit()
+db.session.add(poo)
+
+miles = Account(
+    phone="1231231234",
+    online=True,
+    first_name="Miles",
+    last_name="Richardson",
+    # tasks=[],
+)
+
+
+will = Account(
+    phone="3213214321",
+    online=True,
+    first_name="Will",
+    last_name="CK",
+    # tasks=[],
+)
+
+task1 = Task(
+    requestor_id="5678",
+    coordinates="45435345",
+    short_title="this",
+    long_title="",
+    bid=0.0,
+    expiration_datetime=None,
+    status='expired')
+
+# task2 = Task(
+#     id="2234",
+#     requestor_id="5678",
+#     coordinates="45435345",
+#     short_title="this",
+#     long_title="",
+#     bid=0.0,
+#     expiration_datetime=None,
+#     status='unassigned',)
+
+
+
+db.session.add(task1)
+db.session.add(miles)
+db.session.add(will)
+db.session.commit()
+
 
 # Create the Flask-Restless API manager.
 manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 
 # Create API endpoints, which will be available at /api/<tablename> by
 # default. Allowed HTTP methods can be specified as well.
-manager.create_api(Person, methods=['GET', 'POST', 'DELETE'])
-manager.create_api(Computer, methods=['GET'])
+
+manager.create_api(Account, methods=['GET', 'POST', 'DELETE'])
+manager.create_api(Task, methods=['GET', 'POST', 'DELETE'])
+manager.create_api(Shit, methods=['GET', 'POST', 'DELETE'])
 
 # start the flask loop
 app.run()
