@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html { text-align: center; }
+      body { font-size:20px; text-align: center; }
+      #container { max-width: 500px; margin-left: auto; margin-right: auto}
+      #ok { font-size:80px }
+      #textbutton { height: 45px; width: 250px; font-size: 30px; padding-left: 10px; margin-bottom: 20px }
+      #button{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-left: 15px; margin-right: 15px; }
+      label.error { color: red; display: block;  }
+   </style>
+  </head>
+  <body>
+    <p id="ok"> OK! </p>
+    <div id="container">
+      <p> We'll text you any time a task is available. You can text us "offline" or "online" at any time to toggle receiving messages. If you're the first to respond, we'll award you the task. </p>
+      <p> What's your number? </p>
+    </div>
+    <form id="form" action="index.html">
+      <input id="textbutton" type="text" name="phonenumber"><br>
+      <input id="button" type="submit" value="WamBam!">
+    </form>
+    <script src="jquery-1.11.0.js"></script>
+    <script src="http://jquery.bassistance.de/validate/jquery.validate.js"></script>
+    <script src="http://jquery.bassistance.de/validate/additional-methods.js"></script>
+    <script>
+      $( "#form" ).validate({
+        rules: {
+          phonenumber: {
+            required: true,
+            phoneUS: true
+          }
+        }
+      });
+      $.validator.messages.required = 'Please specify a valid phone number';
+      $.validator.messages.phoneUS = 'Please specify a valid phone number';
+    </script>
+  </body>
+</html>
