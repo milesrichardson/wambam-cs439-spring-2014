@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style> fib
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0; border: 0 }
+      #header { width: 100%; background: #0F4D92; padding-top: 15px; padding-bottom: 15px}
+      #headertable { width: 100% }
+      #title { color: white; font-size:40px; padding-left: 30px}
+      #loginentry { width: 400px; padding-right: 20px}
+      #logintable { width: 100% }
+      #userlabel { color: white; width: 40%; padding-left: 5px; }
+      #passwordlabel { color: white; width: 40%; padding-left: 5px; }
+      #loginbutton{ color: white; font-weight: bold; background: #0F4D92; text-align: center }
+      #userfield { padding-left: 5px }
+      #passwordfield { padding-left: 5px }
+      #registrationdiv { margin-top: 100px; text-align: center } 
+      #registertitle { text-align: center; font-size: 40px; margin-bottom: 20px }
+      #registrationtable { text-align: left; margin-left: auto; margin-right: auto }
+      #label { font-size: 20px }
+      #phone, #email, #password, #passwordconfirm { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 20px }
+      #register{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-top: 20px }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <table id="headertable">
+        <tr>
+          <td id="title">WamBam!</td>
+          <td id="loginentry">
+            <div id="login">
+              <table id="logintable">
+                <tr>
+                  <td id="userlabel">Email or Phone</td>
+                  <td id="passwordlabel">Password</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <form action="/login" method="POST">
+                    <td>
+                      <input id="userfield" type="text" name="userfield">
+                    </td>
+                    <td>
+                      <input id="passwordfield" type="text" name="passwordfield">
+                    </td>
+                    <td>
+                      <input id="loginbutton" type="submit" name="loginbutton" value="Log In">
+                    </td>
+                  </form>
+                </tr>
+              </table>
+            </div>         
+          </td> 
+        </tr>
+      </table>
+    </div>
+    <div id="registrationdiv">
+      <div id="registertitle"> New to WamBam!? </div>
+      <form action="/register" method="POST">
+        <table id="registrationtable">
+          <tr>
+            <td>
+              <label id="label" for="phone">Phone Number</label>
+            </td>
+            <td>
+              <input type="text" name="phone" id="phone">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label id="label" for="email">Email Address</label>
+            </td>
+            <td>
+              <input type="text" name="email" id="email">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label id="label" for="password">Password</label>
+            </td>
+            <td>
+              <input type="password" name="password" id="password">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label id="label" for="passwordconfirm">Confirm Password</label>
+            </td>
+            <td>
+              <input type="password" name="passwordconfirm" id="passwordconfirm">
+            </td>
+          </tr>
+        </table>
+        <input type="submit" id="register" name="register" value="Register">
+      </form>
+    </div>
+  </body>
+</html>

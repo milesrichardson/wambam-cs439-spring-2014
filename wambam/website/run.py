@@ -1,11 +1,6 @@
 from flask import Flask
-from flask import request
+from flask import request, redirect, url_for
 from flask import render_template
-from twilio.rest import TwilioRestClient
-
-twaccount = "AC032798eca07124939abd8352c516f86d"
-twtoken = "bbc20641c4fdb7e5a0ccc86b4fdefcfe"
-twilio_client = TwilioRestClient(twaccount, twtoken)
 
 app = Flask(__name__)
 
@@ -13,7 +8,25 @@ flask_pos = []
  
 @app.route("/")
 def hello():
+    return render_template('login.html')
+
+@app.route("/home")
+def home():
     return render_template('index.html')
+
+@app.route("/login", methods=['POST'])
+def login():
+    user = request.form['userfield']
+    password = request.form['passwordfield']
+    return redirect(url_for('home'))
+
+@app.route("/register", methods=['POST'])
+def register():
+    phone = request.form['phone']
+    email = request.form['email']
+    password = request.form['password']
+    passwordconfirm = request.form['passwordconfirm']
+    return redirect(url_for('home'))
       
 @app.route("/addtask")
 def index():
@@ -26,7 +39,6 @@ def execute():
 @app.route("/confirmphone", methods=['POST'])
 def confirm():
     phone = request.form['phonenumber']
-    message = twilio_client.messages.create(to="+1"+phone, from_="+1954607-3879", body="Confirmed for WAMBAM!")
     return render_template('confirmation.html')
 
 if __name__ == "__main__":
