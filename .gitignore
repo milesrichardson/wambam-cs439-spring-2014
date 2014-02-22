@@ -1,1 +1,3 @@
 wambam/venv/*
+*~
+*.pyc
