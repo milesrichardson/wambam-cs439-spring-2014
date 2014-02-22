@@ -12,7 +12,7 @@
       #description { color: #FFFFFF; font-size:20px }
       #map-canvas { height: 500px }
       #buttonbar{ text-align: center; padding-top: 10px; padding-bottom: 10px }
-      #button{ height: 50px; width: 200px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-left: 15px; margin-right: 15px; }
+      #button{ height: 50px; width: 300px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-left: 15px; margin-right: 15px; }
       #form { margin: 0; padding: 0; display:inline }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -47,21 +47,6 @@
 	         }
 	       ]});
 
-        var marker = null;
-
-        google.maps.event.addListener(map, 'click', function(e) {
-          if (marker == null) {
-            marker = new google.maps.Marker({
-              position: e.latLng,
-              map: map,
-              title: 'Request Location'
-            });
-            $("#button").show(); 
-          }
-          else {
-            marker.setPosition(e.latLng);
-          }
-        });
       setMapSize();
       }
 
@@ -75,11 +60,8 @@
     </div>
     <div id="map-canvas"></div>
     <div id="buttonbar">
-      <form id="form" action="/addtask">
-        <input id="button" type="submit" value="Get it done" style="display: none" /> 
-      </form>
-      <form id="form" action="/working">
-        <input id="button" type="submit" value="I want to work!">
+      <form id="form" action="/home">
+        <input id="button" type="submit" value="Actually, I don't want to work!">
       </form>
     </div>
   </body>
