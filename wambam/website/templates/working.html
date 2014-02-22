@@ -28,6 +28,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
     <script>
       var map;
+      var infowindow = null;
       function initialize() {
         var mapOptions = {
         zoom: 15,
@@ -48,16 +49,19 @@
 	       ]});
 
       var stubrequests = [
-        ['GHeav Sandwich', 'Calhoun A31', '$10', '1 hour', 'Bring me a sandwich from GHeav with turkey, lettuce, tomato, cheese, and NO MAYO.', 41.3101, -72.9277],
-        ['A Little Lovin', 'Branford E32', '$0', '1 week', 'No description needed.', 41.3091, -72.9267],
-        ['Help with UML', 'Open Zoo', '$40', '1 day', 'I am so glad that we have a unified markup language, but I really need someone to teach me the basics for an hour or so.', 41.3081, -72.9297],
-        ['WamBam! Development', 'CEID', '$30', '1 week', 'We need help testing out amazing product before it comes out to the Yale public.', 41.3115, -72.9307],
-        ['Flying', 'Old Campus', '$1,000,000', '1 week', 'I want to learn to fly, preferably like superman, but I would be OK going Wonderwoman style with an invisible jet.', 41.3103, -72.9317]
+        ['GHeav Sandwich', 'Calhoun A31', '$10', '1 hour', 'Bring me a sandwich from GHeav with turkey, lettuce, tomato, cheese, and NO MAYO.', 'aayush.upadhyay@yale.edu', 41.3101, -72.9277],
+        ['A Little Lovin', 'Branford E32', '$0', '1 week', 'No description needed.', 'william.childs-klein@yale.edu', 41.3091, -72.9267],
+        ['Help with UML', 'Open Zoo', '$40', '1 day', 'I am so glad that we have a unified markup language, but I really need someone to teach me the basics for an hour or so.', 'ruzica.piskac@yale.edu', 41.3081, -72.9297],
+        ['WamBam! Development', 'CEID', '$30', '1 week', 'We need help testing out amazing product before it comes out to the Yale public.', 'brandon.smith@yale.edu', 41.3115, -72.9307],
+        ['Flying', 'Old Campus', '$1,000,000', '1 week', 'I want to learn to fly, preferably like superman, but I would be OK going Wonderwoman style with an invisible jet.', 'miles.richardson@yale.edu', 41.3103, -72.9317]
       ];
 
       var contentString = '<div style="text-align: center">'+
           '<h1> @TITLE@ (@BID@) </h1>'+
           '<table> <tr>'+
+          '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px">Requester Email:</td>'+
+          '<td style="text-align: left; padding-left: 10px">@EMAIL@</td>'+
+          '</tr> <tr>'+
           '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px">Delivery Location:</td>'+
           '<td style="text-align: left; padding-left: 10px">@LOCATION@</td>'+
           '</tr> <tr>'+
@@ -69,28 +73,38 @@
           '@DETAILS@ </div> <br>'+ 
           '<form action="/confirmWamBam" method="POST">'+
           '<input type="submit" value="Claim" style="height: 30px; width: 75px; font-size:15px; color: white; background: #0F4D92; text-align: center">'+
-          '<form> </div>';
+          '<input type="hidden" name="title" value="@TITLE@">'+
+          '<input type="hidden" name="bid" value="@BID@">'+
+          '<input type="hidden" name="location" value="@LOCATION@">'+
+          '<input type="hidden" name="description" value="@DETAILS@">'+
+          '<input type="hidden" name="expiration" value="@EXPIRATION@">'+
+          '<input type="hidden" name="title" value="@TITLE@">'+
+          '<input type="hidden" name="email" value="@EMAIL@">'+
+          '</form> </div>';
+
+      infowindow = new google.maps.InfoWindow({
+            content: "foo",
+            maxWidth: 400
+      });
 
       for (var i = 0; i < stubrequests.length; i++) {
         var request = stubrequests[i];
-        var myLatLng = new google.maps.LatLng(request[5], request[6]);
-        var marker = new google.maps.Marker({
-          position: myLatLng,
-          map: map,
-        });
+        var myLatLng = new google.maps.LatLng(request[6], request[7]);
         var info = contentString.replace("@TITLE@", request[0]);
         info = info.replace("@LOCATION@", request[1]);
         info = info.replace("@BID@", request[2]);
         info = info.replace("@EXPIRATION@", request[3]);
         info = info.replace("@DETAILS@", request[4]);
-
-        var infowindow = new google.maps.InfoWindow({
-              content: info,
-              maxWidth: 400
+        info = info.replace("@EMAIL@", request[5]);
+        var marker = new google.maps.Marker({
+          position: myLatLng,
+          map: map,
+          html: info
         });
 
         google.maps.event.addListener(marker, 'click', function() {
-          infowindow.open(map, marker);
+          infowindow.setContent(this.html);
+          infowindow.open(map, this);
         });
       }
       setMapSize();
