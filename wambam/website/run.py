@@ -5,7 +5,7 @@ from flask import render_template
 app = Flask(__name__)
 
 flask_pos = []
- 
+
 @app.route("/")
 def hello():
     return render_template('login.html')
@@ -49,15 +49,22 @@ def submit():
 def execute():
     return render_template('taskserver.html')
 
-@app.route("/confirmWamBam", methods=['POST'])
+@app.route("/confirmWamBam", methods=['GET', 'POST'])
 def wambam():
     title = request.form['title']
     location = request.form['location']
     bid = request.form['bid']
     expiration = request.form['expiration']
     description = request.form['description']
-    email = request.form['description']
-    return redirect(url_for('home'))
+    email = request.form['email']
+    return render_template('confirmationwambam.html',
+                            title=title,
+                            location=location,
+                            bid=bid,
+                            expiration=expiration,
+                            description=description,
+                            email=email,
+                            phone="770-362-9815")
 
 @app.route("/confirm")
 def confirm():
