@@ -81,14 +81,15 @@
             </td>
             <td></td>
           </tr>
+          <tr>
+            <td id="labelcol" colspan="2">
+              <label id="label">{{description}}</label>
+            </td>
+          </tr>
         </table>
-      <div id="description" onload="load()">{{description}}</div>
       <form id="form" action="/working">
         <input id="button" type="submit" value="Return to WamBam!" /> 
       </form>
     </div>
   </body>
-  <script>
-    $("#description").width($("#confirmtable").width()); 
-  </script>
 </html>

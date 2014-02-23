@@ -19,7 +19,8 @@
       #labelcol { width: 160px }
       #title, #deliveryloc, #bid { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px }
       #expiration { width: 250px; font-size: 20px; padding-top: 5px; padding-bottom: 5px }
-      #description { width: 415px; resize: none; padding-left: 5px; margin-top: 20px; margin-bottom: 20px }
+      #description { width: 415px; resize: none; padding-left: 5px; margin-top: 20px; margin-bottom: 10px }
+      #submitcol { text-align: center }
       #submit{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center }
     </style>
   </head>
@@ -66,9 +67,17 @@
               </select>
             </td>
           </tr>
+          <tr>
+            <td id="labelcol" colspan="2">
+              <textarea rows="6" form="addtaskform" placeholder="Description of task (optional)" id="description" name="description"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td id="submitcol" colspan="2">
+              <input type="submit" id="submit" name="submit" value="WamBam!">
+            </td>
+          </tr>
         </table>
-        <textarea rows="6" form="addtaskform" placeholder="Description of task (optional)" id="description" name="description"></textarea> <br>
-        <input type="submit" id="submit" name="submit" value="WamBam!">
       </form>
     </div>
   </body>
