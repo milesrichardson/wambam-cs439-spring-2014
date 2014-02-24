@@ -1,8 +1,23 @@
 from flask import Flask
 from flask import request, redirect, url_for
 from flask import render_template
+from flask_mail import Message
+from flask_mail import Mail
 
 app = Flask(__name__)
+
+app.config.update(dict(
+    DEBUG = True,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'wambamapp@gmail.com',
+    MAIL_PASSWORD = 'wambam123',
+    MAIL_DEFAULT_SENDER = 'wambamapp@gmail.com'
+))
+
+mail = Mail(app)
 
 flask_pos = []
 
@@ -30,6 +45,14 @@ def register():
     email = request.form['email']
     password = request.form['password']
     passwordconfirm = request.form['passwordconfirm']
+
+    #Email client to complete registration
+    msg = Message(subject="Complete Your WamBam! Registration",
+                  recipients=[email],
+                  body="Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home\r\n\r\nYours truly,\r\nThe WamBam! Team",
+                  html="<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home<br><br>Yours truly,<br>The WamBam! Team</div>")
+    mail.send(msg)
+
     return redirect(url_for('home'))
       
 @app.route("/addtask")
