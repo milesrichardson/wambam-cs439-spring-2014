@@ -24,6 +24,18 @@
 
       $
       $(window).on('resize', function() { setMapSize(); });
+
+      if (!String.prototype.format) {
+        String.prototype.format = function() {
+          var args = arguments;
+          return this.replace(/{(\d+)}/g, function(match, number) { 
+            return typeof args[number] != 'undefined'
+              ? args[number]
+              : match
+            ;
+          });
+        };
+      }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
     <script>
@@ -56,30 +68,29 @@
         ['Flying', 'Old Campus', '$1,000,000', '1 week', 'I want to learn to fly, preferably like superman, but I would be OK going Wonderwoman style with an invisible jet.', 'miles.richardson@yale.edu', 41.3103, -72.9317]
       ];
 
-      var contentString = '<div style="text-align: center">'+
-          '<h1> @TITLE@ (@BID@) </h1>'+
+      var contentString = '<div style="text-align: center ">'+
+          '<h1> {0} ({1}) </h1>'+
           '<table> <tr>'+
           '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px">Requester Email:</td>'+
-          '<td style="text-align: left; padding-left: 10px">@EMAIL@</td>'+
+          '<td style="text-align: left; padding-left: 10px">{3}</td>'+
           '</tr> <tr>'+
           '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px">Delivery Location:</td>'+
-          '<td style="text-align: left; padding-left: 10px">@LOCATION@</td>'+
+          '<td style="text-align: left; padding-left: 10px">{4}</td>'+
           '</tr> <tr>'+
           '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px">Expires:</td>'+
-          '<td style="text-align: left; padding-left: 10px">@EXPIRATION@</td>'+
+          '<td style="text-align: left; padding-left: 10px">{2}</td>'+
           '</tr> <tr>'+
           '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px"> <br> Details:</td>'+
-          '</tr> </table> <div style="text-align: left">'+
-          '@DETAILS@ </div> <br>'+ 
+          '</tr><td style="text-align: left;" colspan="2"> {5}'+
+'</td> </tr> </table>'+ 
           '<form action="/confirmWamBam" method="POST">'+
           '<input type="submit" value="Claim" style="height: 30px; width: 75px; font-size:15px; color: white; background: #0F4D92; text-align: center">'+
-          '<input type="hidden" name="title" value="@TITLE@">'+
-          '<input type="hidden" name="bid" value="@BID@">'+
-          '<input type="hidden" name="location" value="@LOCATION@">'+
-          '<input type="hidden" name="description" value="@DETAILS@">'+
-          '<input type="hidden" name="expiration" value="@EXPIRATION@">'+
-          '<input type="hidden" name="title" value="@TITLE@">'+
-          '<input type="hidden" name="email" value="@EMAIL@">'+
+          '<input type="hidden" name="title" value="{0}">'+
+          '<input type="hidden" name="bid" value="{1}">'+
+          '<input type="hidden" name="location" value="{4}">'+
+          '<input type="hidden" name="description" value="{5}">'+
+          '<input type="hidden" name="expiration" value="{2}">'+
+          '<input type="hidden" name="email" value="{3}">'+
           '</form> </div>';
 
       infowindow = new google.maps.InfoWindow({
@@ -90,12 +101,7 @@
       for (var i = 0; i < stubrequests.length; i++) {
         var request = stubrequests[i];
         var myLatLng = new google.maps.LatLng(request[6], request[7]);
-        var info = contentString.replace("@TITLE@", request[0]);
-        info = info.replace("@LOCATION@", request[1]);
-        info = info.replace("@BID@", request[2]);
-        info = info.replace("@EXPIRATION@", request[3]);
-        info = info.replace("@DETAILS@", request[4]);
-        info = info.replace("@EMAIL@", request[5]);
+        var info = contentString.format(request[0], request[2], request[3], request[5], request[1], request[4]);
         var marker = new google.maps.Marker({
           position: myLatLng,
           map: map,
@@ -116,7 +122,7 @@
   <body>
     <div id="header">
       <div id="title"> WamBam! </div>
-      <div id="description"> Drop a pin where you need something. </div>
+      <div id="description"> Claim a task and become a WamBam! </div>
     </div>
     <div id="map-canvas"></div>
     <div id="buttonbar">

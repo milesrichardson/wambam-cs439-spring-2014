@@ -67,6 +67,9 @@ login_manager.token_loader(_token_loader)
 def hello():
     return 'Hello World'
 
+@app.route('/get_all_active_tasks')
+def tasks_for_requestor():
+    return flask.jsonify(items=schema.Task.query.filter_by(status='unassigned').all())
 
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):

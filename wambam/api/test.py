@@ -27,17 +27,6 @@ class Account(db.Model):
     fulfiller_tasks = db.relationship('Task', secondary=account_task,
                             backref=db.backref('acounts', lazy='dynamic'))
 
-    @property
-    def serialize(self):
-        return {
-            'id' : self.id
-            'phone' : self.phone
-            'online' : self.online
-            'first_name' = self.first_name
-            'last_name' = self.last_name
-
-            'fulfiller_tasks' = 
-
 
 
 class Task(db.Model):
@@ -55,25 +44,7 @@ class Task(db.Model):
     fulfiller_accounts = db.relationship('Account', secondary=account_task,
                             backref=db.backref('tasks', lazy='dynamic'))
 
-    @property
-    def serialize(self):
-        """Return object data in easily serializeable format"""
-        return {
-            'id' : self.id,
-            'requestor_id' : self.requestor.id
-            'coordinates' : self.coordinates
-            'short_title' : self.short_title
-            'long_title' : self.long_title
-            'bid' : self.bid
-            'expiration_datetime' : dump_datetime(self.expiration_datetime)
-            'status' : self.status
-            'fulfiller_accounts' = self.serialize_fulfiller_accounts
-            }
-
-    @property
-    def serialize_fulfiller_accounts(self):
-        return [account.serialize for account in self.fulfiller_accounts]
-        
+   
 
 # Create the database tables.
 db.create_all()
@@ -138,9 +109,7 @@ def hello():
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
     response = ''
-<    return flask.jsonify(items=Task.query.filter_by(requestor_id=requestor).all())
-    
-
+    return flask.jsonify(items=Task.query.filter_by(requestor_id=requestor).all())
 
 # start the flask loop
 app.run()
