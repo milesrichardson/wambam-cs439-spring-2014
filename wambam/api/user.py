@@ -8,14 +8,3 @@ class User(login.UserMixin):
         self.authenticated = authenticated
         self.active = active
 
-    def is_active(self):
-        return self.active
-
-    def is_anonymous(self):
-        return False
-
-    def is_authenticated(self):
-        return authenticated
-
-    def set_authenticated(self, authenticated):
-        self.authenticated = authenticated

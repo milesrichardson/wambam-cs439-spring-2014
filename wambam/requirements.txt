@@ -1,11 +1,14 @@
 Flask==0.10.1
+Flask-Login==0.2.9
 Flask-Restless==0.12.1
 Flask-SQLAlchemy==1.0
 Jinja2==2.7.2
 MarkupSafe==0.18
 SQLAlchemy==0.9.2
 Werkzeug==0.9.4
+argparse==1.2.1
 itsdangerous==0.23
+passlib==1.6.2
 python-dateutil==2.2
 six==1.5.2
 wsgiref==0.1.2

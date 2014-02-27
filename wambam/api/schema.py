@@ -2,6 +2,7 @@ import flask
 import flask.ext.sqlalchemy
 import flask.ext.restless
 
+from passlib.apps import custom_app_context
 
 user_task = None
 Account = None
@@ -23,10 +24,13 @@ def create_account_table(db):
     global Account
     class Account(db.Model):
         id = db.Column(db.Integer, primary_key=True)
+        password_hash = db.Column(db.String(255))
+        email = db.Column(db.String(255), unique=True)
         phone = db.Column(db.String(20))
         online = db.Column(db.Boolean)
         first_name = db.Column(db.String(255))
         last_name = db.Column(db.String(255))
+        
         
         fulfiller_tasks = db.relationship('Task', secondary=account_task,
                                           backref=db.backref('accounts', lazy='dynamic'))
@@ -51,10 +55,42 @@ def create_account_table(db):
         @property
         def serialize_fulfiller_tasks(self):
             return [account.serialize_id for account in self.fulfiller_accounts]
-              
         
+        def generate_auth_token(self, expiration=600):
+            s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+            token = s.dumps({'id':self.id})
+            return token
 
-         
+        @staticmethod
+        def verify_auth_token(token):
+            s = Serializer(app.config['SECRET_KEY'])
+            try:
+                data = s.loads(token)
+            except SignatureExpired:
+                return None
+            except BadSignature:
+                return None
+            return Account.query.get(data['id'])
+            
+
+        def is_active(self):
+            return True
+
+        def is_anonymous(self):
+            return False
+
+        def is_authenticated(self):
+            return True
+        
+        def get_id(self):
+            return self.id
+
+        def hash_password(self, password):
+            self.password_hash = custom_app_context.encrypt(password)
+
+        def verify_password(self, password):
+            return password == self.password
+
 
 
 def create_task_table(db):
