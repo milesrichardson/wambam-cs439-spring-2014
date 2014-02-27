@@ -1,10 +1,10 @@
 import flask
 import flask.ext.sqlalchemy
 import flask.ext.restless
-import uuid
 import flask.ext.login
+import uuid
 
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+import login
 import schema
 
 def create_app():
@@ -21,7 +21,7 @@ def create_database(app):
     
     # get the database object
     db = flask.ext.sqlalchemy.SQLAlchemy(app)
-    schema.create_tables(db)
+    schema.create_tables(app, db)
 
     # Create the database tables.
     db.create_all()
@@ -50,17 +50,7 @@ app.config['SECRET_KEY'] = 'WaMbAm'
 
 db = create_database(app)
 api_manager = create_api(app,db)
-login_manager = flask.ext.login.LoginManager()
-login_manager.init_app(app)
-
-def _token_loader(token):
-    try:
-        user = schema.Account.verify_auth_token(token)
-        return user
-    except:
-        pass
-
-login_manager.token_loader(_token_loader)
+login_manager = login.create_login_manager(app)
 
 @app.route('/')
 @flask.ext.login.login_required
@@ -68,7 +58,7 @@ def hello():
     return 'Hello World'
 
 @app.route('/get_all_active_tasks')
-def tasks_for_requestor():
+def get_all_active_tasks():
     return flask.jsonify(items=schema.Task.query.filter_by(status='unassigned').all())
 
 @app.route('/tasks_for_requestor/<int:requestor>')
@@ -79,22 +69,6 @@ def tasks_for_requestor(requestor):
 def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=data)
-
-@app.route('/api/token', methods=['POST'])
-def token_api():
-
-    email = flask.request.values.get('email')
-    password = flask.request.values.get('password')
-
-    return email + ' ' + password
-    user = schema.Account.query.filter_by(email=email).filter_by(password_hash=password).first()
-    if user is None:
-        flask.abort(401)
-    else:
-        token = user.generate_auth_token()
-        
-    return token
-
 
 # start the flask loop
 app.run()
