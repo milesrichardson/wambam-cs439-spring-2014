@@ -2,11 +2,12 @@ import flask
 import flask.ext.sqlalchemy
 import flask.ext.restless
 
-from passlib.apps import custom_app_context
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 user_task = None
 Account = None
 Task = None
+app = None
 
 # a join table used for matching the fulfilling users and tasks
 def create_account_task_join_table(db):
@@ -56,8 +57,8 @@ def create_account_table(db):
         def serialize_fulfiller_tasks(self):
             return [account.serialize_id for account in self.fulfiller_accounts]
         
-        def generate_auth_token(self, expiration=600):
-            s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+        def get_auth_token(self):
+            s = Serializer(app.config['SECRET_KEY'], expires_in=600)
             token = s.dumps({'id':self.id})
             return token
 
@@ -96,7 +97,6 @@ def dump_datetime(value):
     if value is None:
         return None
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
-
 
 def create_task_table(db):
     global Task
@@ -143,7 +143,9 @@ def create_task_table(db):
             return [account.serialize_id for account in self.fulfiller_accounts]
         
 
-def create_tables(db):
+def create_tables(application, db):
+    global app
+    app = application
     create_account_task_join_table(db)
     create_account_table(db)
     create_task_table(db)

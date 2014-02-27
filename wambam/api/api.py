@@ -1,11 +1,11 @@
 import flask
 import flask.ext.sqlalchemy
 import flask.ext.restless
-import uuid
 import flask.ext.login
+import uuid
 from flask import session, request, redirect, url_for
 
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+import login
 import schema
 from wambam import app
 
@@ -23,7 +23,7 @@ def create_database(app):
     
     # get the database object
     db = flask.ext.sqlalchemy.SQLAlchemy(app)
-    schema.create_tables(db)
+    schema.create_tables(app, db)
 
     # Create the database tables.
     db.create_all()
@@ -54,18 +54,7 @@ def create_api(app, db):
 
 db = create_database(app)
 api_manager = create_api(app,db)
-login_manager = flask.ext.login.LoginManager()
-login_manager.init_app(app)
-
-def _token_loader(token):
-    try:
-        user = schema.Account.verify_auth_token(token)
-        return user
-    except:
-        pass
-
-
-login_manager.token_loader(_token_loader)
+login_manager = login.create_login_manager(app)
 
 @app.route('/get_all_active_tasks')
 def get_all_active_tasks():
@@ -79,21 +68,6 @@ def tasks_for_requestor(requestor):
 def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=data)
-
-@app.route('/api/token', methods=['POST'])
-def token_api():
-
-    email = flask.request.values.get('email')
-    password = flask.request.values.get('password')
-
-    return email + ' ' + password
-    user = schema.Account.query.filter_by(email=email).filter_by(password_hash=password).first()
-    if user is None:
-        flask.abort(401)
-    else:
-        token = user.generate_auth_token()
-        
-    return token
 
 @app.route("/submittask", methods=['POST'])
 def submit():
@@ -124,5 +98,28 @@ def submit():
     app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
 
-app.jinja_env.globals.update(get_all_active_tasks=get_all_active_tasks)
+@app.route("/claimtask", methods=['POST'])
+def claim():
+
+    fulfiller = scheme.Account(
+        phone="3213214321",
+        online=True,
+        first_name="Will",
+        last_name="CK")
+    task = 1 #request.form['id']
+
+    # add entry to account_task table
+    claimed_task = schema.account_task(
+        account_id = 1, #fulfiller.id in later versions
+        task_id = task,
+        status = 'inactive' # inactive immediately for v0
+        ) 
+    
+    # update task table
+    temp = schema.Account.query.filter_by(id=int(task)).first()
+    temp.status = 'completed'
+
+    # add and commit changes
+    db.session.add(claimed_task)
+    db.session.commit()
 
