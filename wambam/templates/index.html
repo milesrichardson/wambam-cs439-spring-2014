@@ -61,6 +61,8 @@
           else {
             marker.setPosition(e.latLng);
           }
+          $("#lat").val(e.latLng.lat());
+          $("#lng").val(e.latLng.lng())
         });
       setMapSize();
       }
@@ -75,8 +77,10 @@
     </div>
     <div id="map-canvas"></div>
     <div id="buttonbar">
-      <form id="form" action="/addtask">
-        <input id="button" type="submit" value="Get it done" style="display: none" /> 
+      <form id="form" action="/addtask" method="POST">
+        <input type="hidden" id="lat" name="lat" type="text" />
+        <input type="hidden" id="lng" name="lng" type="text" />
+        <input onClick="addtask()" id="button" type="submit" value="Get it done" style="display: none" /> 
       </form>
       <form id="form" action="/working">
         <input id="button" type="submit" value="I want to work!">

@@ -1,10 +1,14 @@
 from flask import Flask
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, session
 from flask import render_template
 from flask_mail import Message
 from flask_mail import Mail
+import json
+import requests
 
-app = Flask(__name__)
+from wambam import app
+
+app.secret_key="wambam"
 
 app.config.update(dict(
     DEBUG = True,
@@ -55,18 +59,15 @@ def register():
 
     return redirect(url_for('home'))
       
-@app.route("/addtask")
+@app.route("/addtask", methods=['POST'])
 def index():
-    return render_template('addtask.html')
+    session['lat'] = request.form['lat']
+    session['lng'] = request.form['lng']
+    return redirect(url_for('construct'))
 
-@app.route("/submittask", methods=['POST'])
-def submit():
-    title = request.form['title']
-    location = request.form['deliveryloc']
-    bid = request.form['bid']
-    expiration = request.form['expiration']
-    description = request.form['description']
-    return redirect(url_for('confirm'))
+@app.route("/constructtask")
+def construct():
+    return render_template('addtask.html')
 
 @app.route("/dotask")
 def execute():
@@ -74,12 +75,14 @@ def execute():
 
 @app.route("/confirmWamBam", methods=['GET', 'POST'])
 def wambam():
+
     title = request.form['title']
     location = request.form['location']
     bid = request.form['bid']
     expiration = request.form['expiration']
     description = request.form['description']
     email = request.form['email']
+
     return render_template('confirmationwambam.html',
                             title=title,
                             location=location,

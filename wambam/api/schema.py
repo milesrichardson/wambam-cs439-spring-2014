@@ -92,12 +92,18 @@ def create_account_table(db):
         def verify_password(self, password):
             return password == self.password
 
+def dump_datetime(value):
+    """Deserialize datetime object into string form for JSON processing."""
+    if value is None:
+        return None
+    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
 
 def create_task_table(db):
     global Task
     class Task(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         requestor_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+        requestor_id = db.Column(db.Integer)
         coordinates = db.Column(db.String(255))
         short_title = db.Column(db.String(255))
         long_title = db.Column(db.Text)
@@ -110,6 +116,7 @@ def create_task_table(db):
         fulfiller_accounts = db.relationship('Account', secondary=account_task,
                                           backref=db.backref('tasks', lazy='dynamic'))
 
+
         @property
         def serialize_id(self):
             return {
@@ -120,15 +127,15 @@ def create_task_table(db):
         def serialize(self):
             #Return object data in easily serializeable format
             return {
-                'id' : self.id,
-                'requestor_id' : self.requestor.id,
+                'id' : str(self.id),
+                'requestor_id' : self.requestor_id,
                 'coordinates' : self.coordinates,
                 'short_title' : self.short_title,
                 'long_title' : self.long_title,
-                'bid' : self.bid,
+                'bid' : str(self.bid),
                 'expiration_datetime' : dump_datetime(self.expiration_datetime),
                 'status' : self.status,
-                'fulfiller_accounts' : self.serialize_fulfiller_accounts
+   #             'fulfiller_accounts' : self.serialize_fulfiller_accounts
                 }
 
         @property

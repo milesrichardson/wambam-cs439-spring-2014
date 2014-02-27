@@ -3,9 +3,10 @@ import flask.ext.sqlalchemy
 import flask.ext.restless
 import uuid
 
+from wambam import app
+
 # Create the Flask application and the Flask-SQLAlchemy object.
 db_name = uuid.uuid1().hex
-app = flask.Flask(__name__)
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + db_name + '.db'
 db = flask.ext.sqlalchemy.SQLAlchemy(app)
@@ -43,7 +44,6 @@ class Task(db.Model):
 
     fulfiller_accounts = db.relationship('Account', secondary=account_task,
                             backref=db.backref('tasks', lazy='dynamic'))
-
    
 
 # Create the database tables.
@@ -102,14 +102,7 @@ manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 manager.create_api(Account, methods=['GET', 'POST', 'DELETE'])
 manager.create_api(Task, methods=['GET', 'POST', 'DELETE'])
 
-@app.route('/')
-def hello():
-    return 'Hello World'
-
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
     response = ''
     return flask.jsonify(items=Task.query.filter_by(requestor_id=requestor).all())
-
-# start the flask loop
-app.run()
