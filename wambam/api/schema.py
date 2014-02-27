@@ -100,8 +100,6 @@ def create_task_table(db):
             return [account.serialize_id for account in self.fulfiller_accounts]
         
 
-        
-
 def create_tables(db):
     create_account_task_join_table(db)
     create_account_table(db)

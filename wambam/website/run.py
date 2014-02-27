@@ -1,10 +1,14 @@
 from flask import Flask
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, session
 from flask import render_template
 from flask_mail import Message
 from flask_mail import Mail
+import json
+import requests
 
-app = Flask(__name__)
+from wambam import app
+
+app.secret_key="wambam"
 
 app.config.update(dict(
     DEBUG = True,
@@ -55,17 +59,57 @@ def register():
 
     return redirect(url_for('home'))
       
-@app.route("/addtask")
+@app.route("/addtask", methods=['POST'])
 def index():
+    session['lat'] = request.form['lat']
+    session['lng'] = request.form['lng']
+    return redirect(url_for('construct'))
+
+@app.route("/constructtask")
+def construct():
     return render_template('addtask.html')
 
 @app.route("/submittask", methods=['POST'])
 def submit():
+    app.logger.debug("/submittask")
+    app.logger.debug("2 submittask")
+    if not ('lat' in session) or not ('lng' in session):
+        return redirect(url_for('working'))
+    app.logger.debug("3 submittask")
+    lat = session['lat']
+    app.logger.debug("4 submittask")
+    lng = session['lng']
+    app.logger.debug("5 submittask")
     title = request.form['title']
-    location = request.form['deliveryloc']
+    app.logger.debug("6 submittask")
+    location = request.form['location']
+    app.logger.debug("7 submittask")
     bid = request.form['bid']
+    app.logger.debug("8 submittask")
     expiration = request.form['expiration']
+    app.logger.debug("9 submittask")
     description = request.form['description']
+    app.logger.debug("10 submittask")
+
+    app.logger.debug("middle submittask")
+
+    task = {
+        'requestor_id': '42',
+        'coordinates': lat + ',' + 'long',
+        'short_title': title,
+        'long_title': description,
+        'bid': bid,
+        'expiration_datetime': None,
+        'status': 'unassigned'
+    }
+
+    r = requests.post('~/api/task', data=json.dumps(task),
+                       headers={'content-type': 'application/json'})
+    app.logger.debug(r)
+
+    session.clear()
+
+    app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
 
 @app.route("/dotask")
@@ -74,12 +118,14 @@ def execute():
 
 @app.route("/confirmWamBam", methods=['GET', 'POST'])
 def wambam():
+
     title = request.form['title']
     location = request.form['location']
     bid = request.form['bid']
     expiration = request.form['expiration']
     description = request.form['description']
     email = request.form['email']
+
     return render_template('confirmationwambam.html',
                             title=title,
                             location=location,

@@ -4,6 +4,7 @@ import flask.ext.restless
 import uuid
 
 import schema
+from wambam import app
 
 def create_app():
     return flask.Flask(__name__)
@@ -39,17 +40,11 @@ def create_api(app, db):
     return manager
         
 
-app = create_app()
 db = create_database(app)
 api_manager = create_api(app,db)
 
-
-@app.route('/')
-def hello():
-    return 'Hello World'
-
 @app.route('/get_all_active_tasks')
-def tasks_for_requestor():
+def get_all_active_tasks():
     return flask.jsonify(items=schema.Task.query.filter_by(status='unassigned').all())
 
 @app.route('/tasks_for_requestor/<int:requestor>')
@@ -60,8 +55,3 @@ def tasks_for_requestor(requestor):
 def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=data)
-
-
-    
-# start the flask loop
-app.run()
