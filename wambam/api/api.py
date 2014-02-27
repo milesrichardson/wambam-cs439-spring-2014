@@ -124,3 +124,5 @@ def submit():
     app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
 
+app.jinja_env.globals.update(get_all_active_tasks=get_all_active_tasks)
+
