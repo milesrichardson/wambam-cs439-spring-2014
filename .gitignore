@@ -1,3 +1,4 @@
 wambam/venv/*
 *~
 *.pyc
+*.swp
