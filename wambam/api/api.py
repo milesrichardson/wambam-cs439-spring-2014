@@ -113,3 +113,27 @@ def submit():
     app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
 
+@app.route("/claimtask", methods=['POST'])
+def claim():
+
+    fulfiller = scheme.Account(
+        phone="3213214321",
+        online=True,
+        first_name="Will",
+        last_name="CK")
+    task = 1 #request.form['id']
+
+    # add entry to account_task table
+    claimed_task = schema.account_task(
+        account_id = 1, #fulfiller.id in later versions
+        task_id = task,
+        status = 'inactive' # inactive immediately for v0
+        ) 
+    
+    # update task table
+    temp = schema.Account.query.filter_by(id=int(task)).first()
+    temp.status = 'completed'
+
+    # add and commit changes
+    db.session.add(claimed_task)
+    db.session.commit()
