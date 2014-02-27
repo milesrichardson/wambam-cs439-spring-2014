@@ -3,6 +3,7 @@ import flask.ext.sqlalchemy
 import flask.ext.restless
 import uuid
 import flask.ext.login
+from flask import session
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 import schema
@@ -44,9 +45,6 @@ def create_api(app, db):
     manager.create_api(schema.Account, methods=['GET', 'POST', 'DELETE', 'PATCH'])
     manager.create_api(schema.Task, methods=['GET', 'POST', 'DELETE'])
     return manager
-
-app = create_app()
-app.config['SECRET_KEY'] = 'WaMbAm'
 
 db = create_database(app)
 api_manager = create_api(app,db)
@@ -90,4 +88,34 @@ def token_api():
         token = user.generate_auth_token()
         
     return token
+
+@app.route("/submittask", methods=['POST'])
+def submit():
+    if not ('lat' in session) or not ('lng' in session):
+        return redirect(url_for('working'))
+
+    lat = session['lat']
+    lng = session['lng']
+    title = request.form['title']
+    location = request.form['location']
+    bid = request.form['bid']
+    expiration = request.form['expiration']
+    description = request.form['description']
+
+    task = {
+        'requestor_id': '42',
+        'coordinates': lat + ',' + 'long',
+        'short_title': title,
+        'long_title': description,
+        'bid': bid,
+        'expiration_datetime': None,
+        'status': 'unassigned'
+    }
+
+    db.session.add(task1)
+    db.commit()
+    session.clear()
+
+    app.logger.debug("end submittask")
+    return redirect(url_for('confirm'))
 

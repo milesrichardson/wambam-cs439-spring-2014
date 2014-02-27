@@ -69,49 +69,6 @@ def index():
 def construct():
     return render_template('addtask.html')
 
-@app.route("/submittask", methods=['POST'])
-def submit():
-    app.logger.debug("/submittask")
-    app.logger.debug("2 submittask")
-    if not ('lat' in session) or not ('lng' in session):
-        return redirect(url_for('working'))
-    app.logger.debug("3 submittask")
-    lat = session['lat']
-    app.logger.debug("4 submittask")
-    lng = session['lng']
-    app.logger.debug("5 submittask")
-    title = request.form['title']
-    app.logger.debug("6 submittask")
-    location = request.form['location']
-    app.logger.debug("7 submittask")
-    bid = request.form['bid']
-    app.logger.debug("8 submittask")
-    expiration = request.form['expiration']
-    app.logger.debug("9 submittask")
-    description = request.form['description']
-    app.logger.debug("10 submittask")
-
-    app.logger.debug("middle submittask")
-
-    task = {
-        'requestor_id': '42',
-        'coordinates': lat + ',' + 'long',
-        'short_title': title,
-        'long_title': description,
-        'bid': bid,
-        'expiration_datetime': None,
-        'status': 'unassigned'
-    }
-
-    r = requests.post('~/api/task', data=json.dumps(task),
-                       headers={'content-type': 'application/json'})
-    app.logger.debug(r)
-
-    session.clear()
-
-    app.logger.debug("end submittask")
-    return redirect(url_for('confirm'))
-
 @app.route("/dotask")
 def execute():
     return render_template('taskserver.html')
