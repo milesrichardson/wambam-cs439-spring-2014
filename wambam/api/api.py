@@ -69,21 +69,6 @@ def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=data)
 
-@app.route('/api/token', methods=['POST'])
-def token_api():
-
-    email = flask.request.values.get('email')
-    password = flask.request.values.get('password')
-
-    return email + ' ' + password
-    user = schema.Account.query.filter_by(email=email).filter_by(password_hash=password).first()
-    if user is None:
-        flask.abort(401)
-    else:
-        token = user.generate_auth_token()
-        
-    return token
-
 @app.route("/submittask", methods=['POST'])
 def submit():
     if not ('lat' in session) or not ('lng' in session):
