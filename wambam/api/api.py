@@ -3,7 +3,7 @@ import flask.ext.sqlalchemy
 import flask.ext.restless
 import uuid
 import flask.ext.login
-from flask import session
+from flask import session, request, redirect, url_for
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 import schema
@@ -28,8 +28,14 @@ def create_database(app):
     # Create the database tables.
     db.create_all()
 
-    a = schema.Account(email='hihihi', password_hash='')
-    db.session.add(a)
+    michael = schema.Account(
+    phone="7703629815",
+    email="michael.hopkins@yale.edu",
+    online=True,
+    first_name="Michael",
+    last_name="Hopkins")
+
+    db.session.add(michael)
     db.session.commit()
 
     return db
@@ -63,7 +69,7 @@ login_manager.token_loader(_token_loader)
 
 @app.route('/get_all_active_tasks')
 def get_all_active_tasks():
-    return flask.jsonify(items=schema.Task.query.filter_by(status='unassigned').all())
+    return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status='unassigned').all()])
 
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
@@ -102,18 +108,17 @@ def submit():
     expiration = request.form['expiration']
     description = request.form['description']
 
-    task = {
-        'requestor_id': '42',
-        'coordinates': lat + ',' + 'long',
-        'short_title': title,
-        'long_title': description,
-        'bid': bid,
-        'expiration_datetime': None,
-        'status': 'unassigned'
-    }
+    task = schema.Task(
+        requestor_id='1',
+        coordinates= lat + ',' + lng,
+        short_title=title,
+        long_title=description,
+        bid=float(bid),
+        expiration_datetime=None,
+        status='unassigned')
 
-    db.session.add(task1)
-    db.commit()
+    db.session.add(task)
+    db.session.commit()
     session.clear()
 
     app.logger.debug("end submittask")
