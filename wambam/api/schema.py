@@ -1,13 +1,15 @@
 import flask
 import flask.ext.sqlalchemy
 import flask.ext.restless
+import flask.ext.login
 
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import URLSafeTimedSerializer as Serializer
 
 user_task = None
 Account = None
 Task = None
-app = None
+token_serializer = None
+token_duration = None
 
 # a join table used for matching the fulfilling users and tasks
 def create_account_task_join_table(db):
@@ -58,21 +60,22 @@ def create_account_table(db):
             return [account.serialize_id for account in self.fulfiller_accounts]
         
         def get_auth_token(self):
-            s = Serializer(app.config['SECRET_KEY'], expires_in=600)
-            token = s.dumps({'id':self.id})
+            token = token_serializer.dumps([str(self.id), self.password_hash])
             return token
 
         @staticmethod
         def verify_auth_token(token):
-            s = Serializer(app.config['SECRET_KEY'])
             try:
-                data = s.loads(token)
+                data = token_serializer.loads(token, max_age=token_duration)
             except SignatureExpired:
                 return None
             except BadSignature:
                 return None
-            return Account.query.get(data['id'])
-            
+            user = Account.query.get(int(data[0]))
+            #make sure the passwords match
+            if user.verify_password(data[1]):
+                return user
+            return None
 
         def is_active(self):
             return True
@@ -90,7 +93,7 @@ def create_account_table(db):
             self.password_hash = custom_app_context.encrypt(password)
 
         def verify_password(self, password):
-            return password == self.password
+            return password == self.password_hash
 
 def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
@@ -143,9 +146,12 @@ def create_task_table(db):
             return [account.serialize_id for account in self.fulfiller_accounts]
         
 
-def create_tables(application, db):
-    global app
-    app = application
+def create_tables(app, db):
+    global token_serializer
+    token_serializer = Serializer(app.config['SECRET_KEY'])
+    global token_duration
+    token_duration = app.config['REMEMBER_COOKIE_DURATION'].total_seconds()
+
     create_account_task_join_table(db)
     create_account_table(db)
     create_task_table(db)

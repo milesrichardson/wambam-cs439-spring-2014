@@ -5,6 +5,9 @@ import flask.ext.login
 import uuid
 from flask import session, request, redirect, url_for
 
+import random
+import datetime
+
 import login
 import schema
 from wambam import app
@@ -31,6 +34,7 @@ def create_database(app):
     michael = schema.Account(
     phone="7703629815",
     email="michael.hopkins@yale.edu",
+    password_hash="blah",
     online=True,
     first_name="Michael",
     last_name="Hopkins")
@@ -51,6 +55,10 @@ def create_api(app, db):
     manager.create_api(schema.Account, methods=['GET', 'POST', 'DELETE', 'PATCH'])
     manager.create_api(schema.Task, methods=['GET', 'POST', 'DELETE'])
     return manager
+
+app.config['SECRET_KEY'] = str(random.SystemRandom().randint(0,1000000))
+app.config['REMEMBER_COOKIE_DURATION'] = datetime.timedelta(days=14)
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(seconds=10)
 
 db = create_database(app)
 api_manager = create_api(app,db)
@@ -97,6 +105,12 @@ def submit():
 
     app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
+
+@app.route("/protected")
+@flask.ext.login.login_required
+def protected():
+    return 'Hello World'
+
 
 @app.route("/claimtask", methods=['POST'])
 def claim():
