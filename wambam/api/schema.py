@@ -105,7 +105,6 @@ def create_task_table(db):
     class Task(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         requestor_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-        requestor_id = db.Column(db.Integer)
         latitude = db.Column(db.Float())
         longitude = db.Column(db.Float())
         delivery_location = db.Column(db.String(255))
