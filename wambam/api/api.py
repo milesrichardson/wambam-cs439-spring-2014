@@ -102,9 +102,11 @@ def submit():
     title = request.form['title']
     app.logger.debug(title)
     if not ('lat' in session):
-      app.logger.debug("hello")
+        app.logger.debug("hello")
     if not ('lat' in session):
-      app.logger.debug("hello2")
+        app.logger.debug("hello2")
+    if not ('request_time' in session):
+        app.logger.debug('hello3')
     if not ('lat' in session) or not ('lng' in session):
         app.logger.debug("No lat/lng for task")
         return redirect(url_for('working'))
@@ -130,7 +132,9 @@ def submit():
 
     db.session.add(task)
     db.session.commit()
-    session.clear()
+
+    del session['lat']
+    del session['lng']
 
     app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
@@ -139,19 +143,28 @@ def submit():
 def protected():
     return 'Hello World'
 
+
+def is_session_valid():
+    user = flask.ext.login.current_user
+    if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 30 < user.last_request:
+        return False
+    return True
+
 @app.before_request
 def before_request():
     user = flask.ext.login.current_user
-    if not (flask.request.path == '/' or flask.request.path == '/login'):
-        if user.is_anonymous():
+    if flask.request.path == '/' or flask.request.path == '/login':
+        if not user.is_anonymous() and is_session_valid():
+            return flask.redirect('/home')
+
+    else:
+        if user.is_anonymous() or not is_session_valid():
             return flask.redirect('/')
         else:
-            if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 30 < user.last_request:
-                return flask.redirect('/')
-            else:
-                user.last_request = int(time.time())
-                flask.session['request_time'] = user.last_request
-                db.session.commit()
+            #session is valid
+            user.last_request = int(time.time())
+            flask.session['request_time'] = user.last_request
+            db.session.commit()
 
     
 @app.route("/claimtask", methods=['POST'])
