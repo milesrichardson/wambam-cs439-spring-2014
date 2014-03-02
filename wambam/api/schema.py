@@ -20,7 +20,6 @@ def create_account_task_join_table(db):
                          # whether the user is assigned to fulfilling this task 
                          db.Column('status', db.Enum('active', 'inactive')),  
                          )
-     
 
 
 def create_account_table(db):
