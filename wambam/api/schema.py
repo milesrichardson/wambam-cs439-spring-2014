@@ -132,10 +132,10 @@ def create_task_table(db):
                 'coordinates' : self.coordinates,
                 'short_title' : self.short_title,
                 'long_title' : self.long_title,
-                'bid' : str(self.bid),
+                'bid' : "$%(bid).2f" % {"bid": self.bid},
                 'expiration_datetime' : dump_datetime(self.expiration_datetime),
                 'status' : self.status,
-   #             'fulfiller_accounts' : self.serialize_fulfiller_accounts
+                'fulfiller_accounts' : self.serialize_fulfiller_accounts
                 }
 
         @property
