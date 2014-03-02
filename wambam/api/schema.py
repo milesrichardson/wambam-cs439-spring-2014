@@ -27,12 +27,12 @@ def create_account_table(db):
     global Account
     class Account(db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        password_hash = db.Column(db.String(255))
-        email = db.Column(db.String(255), unique=True)
+        password_hash = db.Column(db.String(500))
+        email = db.Column(db.String(500), unique=True)
         phone = db.Column(db.String(20))
         online = db.Column(db.Boolean)
-        first_name = db.Column(db.String(255))
-        last_name = db.Column(db.String(255))
+        first_name = db.Column(db.String(500))
+        last_name = db.Column(db.String(500))
         
         
         fulfiller_tasks = db.relationship('Task', secondary=account_task,
@@ -107,8 +107,8 @@ def create_task_table(db):
         id = db.Column(db.Integer, primary_key=True)
         requestor_id = db.Column(db.Integer, db.ForeignKey('account.id'))
         requestor_id = db.Column(db.Integer)
-        coordinates = db.Column(db.String(255))
-        short_title = db.Column(db.String(255))
+        coordinates = db.Column(db.String(500))
+        short_title = db.Column(db.String(500))
         long_title = db.Column(db.Text)
         bid = db.Column(db.Float())
         expiration_datetime = db.Column(db.DateTime)

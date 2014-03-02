@@ -79,14 +79,22 @@ def tasks_for_fulfiller(fulfiller):
 
 @app.route("/submittask", methods=['POST'])
 def submit():
+    title = request.form['title']
+    app.logger.debug(title)
+    if not ('lat' in session):
+      app.logger.debug("hello")
+    if not ('lat' in session):
+      app.logger.debug("hello2")
     if not ('lat' in session) or not ('lng' in session):
         return redirect(url_for('working'))
 
     lat = session['lat']
     lng = session['lng']
-    title = request.form['title']
+    
+
     location = request.form['location']
     bid = request.form['bid']
+    bid = bid.replace("$","");
     expiration = request.form['expiration']
     description = request.form['description']
 
