@@ -99,11 +99,13 @@
             var title = activeTasks[i]["short_title"];
             var bid = activeTasks[i]["bid"];
             var expiration = activeTasks[i]["expiration_datetime"];
-            var email = "hi";
+            var email = "michael.hopkins@yale.edu";
             var requestor = activeTasks[i]["requestor_id"];
-//            $.get('api/account/' + requestor, function(data2) {
-//              email = data2["email"]
-//            });
+            $.ajax({url:'api/account/' + requestor, 
+                    success: function(data2) {
+                      email = data2["email"];
+                    }, 
+                    async: false});
             var location = activeTasks[i]["delivery_location"];
             var description = activeTasks[i]["long_title"];
             var lat = parseFloat(activeTasks[i]["latitude"]);
