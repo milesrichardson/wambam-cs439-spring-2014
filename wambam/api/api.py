@@ -73,6 +73,19 @@ db = create_database(app)
 api_manager = create_api(app,db)
 login_manager = login.create_login_manager(app, db)
 
+def add_user(user_data):
+
+    user = schema.Account(
+    phone=user_data["phone"],
+    email=user_data["email"],
+    password_hash=user_data["pwd"],
+    online=True,
+    first_name=user_data["first_name"],
+    last_name=user_data["last_name"])
+
+    db.session.add(user)
+    db.session.commit()
+
 @app.route('/get_all_tasks')
 def get_all_tasks():
     return flask.jsonify(items=[i.serialize for i in schema.Task.query.all()])
@@ -162,7 +175,7 @@ def is_session_valid():
 @app.before_request
 def before_request():
     user = flask.ext.login.current_user
-    if flask.request.path == '/' or flask.request.path == '/login':
+    if flask.request.path == '/' or flask.request.path == '/login' or flask.request.path == '/register':
         if not user.is_anonymous() and is_session_valid():
             return flask.redirect('/home')
 

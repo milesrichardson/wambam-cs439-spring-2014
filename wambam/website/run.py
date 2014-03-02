@@ -7,6 +7,7 @@ import json
 import requests
 
 from wambam import app
+import api
 
 app.secret_key="wambam"
 
@@ -45,17 +46,23 @@ def login():
 
 @app.route("/register", methods=['POST'])
 def register():
-    phone = request.form['phone']
-    email = request.form['email']
-    password = request.form['password']
+
+    user = {}
+    user["phone"] = request.form['phone'] 
+    user["email"] = request.form['email']
+    user["pwd"] = request.form['password']
+    user["first_name"] = "Michael"
+    user["last_name"] = "Hopkins"
     passwordconfirm = request.form['passwordconfirm']
 
     #Email client to complete registration
     msg = Message(subject="Complete Your WamBam! Registration",
-                  recipients=[email],
+                  recipients=[user["email"]],
                   body="Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home\r\n\r\nYours truly,\r\nThe WamBam! Team",
                   html="<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home<br><br>Yours truly,<br>The WamBam! Team</div>")
     mail.send(msg)
+
+    api.add_user(user)
 
     return redirect(url_for('home'))
       
