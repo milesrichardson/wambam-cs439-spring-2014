@@ -1,22 +1,22 @@
 import schema
 import flask.ext.login
 import sqlalchemy
+import time
 
 login_manager = None
+db = None
 
-def create_login_manager(app):
+def create_login_manager(app, db):
     global login_manager
     login_manager = flask.ext.login.LoginManager()
     login_manager.init_app(app)
 
     @login_manager.user_loader
     def load_user(userid):
-        print 'user_loader'
         return schema.Account.query.get(int(userid))
 
     @login_manager.token_loader
     def load_token(token):
-        print 'token_loader'
         try:
             user = schema.Account.verify_auth_token(token)
             return user
@@ -44,15 +44,23 @@ def create_login_manager(app):
                 flask.abort(401)
             else:
                 flask.ext.login.login_user(user, remember=True)
+                user.last_request = int(time.time())
+                flask.session['request_time'] = user.last_request
+                db.session.commit()
                 return flask.redirect(flask.request.args.get('next') or "/")
         else:
             return flask.abort(401)
 
     @app.route('/logout')
     def user_logout():
+        user = flask.ext.login.current_user
+        if not user.is_anonymous():
+            user.last_request = 0
+            db.session.commit()
         flask.ext.login.logout_user()
         return flask.redirect("/")
 
 #    app.config['REMEMBER_COOKIE_DOMAIN']='.'+app.config['SERVER_NAME']
     login_manager.login_view = '/login'
     return login_manager
+

@@ -7,6 +7,7 @@ from flask import session, request, redirect, url_for
 
 import random
 import datetime
+import time
 
 import login
 import schema
@@ -58,11 +59,10 @@ def create_api(app, db):
 
 app.config['SECRET_KEY'] = str(random.SystemRandom().randint(0,1000000))
 app.config['REMEMBER_COOKIE_DURATION'] = datetime.timedelta(days=14)
-app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(seconds=10)
 
 db = create_database(app)
 api_manager = create_api(app,db)
-login_manager = login.create_login_manager(app)
+login_manager = login.create_login_manager(app, db)
 
 @app.route('/get_all_active_tasks')
 def get_all_active_tasks():
@@ -107,11 +107,24 @@ def submit():
     return redirect(url_for('confirm'))
 
 @app.route("/protected")
-@flask.ext.login.login_required
 def protected():
     return 'Hello World'
 
+@app.before_request
+def before_request():
+    user = flask.ext.login.current_user
+    if not (flask.request.path == '/' or flask.request.path == '/login'):
+        if user.is_anonymous():
+            return flask.redirect('/')
+        else:
+            if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 30 < user.last_request:
+                return flask.redirect('/')
+            else:
+                user.last_request = int(time.time())
+                flask.session['request_time'] = user.last_request
+                db.session.commit()
 
+    
 @app.route("/claimtask", methods=['POST'])
 def claim():
 
@@ -136,4 +149,3 @@ def claim():
     # add and commit changes
     db.session.add(claimed_task)
     db.session.commit()
-

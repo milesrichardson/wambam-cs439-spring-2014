@@ -33,7 +33,7 @@ def create_account_table(db):
         online = db.Column(db.Boolean)
         first_name = db.Column(db.String(255))
         last_name = db.Column(db.String(255))
-        
+        last_request = db.Column(db.Integer, default=0)
         
         fulfiller_tasks = db.relationship('Task', secondary=account_task,
                                           backref=db.backref('accounts', lazy='dynamic'))
