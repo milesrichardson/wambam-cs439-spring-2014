@@ -17,8 +17,8 @@ def create_account_task_join_table(db):
     account_task = db.Table('account_task',
                          db.Column('account_id', db.Integer, db.ForeignKey('account.id')),
                          db.Column('task_id', db.Integer, db.ForeignKey('task.id')),
-                         db.Column('status', db.Enum('active', 'inactive')),  # whether the user is 
-                                                                              # assigned to fulfilling this task
+                         # whether the user is assigned to fulfilling this task 
+                         db.Column('status', db.Enum('active', 'inactive')),  
                          )
      
 
