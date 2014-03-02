@@ -72,7 +72,6 @@ def get_all_tasks():
 def get_all_active_tasks():
     return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status='unassigned').all()])
 
-
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
     return flask.jsonify(items=schema.Task.query.filter_by(requestor_id=requestor).all())
@@ -85,21 +84,13 @@ def tasks_for_fulfiller(fulfiller):
 @app.route("/submittask", methods=['POST'])
 def submit():
     title = request.form['title']
-    app.logger.debug(title)
-    if not ('lat' in session):
-        app.logger.debug("hello")
-    if not ('lat' in session):
-        app.logger.debug("hello2")
-    if not ('request_time' in session):
-        app.logger.debug('hello3')
     if not ('lat' in session) or not ('lng' in session):
         app.logger.debug("No lat/lng for task")
         return redirect(url_for('working'))
 
-    lat = session['lat']
-    lng = session['lng']
+    lat = float(session['lat'])
+    lng = float(session['lng'])
     
-
     location = request.form['location']
     bid = request.form['bid']
     bid = bid.replace("$","");
@@ -108,11 +99,13 @@ def submit():
 
     task = schema.Task(
         requestor_id='1',
-        coordinates= lat + ',' + lng,
+        latitude = lat,
+        longitude = lng,
         short_title=title,
         bid=float(bid),
         expiration_datetime=None,
         long_title=description,
+        delivery_location=location,
         status='unassigned')
 
     db.session.add(task)

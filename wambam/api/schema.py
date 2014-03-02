@@ -107,8 +107,10 @@ def create_task_table(db):
         id = db.Column(db.Integer, primary_key=True)
         requestor_id = db.Column(db.Integer, db.ForeignKey('account.id'))
         requestor_id = db.Column(db.Integer)
-        coordinates = db.Column(db.String(500))
-        short_title = db.Column(db.String(500))
+        latitude = db.Column(db.Float())
+        longitude = db.Column(db.Float())
+        delivery_location = db.Column(db.String(255))
+        short_title = db.Column(db.String(255))
         long_title = db.Column(db.Text)
         bid = db.Column(db.Float())
         expiration_datetime = db.Column(db.DateTime)
@@ -132,7 +134,9 @@ def create_task_table(db):
             return {
                 'id' : str(self.id),
                 'requestor_id' : self.requestor_id,
-                'coordinates' : self.coordinates,
+                'latitude' : str(self.latitude),
+                'longitude' : str(self.longitude),
+                'delivery_location' : self.delivery_location,
                 'short_title' : self.short_title,
                 'long_title' : self.long_title,
                 'bid' : "$%(bid).2f" % {"bid": self.bid},
