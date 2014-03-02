@@ -4,6 +4,7 @@ import flask.ext.restless
 import flask.ext.login
 
 from itsdangerous import URLSafeTimedSerializer as Serializer
+import datetime
 
 user_task = None
 Account = None
@@ -27,12 +28,12 @@ def create_account_table(db):
     global Account
     class Account(db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        password_hash = db.Column(db.String(500))
-        email = db.Column(db.String(500), unique=True)
+        password_hash = db.Column(db.String(255))
+        email = db.Column(db.String(255), unique=True)
         phone = db.Column(db.String(20))
         online = db.Column(db.Boolean)
-        first_name = db.Column(db.String(500))
-        last_name = db.Column(db.String(500))
+        first_name = db.Column(db.String(255))
+        last_name = db.Column(db.String(255))
         last_request = db.Column(db.Integer, default=0)
         
         fulfiller_tasks = db.relationship('Task', secondary=account_task,
@@ -99,7 +100,13 @@ def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
     if value is None:
         return None
-    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+    currentTime = datetime.datetime.now();
+    if (value.date() == currentTime.date()):
+        return value.strftime("%I:%M %p %Z")
+    elif ((value.date() - currentTime.date()).days < 7):
+        return value.strftime("%A %I:%M %p %Z")
+    
+    return value.strftime("%B %d, %Y")
 
 def create_task_table(db):
     global Task
@@ -107,8 +114,8 @@ def create_task_table(db):
         id = db.Column(db.Integer, primary_key=True)
         requestor_id = db.Column(db.Integer, db.ForeignKey('account.id'))
         requestor_id = db.Column(db.Integer)
-        coordinates = db.Column(db.String(500))
-        short_title = db.Column(db.String(500))
+        coordinates = db.Column(db.String(255))
+        short_title = db.Column(db.String(255))
         long_title = db.Column(db.Text)
         bid = db.Column(db.Float())
         expiration_datetime = db.Column(db.DateTime)

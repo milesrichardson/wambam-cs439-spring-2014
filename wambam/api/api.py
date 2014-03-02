@@ -8,6 +8,7 @@ from flask import session, request, redirect, url_for, render_template
 import random
 import datetime
 import time
+import json
 
 import login
 import schema
@@ -106,12 +107,26 @@ def submit():
     expiration = request.form['expiration']
     description = request.form['description']
 
+    # format for timedelta is (days, seconds, microseconds, 
+    # milliseconds, minutes, hours, weeks)
+    expirationdate = datetime.datetime.now()
+    app.logger.debug(expiration)
+    if (expiration == "30min"):
+        expirationdate += datetime.timedelta(0,0,0,0,30)
+    elif (expiration == "1hr"):
+        expirationdate += datetime.timedelta(0,0,0,0,0,1)
+        app.logger.debug("1 hour")
+    elif (expiration == "1day"):
+        expirationdate += datetime.timedelta(1)
+    elif (expiration == "1wk"):
+        expirationdate += datetime.timedelta(0,0,0,0,0,0,1)
+
     task = schema.Task(
         requestor_id='1',
         coordinates= lat + ',' + lng,
         short_title=title,
         bid=float(bid),
-        expiration_datetime=None,
+        expiration_datetime=expirationdate,
         long_title=description,
         status='unassigned')
 

@@ -57,6 +57,7 @@ def create_login_manager(app, db):
         if not user.is_anonymous():
             user.last_request = 0
             db.session.commit()
+        flask.session.clear() #VERY DANGEROUS, USE AT OWN RISK!
         flask.ext.login.logout_user()
         return flask.redirect("/")
 
