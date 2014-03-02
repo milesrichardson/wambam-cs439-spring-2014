@@ -4,6 +4,7 @@ import flask.ext.restless
 import flask.ext.login
 import uuid
 from flask import session, request, redirect, url_for, render_template
+from sqlalchemy import create_engine, select
 
 import random
 import datetime
@@ -13,10 +14,13 @@ import login
 import schema
 from wambam import app
 
+engine = None
+
 def create_app():
     return flask.Flask(__name__)
 
 def create_database(app):
+    global engine
     # Create the Flask application and the Flask-SQLAlchemy object
     
     # generate a new name for the database each time, for testing purposes
@@ -24,6 +28,10 @@ def create_database(app):
 
     app.config['DEBUG'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + db_name + '.db'
+
+    print app.config['SQLALCHEMY_DATABASE_URI']
+
+    engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     
     # get the database object
     db = flask.ext.sqlalchemy.SQLAlchemy(app)
@@ -72,6 +80,13 @@ def get_all_tasks():
 def get_all_active_tasks():
     return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status='unassigned').all()])
 
+@app.route('/get_all_claimed_tasks')
+def get_all_claimed_tasks():
+    conn = engine.connect()
+    query = select([schema.account_task])
+    results = conn.execute(query)
+
+    return flask.jsonify(items=[dict(i) for i in results])
 
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
@@ -156,16 +171,17 @@ def claim():
         first_name="Will",
         last_name="CK")
 
-    task = 1 #later on request.form['id']
+    task_num = 1 #later on request.form['id']
 
     # add entry to account_task table
-    schema.account_task.insert().values(account_id=fulfiller.id,
-                                        task_id=task, 
-                                        status='inactive' #inactive for v0
-                                        )
+    conn = engine.connect()
+    results = conn.execute(schema.account_task.insert(), 
+                           account_id=fulfiller.id, 
+                           task_id=task_num, 
+                           status='inactive')
     
     # update task table
-    temp = schema.Task.query.filter_by(id=int(task)).first()
+    temp = schema.Task.query.filter_by(id=int(task_num)).first()
     temp.status = 'completed'
 
     # add and commit changes
