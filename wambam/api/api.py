@@ -184,6 +184,7 @@ def claim():
         first_name="Will",
         last_name="CK")
 
+    #TODO: make task_num equal to the actual number of the task
     task_num = 1 #later on request.form['id']
 
     # add entry to account_task table
