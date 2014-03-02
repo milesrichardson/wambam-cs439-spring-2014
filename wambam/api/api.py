@@ -3,7 +3,7 @@ import flask.ext.sqlalchemy
 import flask.ext.restless
 import flask.ext.login
 import uuid
-from flask import session, request, redirect, url_for
+from flask import session, request, redirect, url_for, render_template
 
 import random
 import datetime
@@ -64,9 +64,14 @@ db = create_database(app)
 api_manager = create_api(app,db)
 login_manager = login.create_login_manager(app)
 
+@app.route('/get_all_tasks')
+def get_all_tasks():
+    return flask.jsonify(items=[i.serialize for i in schema.Task.query.all()])
+
 @app.route('/get_all_active_tasks')
 def get_all_active_tasks():
     return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status='unassigned').all()])
+
 
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
@@ -80,6 +85,7 @@ def tasks_for_fulfiller(fulfiller):
 @app.route("/submittask", methods=['POST'])
 def submit():
     if not ('lat' in session) or not ('lng' in session):
+        app.logger.debug("No lat/lng for task")
         return redirect(url_for('working'))
 
     lat = session['lat']
@@ -94,9 +100,9 @@ def submit():
         requestor_id='1',
         coordinates= lat + ',' + lng,
         short_title=title,
-        long_title=description,
         bid=float(bid),
         expiration_datetime=None,
+        long_title=description,
         status='unassigned')
 
     db.session.add(task)
@@ -115,25 +121,43 @@ def protected():
 @app.route("/claimtask", methods=['POST'])
 def claim():
 
-    fulfiller = scheme.Account(
+    title = request.form['title']
+    location = request.form['location']
+    bid = request.form['bid']
+    expiration = request.form['expiration']
+    description = request.form['description']
+    email = request.form['email']
+
+    fulfiller = schema.Account(
+        id=1,
         phone="3213214321",
         online=True,
         first_name="Will",
         last_name="CK")
-    task = 1 #request.form['id']
+
+    task = 1 #later on request.form['id']
 
     # add entry to account_task table
-    claimed_task = schema.account_task(
-        account_id = 1, #fulfiller.id in later versions
-        task_id = task,
-        status = 'inactive' # inactive immediately for v0
-        ) 
+    schema.account_task.insert().values(account_id=fulfiller.id,
+                                        task_id=task, 
+                                        status='inactive' #inactive for v0
+                                        )
     
     # update task table
-    temp = schema.Account.query.filter_by(id=int(task)).first()
+    temp = schema.Task.query.filter_by(id=int(task)).first()
     temp.status = 'completed'
 
     # add and commit changes
-    db.session.add(claimed_task)
+    db.session.add(temp)
     db.session.commit()
+    app.logger.debug("end claimtask")
+
+    return render_template('confirmationwambam.html',
+                            title = request.form['title'],
+                            location = request.form['location'],
+                            bid = request.form['bid'],
+                            expiration = request.form['expiration'],
+                            description = request.form['description'],
+                            email = request.form['email'],
+                            phone="770-362-9815")
 
