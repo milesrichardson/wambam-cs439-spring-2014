@@ -37,7 +37,7 @@
               <label id="label" for="title">Title</label>
             </td>
             <td>
-              <input type="text" name="title" id="title">
+              <input type="text" name="title" id="title" maxlength="127">
             </td>
             <td>
               <div id="titleerror"></div>
@@ -48,7 +48,7 @@
               <label id="label" for="location">Delivery Location</label>
             </td>
             <td>
-              <input type="text" name="location" id="location">
+              <input type="text" name="location" id="location" maxlength="127">
             </td>
             <td>
               <div id="locationerror"></div>
@@ -96,7 +96,7 @@
     <script src="http://jquery.bassistance.de/validate/additional-methods.js"></script>
     <script>
       jQuery.validator.addMethod("dollars", function(value) {
-		      return /^\$?[0-9]*(.[0-9]{2})?$/.test(value);
+		      return /^\$?([0-9]{0,9})((\.([0-9]{2}))?)$/.test(value);
 	      }, "Please specify a valid dollar amount"
       );
 
@@ -114,7 +114,6 @@
           }
         }, 
         errorPlacement: function(error, element) {
-            console.log("foo");
             if (element.attr("name") == "title" )
                 error.appendTo("#titleerror");
             else if  (element.attr("name") == "location" )
@@ -123,25 +122,6 @@
                 error.appendTo("#biderror");
         }
       });
-
-     /* jQuery.validator.setDefaults({
-          errorPlacement: function(error, element) {
-              $('#' + element.attr('id') + 'error').append("Hello");
-              error.appendTo('#' +element.attr('id') + 'error');
-          }
-      });*/
-
-    /*  $("#addtaskform").validate({
-          errorPlacement: function(error, element) {
-              console.log("foo");
-              if (element.attr("name") == "title" )
-                  error.appendTo("#titleerror");
-              else if  (element.attr("name") == "location" )
-                  error.appendTo("#locationerror");
-              else if  (element.attr("name") == "bid" )
-                  error.appendTo("#biderror");
-          }
-      });*/
 
       $.validator.messages.required = 'WamBam! needs this information!';
     </script>
