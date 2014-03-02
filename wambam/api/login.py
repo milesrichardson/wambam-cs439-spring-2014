@@ -47,7 +47,7 @@ def create_login_manager(app, db):
                 user.last_request = int(time.time())
                 flask.session['request_time'] = user.last_request
                 db.session.commit()
-                return flask.redirect(flask.request.args.get('next') or "/")
+                return flask.redirect(flask.request.args.get('next') or "/home")
         else:
             return flask.abort(401)
 
