@@ -22,7 +22,9 @@
       #registrationtable { text-align: left; margin-left: auto; margin-right: auto }
       #label { font-size: 20px }
       #phone, #email, #password, #passwordconfirm { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 20px }
+      #submitcol { text-align: center }
       #register{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-top: 20px }
+      label.error { color: red  }
     </style>
   </head>
   <body>
@@ -58,9 +60,11 @@
       </table>
     </div>
     <div id="registrationdiv">
-      <div id="registertitle"> New to WamBam!? </div>
-      <form action="/register" method="POST">
+      <form id="registerform" action="/register" method="POST">
         <table id="registrationtable">
+          <tr>
+            <td colspan="2"> <div id="registertitle"> New to WamBam!? </div> </td>
+          </tr>
           <tr>
             <td>
               <label id="label" for="phone">Phone Number</label>
@@ -105,32 +109,56 @@
               <div id="passwordconfirmerror"> </div>
             </td>
           </tr>
+          <tr>
+            <td id="submitcol" colspan="2"> <input type="submit" id="register" name="register" value="Register"></td>
+          </tr>
         </table>
-        <input type="submit" id="register" name="register" value="Register">
       </form>
     </div>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="http://jquery.bassistance.de/validate/jquery.validate.js"></script>
     <script src="http://jquery.bassistance.de/validate/additional-methods.js"></script>
     <script>
+      jQuery.validator.addMethod("passwordmatch", function(value) {
+		      return value === $("#password").val();
+	      }, "Passwords don't match."
+      );
 
-      $( "#addtaskform" ).validate({
+      $( "#registerform" ).validate({
         rules: {
           phone: {
-            required: true
+            required: true,
+            phoneUS: true
           },
           email: {
-            required: true
+            required: true,
+            email: true
           },
           password: {
             required: true
           },
-          confirmpassword: {
-            required: true
+          passwordconfirm: {
+            required: true,
+            passwordmatch: true
           },
+        }, 
+        errorPlacement: function(error, element) {
+            if (element.attr("name") == "phone" )
+                error.appendTo("#phoneerror");
+            else if  (element.attr("name") == "email" )
+                error.appendTo("#emailerror");
+            else if  (element.attr("name") == "password" )
+                error.appendTo("#passworderror");
+            else if  (element.attr("name") == "password" )
+                error.appendTo("#passworderror");
+            else if  (element.attr("name") == "passwordconfirm" )
+                error.appendTo("#passwordconfirmerror");
         }
       });
 
+      $.validator.messages.required = 'WamBam! needs this information!';
+      $.validator.messages.phoneUS = 'Please specify a valid phone number';
+      $.validator.messages.email = 'Please specify a valid email address';
     </script>
   </body>
 </html>
