@@ -98,14 +98,16 @@
           for (var i = 0; i < activeTasks.length; i++) {
             var title = activeTasks[i]["short_title"];
             var bid = activeTasks[i]["bid"];
-            var expiration = activeTasks[i]["expiration_datetime"]
-            console.log(expiration);
-            var email = "michael.hopkins@yale.edu";
-            var location = "Michael's room"; //add to task eventually
+            var expiration = activeTasks[i]["expiration_datetime"];
+            var email = "hi";
+            var requestor = activeTasks[i]["requestor_id"];
+//            $.get('api/account/' + requestor, function(data2) {
+//              email = data2["email"]
+//            });
+            var location = activeTasks[i]["delivery_location"];
             var description = activeTasks[i]["long_title"];
-            var coordinates = activeTasks[i]["coordinates"].split(",");
-            var lat = parseFloat(coordinates[0]);
-            var lng = parseFloat(coordinates[1]);
+            var lat = parseFloat(activeTasks[i]["latitude"]);
+            var lng = parseFloat(activeTasks[i]["longitude"]);
             var myLatLng = new google.maps.LatLng(lat, lng);
             var info = contentString.format(title,bid,expiration,email, location, description);
             var marker = new google.maps.Marker({

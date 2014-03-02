@@ -4,6 +4,7 @@ import flask.ext.restless
 import flask.ext.login
 import uuid
 from flask import session, request, redirect, url_for, render_template
+from sqlalchemy import create_engine, select
 
 import random
 import datetime
@@ -14,10 +15,13 @@ import login
 import schema
 from wambam import app
 
+engine = None
+
 def create_app():
     return flask.Flask(__name__)
 
 def create_database(app):
+    global engine
     # Create the Flask application and the Flask-SQLAlchemy object
     
     # generate a new name for the database each time, for testing purposes
@@ -25,6 +29,10 @@ def create_database(app):
 
     app.config['DEBUG'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + db_name + '.db'
+
+    print app.config['SQLALCHEMY_DATABASE_URI']
+
+    engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     
     # get the database object
     db = flask.ext.sqlalchemy.SQLAlchemy(app)
@@ -73,6 +81,13 @@ def get_all_tasks():
 def get_all_active_tasks():
     return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status='unassigned').all()])
 
+@app.route('/get_all_claimed_tasks')
+def get_all_claimed_tasks():
+    conn = engine.connect()
+    query = select([schema.account_task])
+    results = conn.execute(query)
+
+    return flask.jsonify(items=[dict(i) for i in results])
 
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
@@ -86,21 +101,13 @@ def tasks_for_fulfiller(fulfiller):
 @app.route("/submittask", methods=['POST'])
 def submit():
     title = request.form['title']
-    app.logger.debug(title)
-    if not ('lat' in session):
-        app.logger.debug("hello")
-    if not ('lat' in session):
-        app.logger.debug("hello2")
-    if not ('request_time' in session):
-        app.logger.debug('hello3')
     if not ('lat' in session) or not ('lng' in session):
         app.logger.debug("No lat/lng for task")
         return redirect(url_for('working'))
 
-    lat = session['lat']
-    lng = session['lng']
+    lat = float(session['lat'])
+    lng = float(session['lng'])
     
-
     location = request.form['location']
     bid = request.form['bid']
     bid = bid.replace("$","");
@@ -123,11 +130,13 @@ def submit():
 
     task = schema.Task(
         requestor_id='1',
-        coordinates= lat + ',' + lng,
+        latitude = lat,
+        longitude = lng,
         short_title=title,
         bid=float(bid),
         expiration_datetime=expirationdate,
         long_title=description,
+        delivery_location=location,
         status='unassigned')
 
     db.session.add(task)
@@ -184,16 +193,18 @@ def claim():
         first_name="Will",
         last_name="CK")
 
-    task = 1 #later on request.form['id']
+    #TODO: make task_num equal to the actual number of the task
+    task_num = 1 #later on request.form['id']
 
     # add entry to account_task table
-    schema.account_task.insert().values(account_id=fulfiller.id,
-                                        task_id=task, 
-                                        status='inactive' #inactive for v0
-                                        )
+    conn = engine.connect()
+    results = conn.execute(schema.account_task.insert(), 
+                           account_id=fulfiller.id, 
+                           task_id=task_num, 
+                           status='inactive')
     
     # update task table
-    temp = schema.Task.query.filter_by(id=int(task)).first()
+    temp = schema.Task.query.filter_by(id=int(task_num)).first()
     temp.status = 'completed'
 
     # add and commit changes
