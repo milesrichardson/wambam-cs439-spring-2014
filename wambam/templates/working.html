@@ -60,7 +60,7 @@
 	         }
 	       ]});
 
-     var contentString = '<div style="text-align: center ">'+
+     var contentString = '<div style="text-align: center; ">'+
           '<h1> {0} ({1}) </h1>'+
           '<table> <tr>'+
           '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px">Requester Email:</td>'+
@@ -70,12 +70,12 @@
           '<td style="text-align: left; padding-left: 10px">{4}</td>'+
           '</tr> <tr>'+
           '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px">Expires:</td>'+
-          '<td style="text-align: left; padding-left: 10px">{2}</td>'+
+          '<td style="text-align: left; padding-left: 10px;">{2}</td>'+
           '</tr> <tr>'+
-          '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px"> <br> Details:</td>'+
+          '<td style="text-align: left; font-weight: bold; border: 0px; margin: 0px; padding: 0px; padding-top:20px"> Details:</td>'+
           '</tr><td style="text-align: left;" colspan="2"> {5}'+
 '</td> </tr> </table>'+ 
-          '<form action="/confirmWamBam" method="POST">'+
+          '<form action="/claimtask" method="POST">'+
           '<input type="submit" value="Claim" style="height: 30px; width: 75px; font-size:15px; color: white; background: #0F4D92; text-align: center">'+
           '<input type="hidden" name="title" value="{0}">'+
           '<input type="hidden" name="bid" value="{1}">'+
@@ -90,6 +90,7 @@
             maxWidth: 400
       });
 
+      setMapSize();
 
       $.get('get_all_active_tasks', function(data) {
           var activeTasks = data["items"];
@@ -122,7 +123,6 @@
     }
 
     google.maps.event.addDomListener(window, 'load', initialize);
-    setMapSize();
 /*
 [
         ['GHeav Sandwich', 'Calhoun A31', '$10', '1 hour', 'Bring me a sandwich from GHeav with turkey, lettuce, tomato, cheese, and NO MAYO.', 'aayush.upadhyay@yale.edu', 41.3101, -72.9277],

@@ -17,8 +17,8 @@ def create_account_task_join_table(db):
     account_task = db.Table('account_task',
                          db.Column('account_id', db.Integer, db.ForeignKey('account.id')),
                          db.Column('task_id', db.Integer, db.ForeignKey('task.id')),
-                         db.Column('status', db.Enum('active', 'inactive')),  # whether the user is 
-                                                                              # assigned to fulfilling this task
+                         # whether the user is assigned to fulfilling this task 
+                         db.Column('status', db.Enum('active', 'inactive')),  
                          )
      
 
@@ -135,10 +135,10 @@ def create_task_table(db):
                 'coordinates' : self.coordinates,
                 'short_title' : self.short_title,
                 'long_title' : self.long_title,
-                'bid' : str(self.bid),
+                'bid' : "$%(bid).2f" % {"bid": self.bid},
                 'expiration_datetime' : dump_datetime(self.expiration_datetime),
                 'status' : self.status,
-   #             'fulfiller_accounts' : self.serialize_fulfiller_accounts
+                'fulfiller_accounts' : self.serialize_fulfiller_accounts
                 }
 
         @property
