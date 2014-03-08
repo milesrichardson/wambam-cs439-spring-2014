@@ -21,7 +21,7 @@
       #registertitle { text-align: center; font-size: 40px; margin-bottom: 20px }
       #registrationtable { text-align: left; margin-left: auto; margin-right: auto }
       #label { font-size: 20px }
-      #phone, #email, #password, #passwordconfirm { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 20px }
+      #firstname, #lastname, #phone, #email, #password, #passwordconfirm { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 20px }
       #submitcol { text-align: center }
       #register{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-top: 20px }
       label.error { color: red  }
@@ -64,6 +64,28 @@
         <table id="registrationtable">
           <tr>
             <td colspan="2"> <div id="registertitle"> New to WamBam!? </div> </td>
+          </tr>
+	  <tr>
+            <td>
+              <label id="label" for="firstname">First Name</label>
+            </td>
+            <td>
+              <input type="text" name="firstname" id="firstname">
+            </td>
+            <td>
+              <div id="firstname_error"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label id="label" for="lastname">Last Name</label>
+            </td>
+            <td>
+              <input type="text" name="lastname" id="lastname">
+            </td>
+            <td>
+              <div id="lastname_error"> </div>
+            </td>
           </tr>
           <tr>
             <td>
@@ -119,20 +141,66 @@
     <script src="http://jquery.bassistance.de/validate/jquery.validate.js"></script>
     <script src="http://jquery.bassistance.de/validate/additional-methods.js"></script>
     <script>
-      jQuery.validator.addMethod("passwordmatch", function(value) {
-		      return value === $("#password").val();
-	      }, "Passwords don't match."
+
+      jQuery.validator.addMethod("passwordmatch",
+        function(value) {
+          return value === $("#password").val();
+        }, "Passwords don't match."
+      );
+      jQuery.validator.addMethod("emailused",
+        function(value) {
+          var email_used = false;
+          var post_data = {};
+          post_data['email'] = value
+          $.ajax({
+            url: 'check_email',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(post_data),
+            async: false,
+            success: function(data) {
+               email_used = (data["used"] === 'True');
+          }});
+          return !email_used;
+        }, "Email address is already registered."
+      );
+      jQuery.validator.addMethod("phoneused",
+        function(value) {
+          var phone_used = false;
+          var post_data = {};
+          post_data['phone'] = value
+          $.ajax({
+            url: 'check_phone',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(post_data),
+            async: false,
+            success: function(data) {
+               phone_used = (data["used"] === 'True');
+          }});
+          return !phone_used;
+        }, "Phone number is already registered."
       );
 
       $( "#registerform" ).validate({
         rules: {
+          firstname: {
+            required: true,
+            lettersonly: true
+          },
+          lastname: {
+            required: true,
+            lettersonly: true
+          },
           phone: {
             required: true,
-            phoneUS: true
+            phoneUS: true,
+            phoneused: true
           },
           email: {
             required: true,
-            email: true
+            email: true,
+            emailused: true
           },
           password: {
             required: true
@@ -143,7 +211,11 @@
           },
         }, 
         errorPlacement: function(error, element) {
-            if (element.attr("name") == "phone" )
+            if (element.attr("name") == "firstname" )
+                error.appendTo("#firstname_error");
+            else if (element.attr("name") == "lastname" )
+                error.appendTo("#lastname_error");
+            else if (element.attr("name") == "phone" )
                 error.appendTo("#phoneerror");
             else if  (element.attr("name") == "email" )
                 error.appendTo("#emailerror");

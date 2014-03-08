@@ -32,11 +32,14 @@ def create_login_manager(app, db):
                 username = data['userfield']
                 password = data['passwordfield']
                 remember = True
-            else:
+            elif 'userfield' in flask.request.form:
                 username = flask.request.form['userfield']
                 password = flask.request.form['passwordfield']
                 if 'rememberfield' in flask.request.form:
                     remember = True
+            else:
+                username = flask.request.form['email']
+                password = flask.request.form['password']
                     
             user = schema.Account.query.filter(sqlalchemy.or_(schema.Account.email==username, schema.Account.phone==username)).filter_by(password_hash=password).first()
                     

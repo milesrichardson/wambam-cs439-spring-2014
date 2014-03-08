@@ -11,6 +11,8 @@ import datetime
 import time
 import json
 
+import phonenumbers
+
 import login
 import schema
 from wambam import app
@@ -75,8 +77,11 @@ login_manager = login.create_login_manager(app, db)
 
 def add_user(user_data):
 
+    number_object = phonenumbers.parse(user_data["phone"], "US")
+    number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
+
     user = schema.Account(
-    phone=user_data["phone"],
+    phone=number_formatted,
     email=user_data["email"],
     password_hash=user_data["pwd"],
     online=True,
@@ -174,6 +179,9 @@ def is_session_valid():
 
 @app.before_request
 def before_request():
+    if flask.request.path == '/check_email' or flask.request.path == '/check_phone':
+        return None
+
     user = flask.ext.login.current_user
     if flask.request.path == '/' or flask.request.path == '/login' or flask.request.path == '/register':
         if not user.is_anonymous() and is_session_valid():
@@ -234,3 +242,13 @@ def claim():
                             description = request.form['description'],
                             email = request.form['email'],
                             phone="770-362-9815")
+
+def is_email_used(email):
+    result = schema.Account.query.filter_by(email=email).first() is not None
+    return flask.jsonify(used=str(result))
+
+def is_phone_used(phone):
+    number_object = phonenumbers.parse(phone, "US")
+    number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
+    result = schema.Account.query.filter_by(phone=number_formatted).first() is not None
+    return flask.jsonify(used=str(result))

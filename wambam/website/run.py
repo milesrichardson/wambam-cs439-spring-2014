@@ -44,15 +44,25 @@ def login():
     password = request.form['passwordfield']
     return redirect(url_for('home'))
 
+@app.route("/check_email", methods=['POST'])
+def check_email():
+    email = request.get_json()['email']
+    return api.is_email_used(email)
+
+@app.route("/check_phone", methods=['POST'])
+def check_phone():
+    phone = request.get_json()['phone']
+    return api.is_phone_used(phone)
+
 @app.route("/register", methods=['POST'])
 def register():
 
     user = {}
-    user["phone"] = request.form['phone'] 
+    user["phone"] = request.form['phone']
     user["email"] = request.form['email']
     user["pwd"] = request.form['password']
-    user["first_name"] = "Michael"
-    user["last_name"] = "Hopkins"
+    user["first_name"] = request.form['firstname']
+    user["last_name"] = request.form['lastname']
     passwordconfirm = request.form['passwordconfirm']
 
     #Email client to complete registration
@@ -64,7 +74,7 @@ def register():
 
     api.add_user(user)
 
-    return redirect(url_for('home'))
+    return redirect('/login', code=307)
       
 @app.route("/addtask", methods=['POST'])
 def index():
