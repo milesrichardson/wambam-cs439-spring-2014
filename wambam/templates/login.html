@@ -4,7 +4,12 @@
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <style> fib
+    <style>
+      input, select, textarea {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+      }
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0; border: 0 }
       #header { width: 100%; background: #0F4D92; padding-top: 15px; padding-bottom: 15px}
@@ -21,7 +26,7 @@
       #registertitle { text-align: center; font-size: 40px; margin-bottom: 20px }
       #registrationtable { text-align: left; margin-left: auto; margin-right: auto }
       #label { font-size: 20px }
-      #firstname, #lastname, #phone, #email, #password, #passwordconfirm { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 20px }
+      #firstname, #lastname, #phone, #phonecarrier, #email, #password, #passwordconfirm { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 20px }
       #submitcol { text-align: center }
       #register{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-top: 20px }
       label.error { color: red  }
@@ -96,6 +101,23 @@
             </td>
             <td>
               <div id="phoneerror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label id="label" for="phonecarrier">Phone Carrier</label>
+            </td>
+            <td>
+              <select id="phonecarrier" name="phonecarrier" form="registerform">
+                <option selected="selected" value="AT&T">AT&T</option>
+                <option value="Boost Mobile">Boost Mobile</option>
+                <option value="MetroPCS">MetroPCS</option>
+                <option value="Sprint">Sprint</option>
+                <option value="T-Mobile">T-Mobile</option>
+                <option value="U.S. Cellular">U.S. Cellular</option>
+                <option value="Virgin Mobile">Virgin Mobile</option>
+                <option value="Verizon Wireless">Verizon Wireless</option>
+              </select>
             </td>
           </tr>
           <tr>

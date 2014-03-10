@@ -58,7 +58,11 @@ def check_phone():
 def register():
 
     user = {}
+    app.logger.debug("Before adding phone after registration")    
     user["phone"] = request.form['phone']
+    app.logger.debug("Before adding pc after registration")    
+    user["phone_carrier"] = request.form['phonecarrier']
+    app.logger.debug("Before adding email after registration")    
     user["email"] = request.form['email']
     user["pwd"] = request.form['password']
     user["first_name"] = request.form['firstname']
@@ -71,6 +75,8 @@ def register():
                   body="Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home\r\n\r\nYours truly,\r\nThe WamBam! Team",
                   html="<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home<br><br>Yours truly,<br>The WamBam! Team</div>")
     mail.send(msg)
+
+    app.logger.debug("Before adding user after registration")    
 
     api.add_user(user)
 

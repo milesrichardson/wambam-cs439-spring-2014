@@ -25,6 +25,7 @@ def create_login_manager(app, db):
 
     @app.route('/login', methods=['POST', 'GET'])
     def user_login():
+        app.logger.debug("<< login")
         if flask.request.method == 'POST':
             data = flask.request.get_json()
             remember = False
@@ -44,14 +45,17 @@ def create_login_manager(app, db):
             user = schema.Account.query.filter(sqlalchemy.or_(schema.Account.email==username, schema.Account.phone==username)).filter_by(password_hash=password).first()
                     
             if user is None:
+                app.logger.debug("abort")
                 flask.abort(401)
             else:
                 flask.ext.login.login_user(user, remember=True)
                 user.last_request = int(time.time())
                 flask.session['request_time'] = user.last_request
                 db.session.commit()
+                app.logger.debug("Good to go on login!")
                 return flask.redirect(flask.request.args.get('next') or "/home")
         else:
+            app.logger.debug("Abort 2.0")
             return flask.abort(401)
 
     @app.route('/logout')

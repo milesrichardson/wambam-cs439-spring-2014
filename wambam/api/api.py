@@ -5,6 +5,8 @@ import flask.ext.login
 import uuid
 from flask import session, request, redirect, url_for, render_template
 from sqlalchemy import create_engine, select
+from flask_mail import Message
+from flask_mail import Mail
 
 import random
 import datetime
@@ -18,6 +20,17 @@ import schema
 from wambam import app
 
 engine = None
+app.config.update(dict(
+    DEBUG = True,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'wambamapp@gmail.com',
+    MAIL_PASSWORD = 'wambam123',
+    MAIL_DEFAULT_SENDER = 'wambamapp@gmail.com'
+))
+mail = Mail(app)
 
 def create_app():
     return flask.Flask(__name__)
@@ -45,6 +58,7 @@ def create_database(app):
 
     michael = schema.Account(
     phone="7703629815",
+    phone_carrier="T-Mobile",
     email="michael.hopkins@yale.edu",
     password_hash="blah",
     online=True,
@@ -82,6 +96,7 @@ def add_user(user_data):
 
     user = schema.Account(
     phone=number_formatted,
+    phone_carrier=user_data["phone_carrier"],
     email=user_data["email"],
     password_hash=user_data["pwd"],
     online=True,
@@ -115,6 +130,32 @@ def tasks_for_requestor(requestor):
 def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=data)
+
+def getTextRecipient(phone_number, phone_carrier):
+    emailaddress = phone_number
+    emailaddress = emailaddress.replace(" ", "")
+    emailaddress = emailaddress.replace("(", "")
+    emailaddress = emailaddress.replace(")", "")
+    emailaddress = emailaddress.replace("-", "")
+
+    if phone_carrier == "AT&T":
+      emailaddress += "@message.alltel.com"
+    elif phone_carrier == "Boost Mobile":
+      emailaddress += "@myboostmobile.com"
+    elif phone_carrier == "MetroPCS":
+      emailaddress += "@mymetropcs.com"
+    elif phone_carrier == "Sprint":
+      emailaddress += "@messaging.sprintpcs.com"
+    elif phone_carrier == "T-Mobile":
+      emailaddress += "@tmomail.net"
+    elif phone_carrier == "U.S. Cellular":
+      emailaddress += "@email.uscc.net"
+    elif phone_carrier == "Virgin Mobile":
+      emailaddress += "@vmobl.com"
+    else:                                  #else we assume 'Verizon Wirless'
+      emailaddress += "@vtext.com"
+
+    return emailaddress
 
 @app.route("/submittask", methods=['POST'])
 def submit():
@@ -163,6 +204,21 @@ def submit():
     del session['lat']
     del session['lng']
 
+    app.logger.debug("Before confirmation text")    
+
+    # Send confirmation text
+    user = flask.ext.login.current_user
+    user_id = int(user.get_id())
+    flask_user = schema.Account.query.get(user_id)
+    phone_number = flask_user.phone
+    phone_carrier = flask_user.phone_carrier
+    text_recipient = getTextRecipient(phone_number, phone_carrier)
+    app.logger.debug("Email address: " + text_recipient)
+    msg = Message(subject="Order Submitted",recipients=["7703629815@tmomail.net"], body="We'll text you when someone claims your task.")
+    mail.send(msg)
+
+    app.logger.debug("Sent confirmation text")    
+
     app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
 
@@ -189,6 +245,7 @@ def before_request():
 
     else:
         if user.is_anonymous() or not is_session_valid():
+            app.logger.debug("Session is not valid")
             return flask.redirect('/')
         else:
             #session is valid

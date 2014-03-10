@@ -30,6 +30,7 @@ def create_account_table(db):
         password_hash = db.Column(db.String(255))
         email = db.Column(db.String(255), unique=True)
         phone = db.Column(db.String(20))
+        phone_carrier = db.Column(db.String(255))
         online = db.Column(db.Boolean)
         first_name = db.Column(db.String(255))
         last_name = db.Column(db.String(255))
@@ -49,6 +50,7 @@ def create_account_table(db):
             return {
                'id' : self.id,
                'phone' : self.phone,
+               'phone_carrier' : self.phone_carrier,
                'online' : self.online,
                'first_name' : self.first_name,
                'last_name' : self.last_name,
