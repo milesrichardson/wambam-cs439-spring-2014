@@ -5,11 +5,18 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
+      input, select, textarea {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+      }
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0; border: 0 }
       #header { background: #0F4D92; text-align: center; vertical-align: middle; padding-top: 15px; padding-bottom: 15px }
       #title { color: white; font-size:40px }
-      #description { color: #FFFFFF; font-size:20px }
+      #toolbar { width: 100%; position: relative  }
+      #description { color: #FFFFFF; font-size:20px; display: block; margin: auto }
+      #logoutbutton { font-size:15px; padding-left: 10px; padding-right: 10px; padding-top: 3px; padding-bottom: 3px; color: white; font-weight: bold; background: #0F4D92; text-align: center; position:absolute; right:30px; }
       #map-canvas { height: 500px }
       #buttonbar{ text-align: center; padding-top: 10px; padding-bottom: 10px }
       #button{ height: 50px; width: 300px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-left: 15px; margin-right: 15px; }
@@ -22,8 +29,16 @@
          $("#map-canvas").height(mapHeight);
       }
 
-      $
+      function setLogoutPos() {
+         var topPos = $("#header").height() / 2;
+         console.debug(topPos);
+         $("#logoutbutton").css({
+            "top": topPos + "px",
+         });
+       }
+
       $(window).on('resize', function() { setMapSize(); });
+      $(window).on('load', function() { setLogoutPos(); });
 
       if (!String.prototype.format) {
         String.prototype.format = function() {
@@ -140,8 +155,15 @@
   </head>
   <body>
     <div id="header">
-      <div id="title"> WamBam! </div>
-      <div id="description"> Claim a task and become a WamBam! </div>
+      <div id="toolbar">
+        <div id="title"> WamBam! </div>
+        <div id="description"> Claim a task and become a WamBam! </div>
+      </div>
+      <span id="logoutdiv">
+        <form action="/logout">
+          <input type="submit" id="logoutbutton" value="Log Out"></input>
+        </form>
+      </span>
     </div>
     <div id="map-canvas"></div>
     <div id="buttonbar">

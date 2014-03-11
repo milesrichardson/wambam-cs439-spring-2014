@@ -5,8 +5,17 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
-      body { margin: 0px; padding: 0px; border: 0px }
-      #header { background: #0F4D92; color: white; font-size:40px; padding-top: 15px; padding-bottom: 15px; padding-left: 30px}
+      input, select, textarea {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+      }
+      body { margin: 0; padding: 0; border: 0 }
+      #header { width: 100%; background: #0F4D92; padding-top: 15px; padding-bottom: 15px }
+      #headertable { width: 100% }
+      #titleheader { color: white; font-size:40px; padding-left: 30px}
+      #logoutbuttoncol { text-align: right }
+      #logoutbutton { font-size:15px; padding-left: 10px; padding-right: 10px; padding-top: 3px; padding-bottom: 3px; margin-right: 30px; color: white; font-weight: bold; background: #0F4D92; text-align: center }
       #contents { text-align: center }
       #cool { font-size:80px; margin-top: 80px }
       #desc { font-size:20px; margin-top: 15px }
@@ -14,7 +23,18 @@
    </style>
   </head>
   <body>
-    <div id="header"> WamBam! </div>
+    <div id="header">
+      <table id="headertable"> 
+        <tr>
+          <td id="titleheader">WamBam!</td>
+          <td id="logoutbuttoncol">
+            <form action="/logout">
+              <input type="submit" id="logoutbutton" value="Log Out"></input>
+            </form>
+          </td>
+        </tr>
+      </table>
+    </div>
     <div id="contents">
       <div id="cool"> Cool. </div>
       <div id="desc"> We're on it. </div>

@@ -72,8 +72,8 @@ def register():
     #Email client to complete registration
     msg = Message(subject="Complete Your WamBam! Registration",
                   recipients=[user["email"]],
-                  body="Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home\r\n\r\nYours truly,\r\nThe WamBam! Team",
-                  html="<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://127.0.0.1:5000/home<br><br>Yours truly,<br>The WamBam! Team</div>")
+                  body="Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home\r\n\r\nYours truly,\r\nThe WamBam! Team",
+                  html="<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home<br><br>Yours truly,<br>The WamBam! Team</div>")
     mail.send(msg)
 
     app.logger.debug("Before adding user after registration")    
