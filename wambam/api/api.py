@@ -214,7 +214,7 @@ def submit():
     phone_carrier = flask_user.phone_carrier
     text_recipient = getTextRecipient(phone_number, phone_carrier)
     app.logger.debug("Email address: " + text_recipient)
-    msg = Message(subject="Order Submitted",recipients=["7703629815@tmomail.net"], body="We'll text you when someone claims your task.")
+    msg = Message(subject="Order Submitted",recipients=[text_recipient], body="Your task request for '" + title + "' has been placed! We'll text you when someone claims your task.")
     mail.send(msg)
 
     app.logger.debug("Sent confirmation text")    
@@ -264,15 +264,18 @@ def claim():
     description = request.form['description']
     email = request.form['email']
 
-    fulfiller = schema.Account(
-        id=1,
-        phone="3213214321",
-        online=True,
-        first_name="Will",
-        last_name="CK")
+    # Get fulfiller
+    current_user = flask.ext.login.current_user
+    fulfiller_id = int(current_user.get_id())
+    fulfiller = schema.Account.query.get(fulfiller_id)
 
     #TODO: make task_num equal to the actual number of the task
     task_num = 1 #later on request.form['id']
+
+    # Get requester
+    current_task = schema.Task.query.get(task_num)
+    requestor_id = current_task.requestor_id
+    requestor = schema.Account.query.get(requestor_id)
 
     # add entry to account_task table
     conn = engine.connect()
@@ -288,6 +291,26 @@ def claim():
     # add and commit changes
     db.session.add(temp)
     db.session.commit()
+
+    app.logger.debug("Before confirmation text")    
+
+    # Send confirmation text to fulfiller
+    fulfiller_number = fulfiller.phone
+    fulfiller_carrier = fulfiller.phone_carrier
+    text_fulfiller = getTextRecipient(fulfiller_number, fulfiller_carrier)
+    app.logger.debug("Email address: " + text_fulfiller)
+    msg = Message(subject="Task Claimed",recipients=[text_fulfiller], body="You have claimed the task '" + title + "'. Get in touch with " + requestor.first_name + " " + requestor.last_name + " at " + requestor.phone + ".")
+    mail.send(msg)
+
+    # Send confirmation text to requestor
+    requestor_number = requestor.phone
+    requestor_carrier = requestor.phone_carrier
+    text_requestor = getTextRecipient(requestor_number, requestor_carrier)
+    app.logger.debug("Email address: " + text_requestor)
+    msg = Message(subject="Your task has been claimed!",recipients=[text_requestor], body= fulfiller.first_name + " " + fulfiller.last_name + " has claimed your task '" + title + "'. You can get in touch with " + fulfiller.first_name + " at " + fulfiller.phone + ".")
+    mail.send(msg)
+
+    app.logger.debug("Sent confirmation texts")   
 
     app.logger.debug("end claimtask")
 
