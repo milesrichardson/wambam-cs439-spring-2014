@@ -5,8 +5,6 @@ import flask.ext.login
 import uuid
 from flask import session, request, redirect, url_for, render_template
 from sqlalchemy import create_engine, select
-from flask_mail import Message
-from flask_mail import Mail
 
 import random
 import datetime
@@ -17,20 +15,10 @@ import phonenumbers
 
 import login
 import schema
+import emails
 from wambam import app
 
 engine = None
-app.config.update(dict(
-    DEBUG = True,
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 587,
-    MAIL_USE_TLS = True,
-    MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'wambamapp@gmail.com',
-    MAIL_PASSWORD = 'wambam123',
-    MAIL_DEFAULT_SENDER = 'wambamapp@gmail.com'
-))
-mail = Mail(app)
 
 def create_app():
     return flask.Flask(__name__)
@@ -264,9 +252,8 @@ def submit():
     msg_body = "Your task request for '" + title + "' has been placed! We'll text you when someone claims your task."
     app.logger.debug("Email address: " + text_recipient[0])
 
-    # Mail message to requester
-    msg = Message(subject=msg_subject, recipients=text_recipient, body=msg_body, html=msg_body)
-    mail.send(msg)
+    # Mail message to requester asynchronously
+    emails.send_email(msg_subject, text_recipient, msg_body, msg_body)
 
     # Send alert text to all online fulfillers 
     # Probably want to do this asynchronously eventually
@@ -280,8 +267,7 @@ def submit():
     msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://salty-dusk-6711.herokuapp.com/working."
 
     # Mail message to potential fulfillers
-    msg = Message(subject=msg_subject, recipients=text_fulfillers, body=msg_body, html=msg_body)
-    mail.send(msg)
+    emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
 
     app.logger.debug("Sent confirmation text")
     app.logger.debug("end submittask")
@@ -370,8 +356,7 @@ def claim():
     msg_body = "You have claimed the task '" + title + "'. Get in touch with " + requestor.first_name + " " + requestor.last_name + " at " + requestor.phone + "."
 
     # Send message to fulfiller
-    msg = Message(subject=msg_subject,recipients=[text_fulfiller], body=msg_body, html=msg_body)
-    mail.send(msg)
+    emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
 
     # Send confirmation text to requestor
     requestor_number = requestor.phone
@@ -384,8 +369,7 @@ def claim():
     msg_body = fulfiller.first_name + " " + fulfiller.last_name + " has claimed your task '" + title + "'. You can get in touch with " + fulfiller.first_name + " at " + fulfiller.phone + "."
 
     # Send confirmation message to requestor
-    msg = Message(subject=msg_subject,recipients=[text_requestor], body= msg_body, html=msg_body)
-    mail.send(msg)
+    emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
 
     app.logger.debug("Sent confirmation texts")   
     app.logger.debug("end claimtask")
