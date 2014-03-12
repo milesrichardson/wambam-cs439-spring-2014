@@ -353,7 +353,8 @@ def claim():
 
     # Construct message to send to fulfiller
     msg_subject = "Task Claimed"
-    msg_body = "You have claimed the task 7703629815 '" + title + "'. Get in touch with " + requestor.first_name + " " + requestor.last_name + " at " + requestor.phone + "."
+    msg_body = "You have claimed the task '" + title + "'. Get in touch with " + requestor.first_name + " " + requestor.last_name + " at " + requestor.phone + "."
+    msg_body = fulfiller.first_name + " " + fulfiller.last_name + " has claimed your task '" + title + "'. You can get in touch with " + fulfiller.first_name + " at " + fulfiller.phone + "."
 
     # Send message to fulfiller
     emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
