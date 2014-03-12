@@ -253,7 +253,7 @@ def submit():
     app.logger.debug("Email address: " + text_recipient[0])
 
     # Mail message to requester asynchronously
-    emails.send_email(msg_subject, text_recipient, msg_body, msg_body)
+    emails.send_email(msg_subject, ["michael.hopkins@yale.edu"], msg_body, msg_body)
 
     # Send alert text to all online fulfillers 
     # Probably want to do this asynchronously eventually
@@ -267,7 +267,7 @@ def submit():
     msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://salty-dusk-6711.herokuapp.com/working."
 
     # Mail message to potential fulfillers
-    emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
+    emails.send_email(msg_subject, ["michael.hopkins@yale.edu"], msg_body, msg_body)
 
     app.logger.debug("Sent confirmation text")
     app.logger.debug("end submittask")
@@ -353,10 +353,10 @@ def claim():
 
     # Construct message to send to fulfiller
     msg_subject = "Task Claimed"
-    msg_body = "You have claimed the task '" + title + "'. Get in touch with " + requestor.first_name + " " + requestor.last_name + " at " + requestor.phone + " la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la."
+    msg_body = "You have claimed the task '" + title + "'. Get in touch with " + requestor.first_name + " " + requestor.last_name + " at " + requestor.phone + "."
 
     # Send message to fulfiller
-    emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
+    emails.send_email(msg_subject, ["michael.hopkins@yale.edu"], msg_body, msg_body)
 
     # Send confirmation text to requestor
     requestor_number = requestor.phone
@@ -369,7 +369,7 @@ def claim():
     msg_body = fulfiller.first_name + " " + fulfiller.last_name + " has claimed your task '" + title + "'. You can get in touch with " + fulfiller.first_name + " at " + fulfiller.phone + "."
 
     # Send confirmation message to requestor
-    emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
+    emails.send_email(msg_subject, ["michael.hopkins@yale.edu"], msg_body, msg_body)
 
     app.logger.debug("Sent confirmation texts")   
     app.logger.debug("end claimtask")
