@@ -8,21 +8,10 @@ import requests
 
 from wambam import app
 import api
+import emails
 
 app.secret_key="wambam"
 
-app.config.update(dict(
-    DEBUG = True,
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 587,
-    MAIL_USE_TLS = True,
-    MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'wambamapp@gmail.com',
-    MAIL_PASSWORD = 'wambam123',
-    MAIL_DEFAULT_SENDER = 'wambamapp@gmail.com'
-))
-
-mail = Mail(app)
 
 flask_pos = []
 
@@ -69,17 +58,15 @@ def register():
     user["last_name"] = request.form['lastname']
     passwordconfirm = request.form['passwordconfirm']
 
-    #Email client to complete registration
-    msg = Message(subject="Complete Your WamBam! Registration",
-                  recipients=[user["email"]],
-                  body="Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home\r\n\r\nYours truly,\r\nThe WamBam! Team",
-                  html="<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home<br><br>Yours truly,<br>The WamBam! Team</div>")
-    mail.send(msg)
+    # Email client to complete registration
+    subject = "Complete Your WamBam! Registration"
+    recipients = [user["email"]]
+    body = "Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home\r\n\r\nYours truly,\r\nThe WamBam! Team"
+    html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home<br><br>Yours truly,<br>The WamBam! Team</div>"
+    emails.send_email(subject, recipients, body, html)
 
     app.logger.debug("Before adding user after registration")    
-
     api.add_user(user)
-
     return redirect('/login', code=307)
       
 @app.route("/addtask", methods=['POST'])
