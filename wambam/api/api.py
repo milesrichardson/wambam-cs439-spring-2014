@@ -157,6 +157,49 @@ def getTextRecipient(phone_number, phone_carrier):
 
     return emailaddress
 
+def getPhone(fulfiller):
+    return fulfiller.phone
+
+def getPhoneCarrier(fulfiller):
+    return fulfiller.phone_carrier
+
+@app.route("/set_online", methods=['POST'])
+def set_online():
+    # Get current user
+    user = flask.ext.login.current_user
+    user_id = int(user.get_id())
+    flask_user = schema.Account.query.get(user_id)
+
+    # Set user to be online
+    flask_user.online = True;
+
+    # add and commit changes
+    db.session.add(flask_user)
+    db.session.commit()
+
+@app.route("/set_offline", methods=['POST'])
+def set_offline():
+    # Get current user
+    user = flask.ext.login.current_user
+    user_id = int(user.get_id())
+    flask_user = schema.Account.query.get(user_id)
+
+    # Set user to be offline
+    flask_user.online = False;
+
+    # add and commit changes
+    db.session.add(flask_user)
+    db.session.commit()
+
+@app.route("/get_online")
+def get_online():
+    # Get current user
+    user = flask.ext.login.current_user
+    user_id = int(user.get_id())
+    flask_user = schema.Account.query.get(user_id)
+
+    return flask.jsonify(online=flask_user.online);
+
 @app.route("/submittask", methods=['POST'])
 def submit():
     title = request.form['title']
@@ -206,7 +249,7 @@ def submit():
 
     app.logger.debug("Before confirmation text")    
 
-    # Send confirmation text
+    # Send confirmation text to requestor
     user = flask.ext.login.current_user
     user_id = int(user.get_id())
     flask_user = schema.Account.query.get(user_id)
@@ -217,6 +260,17 @@ def submit():
     msg = Message(subject="Order Submitted",recipients=[text_recipient], body="Your task request for '" + title + "' has been placed! We'll text you when someone claims your task.")
     mail.send(msg)
 
+    # Send alert text to all online fulfillers 
+    # Probably want to do this asynchronously eventually
+    fulfillers = schema.Account.query.filter(schema.Account.online == True).all()
+    msg_subject = "New Task Alert"
+    msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://salty-dusk-6711.herokuapp.com/working."
+
+    fulfiller_phones = map(getPhone, fulfillers)
+    fulfiller_carriers = map(getPhoneCarrier, fulfillers)
+    text_fulfillers = map(getTextRecipient, fulfiller_phones, fulfiller_carriers)
+    msg = Message(subject=msg_subject, recipients=text_fulfillers, body=msg_body)
+    mail.send(msg)
     app.logger.debug("Sent confirmation text")    
 
     app.logger.debug("end submittask")
