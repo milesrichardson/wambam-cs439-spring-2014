@@ -2,9 +2,11 @@ from flask import Flask
 import sys
 import os
 
-ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), './templates')
+TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), './templates')
 
-app = Flask(__name__, template_folder=ASSETS_DIR, static_folder=ASSETS_DIR)
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), './static')
+
+app = Flask(__name__)
 
 if sys.platform == 'win32':
     sys.path.append("wambam\\website");

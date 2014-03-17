@@ -19,6 +19,10 @@ flask_pos = []
 def hello():
     return render_template('login.html')
 
+@app.route("/mobile")
+def hello_mobile():
+    return render_template('login_mobile.html')
+
 @app.route("/home")
 def home():
     return render_template('index.html')

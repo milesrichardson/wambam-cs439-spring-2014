@@ -286,11 +286,17 @@ def is_session_valid():
 
 @app.before_request
 def before_request():
-    if flask.request.path == '/check_email' or flask.request.path == '/check_phone':
-        return None
+    exempt_files = ['/check_email', '/check_phone',
+                    flask.url_for('static', filename='login.css'), 
+                    flask.url_for('static', filename='login_mobile.css'),
+                    flask.url_for('static', filename='login_validator.js')]
 
+    for f in exempt_files:
+        if flask.request.path == f:
+            return None
+    print flask.request.path;
     user = flask.ext.login.current_user
-    if flask.request.path == '/' or flask.request.path == '/login' or flask.request.path == '/register':
+    if flask.request.path == '/' or flask.request.path == '/mobile' or flask.request.path == '/login' or flask.request.path == '/register':
         if not user.is_anonymous() and is_session_valid():
             return flask.redirect('/home')
 

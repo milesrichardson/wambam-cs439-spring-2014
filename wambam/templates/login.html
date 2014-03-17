@@ -1,36 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script type="text/javascript">
+      if (screen.width < 700) {
+	document.location="mobile";
+      }
+    </script>
+
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <style>
-      input, select, textarea {
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-      }
-      html { height: 100%; min-width: 700px }
-      body { height: 100%; margin: 0; padding: 0; border: 0 }
-      #header { width: 100%; background: #0F4D92; padding-top: 15px; padding-bottom: 15px}
-      #headertable { width: 100% }
-      #title { color: white; font-size:40px; padding-left: 30px}
-      #loginentry { width: 400px; padding-right: 20px}
-      #logintable { width: 100% }
-      #userlabel { color: white; width: 40%; padding-left: 5px; }
-      #passwordlabel { color: white; width: 40%; padding-left: 5px; }
-      #loginbutton{ color: white; font-weight: bold; background: #0F4D92; text-align: center }
-      #userfield { padding-left: 5px }
-      #passwordfield { padding-left: 5px }
-      #registrationdiv { margin-top: 100px; text-align: center } 
-      #registertitle { text-align: center; font-size: 40px; margin-bottom: 20px }
-      #registrationtable { text-align: left; margin-left: auto; margin-right: auto }
-      #label { font-size: 20px }
-      #firstname, #lastname, #phone, #phonecarrier, #email, #password, #passwordconfirm { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 20px }
-      #submitcol { text-align: center }
-      #register{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-top: 20px }
-      label.error { color: red  }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
   </head>
   <body>
     <div id="header">
@@ -40,18 +20,18 @@
           <td id="loginentry">
             <div id="login">
               <table id="logintable">
-                <tr>
-                  <td id="userlabel">Email or Phone</td>
-                  <td id="passwordlabel">Password</td>
+                <tr id="loginlabels">
+                  <td>Email or Phone</td>
+                  <td>Password</td>
                   <td></td>
                 </tr>
                 <tr>
                   <form action="/login" method="POST">
                     <td>
-                      <input id="userfield" type="text" name="userfield">
+                      <input class="logininput" type="text" name="userfield">
                     </td>
                     <td>
-                      <input id="passwordfield" type="password" name="passwordfield">
+                      <input class="logininput" type="password" name="passwordfield">
                     </td>
                     <td>
                       <input id="loginbutton" type="submit" name="loginbutton" value="Log In">
@@ -72,32 +52,32 @@
           </tr>
 	  <tr>
             <td>
-              <label id="label" for="firstname">First Name</label>
+              <label for="firstname">First Name</label>
             </td>
             <td>
-              <input type="text" name="firstname" id="firstname">
+              <input type="text" name="firstname">
             </td>
             <td>
-              <div id="firstname_error"> </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label id="label" for="lastname">Last Name</label>
-            </td>
-            <td>
-              <input type="text" name="lastname" id="lastname">
-            </td>
-            <td>
-              <div id="lastname_error"> </div>
+              <div id="firstnameerror"> </div>
             </td>
           </tr>
           <tr>
             <td>
-              <label id="label" for="phone">Phone Number</label>
+              <label for="lastname">Last Name</label>
             </td>
             <td>
-              <input type="text" name="phone" id="phone">
+              <input type="text" name="lastname">
+            </td>
+            <td>
+              <div id="lastnameerror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="phone">Phone Number</label>
+            </td>
+            <td>
+              <input type="text" name="phone">
             </td>
             <td>
               <div id="phoneerror"> </div>
@@ -105,10 +85,10 @@
           </tr>
           <tr>
             <td>
-              <label id="label" for="phonecarrier">Phone Carrier</label>
+              <label for="phonecarrier">Phone Carrier</label>
             </td>
             <td>
-              <select id="phonecarrier" name="phonecarrier" form="registerform">
+              <select name="phonecarrier" form="registerform">
                 <option selected="selected" value="AT&T">AT&T</option>
                 <option value="Boost Mobile">Boost Mobile</option>
                 <option value="MetroPCS">MetroPCS</option>
@@ -122,10 +102,10 @@
           </tr>
           <tr>
             <td>
-              <label id="label" for="email">Email Address</label>
+              <label for="email">Email Address</label>
             </td>
             <td>
-              <input type="text" name="email" id="email">
+              <input type="text" name="email">
             </td>
             <td>
               <div id="emailerror"> </div>
@@ -133,7 +113,7 @@
           </tr>
           <tr>
             <td>
-              <label id="label" for="password">Password</label>
+              <label for="password">Password</label>
             </td>
             <td>
               <input type="password" name="password" id="password">
@@ -144,10 +124,10 @@
           </tr>
           <tr>
             <td>
-              <label id="label" for="passwordconfirm">Confirm Password</label>
+              <label for="passwordconfirm">Confirm Password</label>
             </td>
             <td>
-              <input type="password" name="passwordconfirm" id="passwordconfirm">
+              <input type="password" name="passwordconfirm">
             </td>
             <td>
               <div id="passwordconfirmerror"> </div>
@@ -160,100 +140,8 @@
       </form>
     </div>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="http://jquery.bassistance.de/validate/jquery.validate.js"></script>
-    <script src="http://jquery.bassistance.de/validate/additional-methods.js"></script>
-    <script>
-
-      jQuery.validator.addMethod("passwordmatch",
-        function(value) {
-          return value === $("#password").val();
-        }, "Passwords don't match."
-      );
-      jQuery.validator.addMethod("emailused",
-        function(value) {
-          var email_used = false;
-          var post_data = {};
-          post_data['email'] = value
-          $.ajax({
-            url: 'check_email',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(post_data),
-            async: false,
-            success: function(data) {
-               email_used = (data["used"] === 'True');
-          }});
-          return !email_used;
-        }, "Email address is already registered."
-      );
-      jQuery.validator.addMethod("phoneused",
-        function(value) {
-          var phone_used = false;
-          var post_data = {};
-          post_data['phone'] = value
-          $.ajax({
-            url: 'check_phone',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(post_data),
-            async: false,
-            success: function(data) {
-               phone_used = (data["used"] === 'True');
-          }});
-          return !phone_used;
-        }, "Phone number is already registered."
-      );
-
-      $( "#registerform" ).validate({
-        rules: {
-          firstname: {
-            required: true,
-            lettersonly: true
-          },
-          lastname: {
-            required: true,
-            lettersonly: true
-          },
-          phone: {
-            required: true,
-            phoneUS: true,
-            phoneused: true
-          },
-          email: {
-            required: true,
-            email: true,
-            emailused: true
-          },
-          password: {
-
-            required: true
-          },
-          passwordconfirm: {
-            required: true,
-            passwordmatch: true
-          },
-        }, 
-        errorPlacement: function(error, element) {
-            if (element.attr("name") == "firstname" )
-                error.appendTo("#firstname_error");
-            else if (element.attr("name") == "lastname" )
-                error.appendTo("#lastname_error");
-            else if (element.attr("name") == "phone" )
-                error.appendTo("#phoneerror");
-            else if  (element.attr("name") == "email" )
-                error.appendTo("#emailerror");
-            else if  (element.attr("name") == "password" )
-                error.appendTo("#passworderror");
-            else if  (element.attr("name") == "password" )
-                error.appendTo("#passworderror");
-            else if  (element.attr("name") == "passwordconfirm" )
-                error.appendTo("#passwordconfirmerror");
-        }
-      });
-
-      $.validator.messages.required = 'WamBam! needs this information!';
-      $.validator.messages.phoneUS = 'Please specify a valid phone number';
-      $.validator.messages.email = 'Please specify a valid email address';
-    </script>
+    <script type="text/javascript" src="http://jquery.bassistance.de/validate/jquery.validate.js"></script>
+    <script type="text/javascript" src="http://jquery.bassistance.de/validate/additional-methods.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='login_validator.js') }}"></script>
   </body>
 </html>
