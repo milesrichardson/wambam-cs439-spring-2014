@@ -4,108 +4,36 @@
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <style>
-      input, select, textarea {
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-      }
-      html { min-width: 700px; height: 100% }
-      body { height: 100%; margin: 0; padding: 0; border: 0 }
-      #header { width: 100%; background: #0F4D92; text-align: center; vertical-align: middle; padding-top: 15px; padding-bottom: 15px; position: relative }
-      #title { color: white; font-size:40px }
-      #toolbar { display: block; margin: auto }
-      #description { color: #FFFFFF; font-size:20px }
-      #logoutbutton { font-size:15px; padding-left: 10px; padding-right: 10px; padding-top: 3px; padding-bottom: 3px; color: white; font-weight: bold; background: #0F4D92; text-align: center; position:absolute; right:30px; }
-      #map-canvas { height: 500px }
-      #buttonbar{ text-align: center; padding-top: 10px; padding-bottom: 20px }
-      #button{ height: 50px; width: 200px; font-size:20px; color: white; background: #0F4D92; text-align: center; margin-left: 15px; margin-right: 15px; }
-      #form { margin: 0; padding: 0; display:inline }
-    </style>
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='index.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='index_mobile.css') }}">
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script>
-      function setMapSize() {
-         var mapHeight = $("body").height() - $("#buttonbar").height() - $("#header").height() - 60;
-         $("#map-canvas").height(mapHeight);
-      }
-
-      function setLogoutPos() {
-         var topPos = $("#header").height() / 2;
-         console.debug(topPos);
-         $("#logoutbutton").css({
-            "top": topPos + "px",
-         });
-       }
-
-      $(window).on('resize', function() { setMapSize(); });
-      $(window).on('load', function() { setLogoutPos(); });
-    </script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
-    <script>
-      var map;
-      function initialize() {
-        var mapOptions = {
-        zoom: 15,
-        center: new google.maps.LatLng(41.3111, -72.9267)
-        };
-
-        map = new google.maps.Map(document.getElementById('map-canvas'),
-                                  mapOptions);
-
-	      map.setOptions({styles: [
-	         {
-	           featureType: "poi",
-             elementType: "labels",
-	           stylers: [
-	             { visibility: "off" }
-	           ]
-	         }
-	       ]});
-
-        var marker = null;
-
-        google.maps.event.addListener(map, 'click', function(e) {
-          if (marker == null) {
-            marker = new google.maps.Marker({
-              position: e.latLng,
-              map: map,
-              title: 'Request Location'
-            });
-            $("#button").show(); 
-          }
-          else {
-            marker.setPosition(e.latLng);
-          }
-          $("#lat").val(e.latLng.lat());
-          $("#lng").val(e.latLng.lng())
-        });
-      setMapSize();
-      }
-
-      google.maps.event.addDomListener(window, 'load', initialize);
-    </script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <script src="{{ url_for('static', filename='logout_location.js') }}"></script>
   </head>
   <body>
     <div id="header">
       <div id="toolbar">
         <div id="title"> WamBam! </div>
-        <div id="description"> Drop a pin where you need something. </div>
-      </div>
-      <span id="logoutdiv">
-        <form action="/logout">
-          <input type="submit" id="logoutbutton" value="Log Out"></input>
-        </form>
+	<span id="logoutdiv">
+          <form action="/logout">
+            <input type="submit" id="logoutbutton" value="Log Out"></input>
+          </form>
       </span>
+
+        <div id="description" style="clear:both;"> Drop a pin where you need something. </div>
+      </div>
     </div>
     <div id="map-canvas"></div>
     <div id="buttonbar">
+      <form id="form" action="/working">
+        <input type="submit" value="I want to work!">
+      </form>
       <form id="form" action="/addtask" method="POST">
         <input type="hidden" id="lat" name="lat" type="text" />
         <input type="hidden" id="lng" name="lng" type="text" />
-        <input onClick="addtask()" id="button" type="submit" value="Get it done" style="display: none" /> 
-      </form>
-      <form id="form" action="/working">
-        <input id="button" type="submit" value="I want to work!">
+        <input onClick="addtask()" id="create_task_button" type="submit" value="Get it done" style="display: none" /> 
       </form>
     </div>
   </body>
