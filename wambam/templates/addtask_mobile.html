@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='addtask_mobile.css') }}">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+  </head>
+  <body>
+    <div id="header">
+      <div id="title">WamBam!</div>
+      <span id="logoutdiv">
+        <form action="/logout">
+          <input type="submit" id="logoutbutton" value="Log Out"></input>
+        </form>
+      </span>
+    </div>

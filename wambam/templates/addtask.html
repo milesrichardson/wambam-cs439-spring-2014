@@ -1,92 +1,61 @@
 <!DOCTYPE html>
 <html>
   <head>
+
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <style>
-      input, select, textarea {
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-      }
-      html { min-width: 700px }
-      body { margin: 0; padding: 0; border: 0 }
-      #header { width: 100%; background: #0F4D92; padding-top: 15px; padding-bottom: 15px }
-      #headertable { width: 100% }
-      #titleheader { color: white; font-size:40px; padding-left: 30px}
-      #logoutbuttoncol { text-align: right }
-      #logoutbutton { font-size:15px; padding-left: 10px; padding-right: 10px; padding-top: 3px; padding-bottom: 3px; margin-right: 30px; color: white; font-weight: bold; background: #0F4D92; text-align: center }
-      #addtaskdiv { margin-top: 40px; text-align: center } 
-      #addtasktitle { text-align: center; font-size: 40px; margin-bottom: 20px }
-      #addtasktable { text-align: left; margin-left: auto; margin-right: auto }
-      #label { font-size: 20px }
-      #labelcol { width: 160px }
-      #title, #location, #bid { width: 250px; font-size: 20px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px }
-      #expiration { width: 250px; font-size: 20px; padding-top: 5px; padding-bottom: 5px }
-      #description { width: 415px; resize: none; padding-left: 5px; margin-top: 20px; margin-bottom: 10px }
-      #submitcol { text-align: center }
-      #submit{ height: 50px; width: 150px; font-size:20px; color: white; background: #0F4D92; text-align: center }
-      label.error { color: red  }
-    </style>
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='addtask.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='addtask_mobile.css') }}">
   </head>
     <div id="header">
-      <table id="headertable"> 
-        <tr>
-          <td id="titleheader">WamBam!</td>
-          <td id="logoutbuttoncol">
-            <form action="/logout">
-              <input type="submit" id="logoutbutton" value="Log Out"></input>
-            </form>
-          </td>
-        </tr>
-      </table>
+      <div id="title">Wambam!</div>
+      <span id="logoutdiv">
+        <form action="logout">
+          <input type="submit" id="logoutbutton" value="Log Out"></input>
+        </form>
+      </span>
     </div>
     <div id="addtaskdiv">
+
+
+    {% macro desktop_table_layout() -%}
+      {% if desktop_client %}
+        </td>
+        <td>
+      {% endif %}
+    {%- endmacro %}
+
       <form id="addtaskform" action="/submittask" method="POST">
         <table id="addtasktable">
           <tr>
             <td colspan="2"> <div id="addtasktitle"> Create a Task </div> </td>
           </tr>
           <tr>
-            <td id="labelcol">
-              <label id="label" for="title">Title</label>
-            </td>
+            <td><label for="title">Title</label></td>
             <td>
-              <input type="text" name="title" id="title" maxlength="255">
-            </td>
-            <td>
-              <div id="titleerror"></div>
-            </td>
+              <input type="text" name="title" maxlength="255">
+            {{ desktop_table_layout() }}
+              <div id="titleerror"></div></td>
           </tr>
           <tr>
-            <td id="labelcol">
-              <label id="label" for="location">Delivery Location</label>
-            </td>
+            <td><label for="location">Delivery Location</label></td>
             <td>
-              <input type="text" name="location" id="location" maxlength="255">
-            </td>
-            <td>
-              <div id="locationerror"></div>
-            </td>
+              <input type="text" name="location" maxlength="255">
+            {{ desktop_table_layout() }}
+              <div id="locationerror"></div></td>
           </tr>
           <tr>
-            <td id="labelcol">
-              <label id="label" for="bid">Bid Amount ($)</label>
-            </td>
+            <td><label for="bid">Bid Amount ($)</label></td>
             <td>
-              <input type="text" name="bid" id="bid">
-            </td>
-            <td>
-              <div id="biderror"></div>
-            </td>
+              <input type="text" name="bid">
+            {{ desktop_table_layout() }}
+              <div id="biderror"></div></td>
           </tr>
           <tr>
-            <td id="labelcol">
-              <label id="label" for="expiration">Task Expiration</label>
-            </td>
+            <td><label for="expiration">Task Expiration</label></td>
             <td>
-              <select id="expiration" name="expiration" form="addtaskform">
+              <select  name="expiration" form="addtaskform">
                 <option value="30min">30 minutes</option>
                 <option selected="selected" value="1hr">1 hour</option>
                 <option value="1day">1 day</option>
@@ -95,13 +64,13 @@
             </td>
           </tr>
           <tr>
-            <td id="labelcol" colspan="2">
-              <textarea rows="6" form="addtaskform" placeholder="Description of task (optional)" id="description" name="description"></textarea>
+            <td colspan="2">
+              <textarea rows="6" form="addtaskform" placeholder="Description of task (optional)" name="description"></textarea>
             </td>
           </tr>
           <tr>
             <td id="submitcol" colspan="2">
-              <input type="submit" id="submit" name="submit" value="WamBam!">
+              <input type="submit" name="submit" value="WamBam!">
             </td>
           </tr>
         </table>
