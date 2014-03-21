@@ -127,7 +127,7 @@ def getTextRecipient(phone_number, phone_carrier):
     emailaddress = emailaddress.replace("-", "")
 
     if phone_carrier == "AT&T":
-      emailaddress += "@message.alltel.com"
+      emailaddress += "@txt.att.net"
     elif phone_carrier == "Boost Mobile":
       emailaddress += "@myboostmobile.com"
     elif phone_carrier == "MetroPCS":
