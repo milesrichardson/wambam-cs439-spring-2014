@@ -104,6 +104,7 @@
           '<input type="hidden" name="description" value="{5}">'+
           '<input type="hidden" name="expiration" value="{2}">'+
           '<input type="hidden" name="email" value="{3}">'+
+          '<input type="hidden" name="id" value="{6}">'+
           '</form> </div>';
 
       infowindow = new google.maps.InfoWindow({
@@ -125,12 +126,13 @@
                       email = data2["email"];
                     }, 
                     async: false});
+            var id = activeTasks[i]["id"];
             var location = activeTasks[i]["delivery_location"];
             var description = activeTasks[i]["long_title"];
             var lat = parseFloat(activeTasks[i]["latitude"]);
             var lng = parseFloat(activeTasks[i]["longitude"]);
             var myLatLng = new google.maps.LatLng(lat, lng);
-            var info = contentString.format(title,bid,expiration,email, location, description);
+            var info = contentString.format(title,bid,expiration,email, location, description, id);
             var marker = new google.maps.Marker({
               position: myLatLng,
               map: map,
