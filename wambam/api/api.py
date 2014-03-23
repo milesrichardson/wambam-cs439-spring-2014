@@ -264,7 +264,7 @@ def submit():
 
     # Construct message for potential fulfillers
     msg_subject = "New Task Alert"
-    msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://salty-dusk-6711.herokuapp.com/viewtaskdetails/" + str(task.id) + " "
+    msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + "."
 
     # Mail message to potential fulfillers
     emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
