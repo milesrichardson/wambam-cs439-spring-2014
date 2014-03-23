@@ -280,7 +280,7 @@ def protected():
 
 def is_session_valid():
     user = flask.ext.login.current_user
-    if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 30 < user.last_request:
+    if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 36000000 < user.last_request:
         return False
     return True
 
@@ -307,7 +307,8 @@ def before_request():
         if user.is_anonymous() or not is_session_valid():
             app.logger.debug("Session is not valid")
             print 'Setting pre_login_url = %s' % flask.request.path
-            flask.session['pre_login_url'] = flask.request.path
+            if flask.request.path.startswith('/viewtaskdetails'):
+                flask.session['pre_login_url'] = flask.request.path
             return flask.redirect('/')
         else:
             #session is valid
