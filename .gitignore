@@ -3,3 +3,4 @@ wambam/venv/*
 *.pyc
 *.swp
 *.pyc
+.DS_Store
