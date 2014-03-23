@@ -1,0 +1,38 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+html {
+    min-width: 700px
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    border: 0
+}
+
+#contents {
+    text-align: center
+}
+
+#cool { 
+    font-size:80px;
+    margin-top: 80px
+}
+
+#desc { 
+    font-size:20px;
+    margin-top: 15px
+}
+
+#contents input[type='submit']{ 
+    height: 50px; 
+    width: 225px;
+    font-size:20px;
+    color: white; 
+    background: #0F4D92; 
+    text-align: center;
+    margin: 20px 15px 0 15px;
+}

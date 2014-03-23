@@ -81,13 +81,7 @@ def index():
 
 @app.route("/constructtask")
 def construct():
-    print request.cookies.get('mobile')
-    print not (request.cookies.get('mobile') == 'true')
     return render_template('addtask.html', desktop_client=request.cookies.get('mobile'))
-
-@app.route("/constructtask_mobile")
-def construct_mobile():
-    return render_template('addtask_mobile.html')
 
 @app.route("/dotask")
 def execute():

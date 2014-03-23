@@ -38,6 +38,8 @@ body {
     color: white;
     font-weight: bold;
     font-size:20px;
+    background: #0F4D92;
+    padding-bottom: 5px;
 }
 
 #logoutbutton { 
