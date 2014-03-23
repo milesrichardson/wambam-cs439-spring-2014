@@ -17,7 +17,12 @@ flask_pos = []
 
 @app.route("/")
 def hello():
-    return render_template('login.html')
+    try:
+        pre_login_url = session['pre_login_url']
+    except KeyError:
+        pre_login_url = '/'
+
+    return render_template('login.html', pre_login_url=pre_login_url)
 
 @app.route("/mobile")
 def hello_mobile():
