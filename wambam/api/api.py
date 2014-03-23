@@ -264,7 +264,7 @@ def submit():
 
     # Construct message for potential fulfillers
     msg_subject = "New Task Alert"
-    msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://salty-dusk-6711.herokuapp.com/working."
+    msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://salty-dusk-6711.herokuapp.com/viewtaskdetails/" + str(task.id) + " "
 
     # Mail message to potential fulfillers
     emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
@@ -388,6 +388,26 @@ def claim():
                             email = request.form['email'],
                             phone="770-362-9815",
                             desktop_client=request.cookies.get('mobile'))
+
+@app.route('/viewtaskdetails/<int:taskid>')
+def view_task_details(taskid):
+    task = schema.Task.query.filter_by(id=taskid).first()
+    if (task is None):
+        return flask.redirect('/home')
+    else:
+        # Get email address of logged in user 
+        current_user = flask.ext.login.current_user
+        fulfiller_id = int(current_user.get_id())
+        fulfiller = schema.Account.query.get(fulfiller_id)
+
+        return render_template('taskview.html',
+                                title = task.short_title,
+                                location = task.delivery_location,
+                                bid = "$%(bid).2f" % {"bid": task.bid},
+                                expiration = schema.dump_datetime(task.expiration_datetime),
+                                description = task.long_title,
+                                email = fulfiller.email)
+
 
 def is_email_used(email):
     result = schema.Account.query.filter_by(email=email).first() is not None
