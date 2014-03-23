@@ -296,13 +296,18 @@ def before_request():
             return None
     print flask.request.path;
     user = flask.ext.login.current_user
-    if flask.request.path == '/' or flask.request.path == '/mobile' or flask.request.path == '/login' or flask.request.path == '/register':
+
+    if flask.request.path == '/' or flask.request.path == '/mobile' or \
+       flask.request.path == '/login' or flask.request.path == '/register':
+
         if not user.is_anonymous() and is_session_valid():
             return flask.redirect('/home')
 
     else:
         if user.is_anonymous() or not is_session_valid():
             app.logger.debug("Session is not valid")
+            print 'Setting pre_login_url = %s' % flask.request.path
+            flask.session['pre_login_url'] = flask.request.path
             return flask.redirect('/')
         else:
             #session is valid
