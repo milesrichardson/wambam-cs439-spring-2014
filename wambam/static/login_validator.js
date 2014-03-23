@@ -47,7 +47,7 @@ $("#registerform").validate({
         },
         lastname: {
             required: true,
-            lettersonly: true
+            lettersonly: false
         },
         phone: {
             required: true,

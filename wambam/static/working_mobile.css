@@ -1,0 +1,65 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+html { 
+    height: 100%
+}
+
+body {
+    height: 100%;
+    margin: 0; 
+    padding: 0;
+    border: 0
+}
+
+#toolbar { 
+    display: block;
+    margin: auto
+}
+
+#description { 
+    color: white;
+    font-weight: bold;
+    font-size:20px;
+    background: #0F4D92;
+    padding-bottom: 5px;
+    text-align: center;
+}
+
+#logoutbutton { 
+    font-size:12px;
+    color: white;
+    padding: 5px 3px;
+    background: #0F4D92;
+}
+
+#buttonbar {
+    height: 80px;
+}
+
+#buttonbar input[type="submit"] {
+    height: 50px;
+    width: 100%;
+    font-size:20px;
+    color: white;
+    background: #0F4D92; 
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 0 10px;
+}
+
+#slider { 
+    display: inline-block;
+    position: absolute
+}
+
+#buttonbar > form > div:first-child {
+    width: 50%;
+    width: calc(100% - 200px);
+    height: 2.5em;
+    padding-left: 20px;
+    padding-top: 10px;
+}

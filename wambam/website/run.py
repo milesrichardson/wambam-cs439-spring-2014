@@ -19,14 +19,19 @@ flask_pos = []
 def hello():
     try:
         pre_login_url = session['pre_login_url']
-    except KeyError:
+    except:
         pre_login_url = '/'
 
     return render_template('login.html', pre_login_url=pre_login_url)
 
 @app.route("/mobile")
 def hello_mobile():
-    return render_template('login_mobile.html')
+    try:
+        pre_login_url = session['pre_login_url']
+    except:
+        pre_login_url = '/'
+
+    return render_template('login_mobile.html', pre_login_url=pre_login_url)
 
 @app.route("/home")
 def home():
@@ -70,8 +75,8 @@ def register():
     # Email client to complete registration
     subject = "Complete Your WamBam! Registration"
     recipients = [user["email"]]
-    body = "Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home\r\n\r\nYours truly,\r\nThe WamBam! Team"
-    html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://salty-dusk-6711.herokuapp.com/home<br><br>Yours truly,<br>The WamBam! Team</div>"
+    body = "Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/home\r\n\r\nYours truly,\r\nThe WamBam! Team"
+    html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/home<br><br>Yours truly,<br>The WamBam! Team</div>"
     emails.send_email(subject, recipients, body, html)
 
     app.logger.debug("Before adding user after registration")    

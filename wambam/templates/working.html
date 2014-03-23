@@ -4,17 +4,17 @@
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <link rel="stylesheet" href="templates/jquery-toggles-master/toggles.css">
-    <link rel="stylesheet" href="templates/jquery-toggles-master/themes/toggles-iphone.css">
     <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='working.css') }}">
     <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='working_mobile.css') }}">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/toggles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/themes/toggles-iphone.css') }}">
     <style>
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="templates/jquery-toggles-master/toggles.js"></script>
-    <script src="templates/jquery-toggles-master/toggles.min.js"></script>
     <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery-toggles-master/toggles.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery-toggles-master/toggles.min.js') }}"> </script>
     <script>
       if (!String.prototype.format) {
         String.prototype.format = function() {
@@ -74,6 +74,7 @@
           '<input type="hidden" name="description" value="{5}">'+
           '<input type="hidden" name="expiration" value="{2}">'+
           '<input type="hidden" name="email" value="{3}">'+
+          '<input type="hidden" name="id" value="{6}">'+
           '</form> </div>';
 
       infowindow = new google.maps.InfoWindow({
@@ -95,12 +96,13 @@
                       email = data2["email"];
                     }, 
                     async: false});
+            var id = activeTasks[i]["id"];
             var location = activeTasks[i]["delivery_location"];
             var description = activeTasks[i]["long_title"];
             var lat = parseFloat(activeTasks[i]["latitude"]);
             var lng = parseFloat(activeTasks[i]["longitude"]);
             var myLatLng = new google.maps.LatLng(lat, lng);
-            var info = contentString.format(title,bid,expiration,email, location, description);
+            var info = contentString.format(title,bid,expiration,email, location, description, id);
             var marker = new google.maps.Marker({
               position: myLatLng,
               map: map,
@@ -139,7 +141,7 @@
     <div id="buttonbar">
       <form id="form" action="/home">
         <div>
-          <label id="label" for="alerts">Text Message Alerts for New Tasks?</label>
+          <label id="alert_label" for="alerts">Text Message Alerts for New Tasks?</label>
           <div id="slider" class="toggle-iphone"></div>
         </div>
         <input id="button" type="submit" value="Actually, I don't want to work!">
@@ -153,25 +155,30 @@
   <script>
     function setSliderPos() {
         if (screen.width >= 700) {
-            var labelLeftPos = $("#label").offset().left;
-            var labelBottomPos = $("#label").offset().top;
-            var labelWidth = $("#label").width();
+            var labelLeftPos = $("#alert_label").offset().left;
+            var labelBottomPos = $("#alert_label").offset().top;
+            var labelWidth = $("#alert_label").width();
             var windowHeight = $(window).height();
             $("#slider").css({
-               "top": (labelBottomPos + 30) + "px",
-               "left": (labelLeftPos + labelWidth / 2 - 60) + "px"
+               "top": (labelBottomPos + 20) + "px",
+               "left": (labelLeftPos + labelWidth / 2 - 60) + "px",
+               "right": ""
             });
         }
         else {
-            var labelBottomPos = $("#label").offset().top;
+            var labelBottomPos = $("#alert_label").offset().top;
+            print(labelBottomPos);
+            console.log(labelBottomPos);
             $("#slider").css({
-              "top": (labelBottomPos + 30) + "px",
-              "left": ($(window).width / 2 - 60) + "px"
+              "top": labelBottomPos + "px",
+              "right": (10) + "px",
+              "left": ""
             });
         }
     }
-    $(window).on('resize', function() { setLogoutPos(); setMapSize(); setSliderPos()});
-    $(window).on('load', function() { setLogoutPos(); setMapSize(); setSliderPos()});
+    setSliderPos();
+    $(window).on('resize', function() { setMapSize(); setSliderPos()});
+    $(window).on('load', function() { setMapSize(); setSliderPos()});
     $.ajax({
         url: 'get_online',
         type: 'GET',

@@ -18,7 +18,6 @@ def create_account_task_join_table(db):
     account_task = db.Table('account_task',
                          db.Column('account_id', db.Integer, db.ForeignKey('account.id')),
                          db.Column('task_id', db.Integer, db.ForeignKey('task.id')),
-                         # whether the user is assigned to fulfilling this task 
                          db.Column('status', db.Enum('active', 'inactive')),  
                          )
 
@@ -43,7 +42,7 @@ def create_account_table(db):
         def serialize_id(self):
             return {
                 'id' : self.id
-                }
+            }
         
         @property
         def serialize(self):
@@ -55,7 +54,7 @@ def create_account_table(db):
                'first_name' : self.first_name,
                'last_name' : self.last_name,
                'fulfiller_tasks' : self.serialize_fulfiller_tasks
-               }
+            }
 
         @property
         def serialize_fulfiller_tasks(self):
@@ -74,8 +73,8 @@ def create_account_table(db):
             except BadSignature:
                 return None
             user = Account.query.get(int(data[0]))
-            #make sure the passwords match
-            if user.verify_password(data[1]):
+        
+            if user.verify_password(data[1]): # make sure the passwords match
                 return user
             return None
 
@@ -98,7 +97,7 @@ def create_account_table(db):
             return password == self.password_hash
 
 def dump_datetime(value):
-    """Deserialize datetime object into string form for JSON processing."""
+    # Deserialize datetime object into string form for JSON processing.
     if value is None:
         return None
     currentTime = datetime.datetime.now();
@@ -126,14 +125,14 @@ def create_task_table(db):
                                    name='task_status_types'))
         
         fulfiller_accounts = db.relationship('Account', secondary=account_task,
-                                          backref=db.backref('tasks', lazy='dynamic'))
+                                            backref=db.backref('tasks', lazy='dynamic'))
 
 
         @property
         def serialize_id(self):
             return {
                 'id' : self.id
-                }
+            }
 
         @property
         def serialize(self):
@@ -150,7 +149,7 @@ def create_task_table(db):
                 'expiration_datetime' : dump_datetime(self.expiration_datetime),
                 'status' : self.status,
                 'fulfiller_accounts' : self.serialize_fulfiller_accounts
-                }
+            }
 
         @property
         def serialize_fulfiller_accounts(self):

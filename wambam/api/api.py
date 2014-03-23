@@ -44,14 +44,15 @@ def create_database(app):
     # Create the database tables.
     db.create_all()
 
+    # init db with account for Mike for ease of testing
     michael = schema.Account(
-    phone="7703629815",
-    phone_carrier="AT&T",
-    email="michael.hopkins@yale.edu",
-    password_hash="blah",
-    online=True,
-    first_name="Michael",
-    last_name="Hopkins")
+        phone='7703629815',
+        phone_carrier="AT&T",
+        email="michael.hopkins@yale.edu",
+        password_hash="blah",
+        online=True,
+        first_name="Michael",
+        last_name="Hopkins")
 
     db.session.add(michael)
     db.session.commit()
@@ -70,26 +71,19 @@ def create_api(app, db):
     manager.create_api(schema.Task, methods=['GET', 'POST', 'DELETE'])
     return manager
 
-app.config['SECRET_KEY'] = str(random.SystemRandom().randint(0,1000000))
-app.config['REMEMBER_COOKIE_DURATION'] = datetime.timedelta(days=14)
-
-db = create_database(app)
-api_manager = create_api(app,db)
-login_manager = login.create_login_manager(app, db)
-
 def add_user(user_data):
 
     number_object = phonenumbers.parse(user_data["phone"], "US")
     number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
 
     user = schema.Account(
-    phone=number_formatted,
-    phone_carrier=user_data["phone_carrier"],
-    email=user_data["email"],
-    password_hash=user_data["pwd"],
-    online=True,
-    first_name=user_data["first_name"],
-    last_name=user_data["last_name"])
+        phone=number_formatted,
+        phone_carrier=user_data["phone_carrier"],
+        email=user_data["email"],
+        password_hash=user_data["pwd"],
+        online=True,
+        first_name=user_data["first_name"],
+        last_name=user_data["last_name"])
 
     db.session.add(user)
     db.session.commit()
@@ -235,7 +229,7 @@ def submit():
     del session['lat']
     del session['lng']
 
-    app.logger.debug("Before confirmation text")    
+    app.logger.debug('Before confirmation text')    
 
     # Get logged in user
     user = flask.ext.login.current_user
@@ -249,7 +243,7 @@ def submit():
 
     # Construct message for requester
     msg_subject = "Order Submitted"
-    msg_body = "Your task request for '" + title + "' has been placed! We'll text you when someone claims your task."
+    msg_body = "Your task request for '" + title + " has been placed! We'll text you when someone claims your task."
     app.logger.debug("Email address: " + text_recipient[0])
 
     # Mail message to requester asynchronously
@@ -277,7 +271,6 @@ def submit():
 def protected():
     return 'Hello World'
 
-
 def is_session_valid():
     user = flask.ext.login.current_user
     if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 36000000 < user.last_request:
@@ -286,7 +279,7 @@ def is_session_valid():
 
 @app.before_request
 def before_request():
-    exempt_files = ['/check_email', '/check_phone',
+    exempt_files = ['/check_email', '/check_phone', '/favicon.ico',
                     flask.url_for('static', filename='login.css'), 
                     flask.url_for('static', filename='login_mobile.css'),
                     flask.url_for('static', filename='login_validator.js')]
@@ -310,8 +303,7 @@ def before_request():
             if flask.request.path.startswith('/viewtaskdetails'):
                 flask.session['pre_login_url'] = flask.request.path
             return flask.redirect('/')
-        else:
-            #session is valid
+        else: #session is valid
             user.last_request = int(time.time())
             flask.session['request_time'] = user.last_request
             db.session.commit()
@@ -332,8 +324,8 @@ def claim():
     fulfiller_id = int(current_user.get_id())
     fulfiller = schema.Account.query.get(fulfiller_id)
 
-    #TODO: make task_num equal to the actual number of the task
-    task_num = 1 #later on request.form['id']
+    #make task_num equal to the actual number of the task
+    task_num = request.form['id'] 
 
     # Get requester
     current_task = schema.Task.query.get(task_num)
@@ -419,8 +411,9 @@ def is_email_used(email):
     result = schema.Account.query.filter_by(email=email).first() is not None
     return flask.jsonify(used=str(result))
 
-def is_phone_used(phone):
-    number_object = phonenumbers.parse(phone, "US")
-    number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
-    result = schema.Account.query.filter_by(phone=number_formatted).first() is not None
-    return flask.jsonify(used=str(result))
+app.config['SECRET_KEY'] = str(random.SystemRandom().randint(0,1000000))
+app.config['REMEMBER_COOKIE_DURATION'] = datetime.timedelta(days=14)
+
+db = create_database(app)
+api_manager = create_api(app,db)
+login_manager = login.create_login_manager(app, db)
