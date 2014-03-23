@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='taskview.css') }}">
+        <link rel="stylesheet" type="text/css" media="screen and (max-device-width:700px)" href="{{ url_for('static', filename='taskview_mobile.css') }}">
+  </head>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <body>
+    {% include 'header.html' %}
+
+    <div id="contents">
+        <div id="cool"> You up for it? </div>
+        <table id="confirmtable">
+          <tr>
+            <td>
+              <label>Email</label>
+            </td>
+            <td>
+              <label>{{email}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Title</label>
+            </td>
+            <td>
+              <label>{{title}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Delivery Location</label>
+            </td>
+            <td>
+              <label>{{location}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Bid Amount</label>
+            </td>
+            <td>
+              <label>{{bid}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Task Expiration</label>
+            </td>
+            <td>
+              <label>{{expiration}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <br>
+              <label>Description:</label>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <label>{{description}}</label>
+            </td>
+          </tr>
+        </table>
+      <form id="form" action="/claimtaskview">
+        <input type="submit" value="Claim" /> 
+      </form>
+    </div>
+  </body>
+</html>
