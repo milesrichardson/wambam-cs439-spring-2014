@@ -391,7 +391,8 @@ def claim():
                             expiration = request.form['expiration'],
                             description = request.form['description'],
                             email = request.form['email'],
-                            phone="770-362-9815")
+                            phone="770-362-9815",
+                            desktop_client=request.cookies.get('mobile'))
 
 def is_email_used(email):
     result = schema.Account.query.filter_by(email=email).first() is not None

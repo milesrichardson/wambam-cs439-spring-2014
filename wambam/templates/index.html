@@ -16,18 +16,8 @@
     </script>
   </head>
   <body>
-    <div id="header">
-      <div id="toolbar">
-        <div id="title">WamBam!</div>
-	      <span id="logoutdiv">
-          <form action="/logout">
-            <input type="submit" id="logoutbutton" value="Log Out"></input>
-          </form>
-        </span>
-
-        <div id="description" style="clear:both;"> Drop a pin where you need something. </div>
-      </div>
-    </div>
+    {% include 'header.html' %}
+    <div id="description">Drop a pin where you need something.</div>
     <div id="map-canvas"></div>
     <div id="buttonbar">
       <form id="form" action="/working">
