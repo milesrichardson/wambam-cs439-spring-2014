@@ -15,33 +15,6 @@ body {
     border: 0
 }
 
-#header {
-    width: 100%;
-    background: #0F4D92;
-    text-align: center;
-    vertical-align: middle;
-    padding: 15px 0;
-    position: relative;
-}
-
-#title {
-    color: white;
-    font-size:40px 
-}
-
-#description { 
-    color: white;
-    font-weight: bold;
-    font-size:20px;
-}
-
-#logoutbutton { 
-    font-size:12px;
-    color: white;
-    padding: 5px 3px;
-    background: #0F4D92;
-}
-
 #addtasktitle {
     padding-top: 15px;
     font-size: 30px;

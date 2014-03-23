@@ -53,7 +53,14 @@ def create_login_manager(app, db):
                 flask.session['request_time'] = user.last_request
                 db.session.commit()
                 app.logger.debug("Good to go on login!")
-                return flask.redirect(flask.request.args.get('next') or "/home")
+
+                try:
+                    next = flask.request.form['next']
+                except:
+                    next = "/home"
+
+                print 'next value = %s' % next
+                return flask.redirect(next)
         else:
             app.logger.debug("Abort 2.0")
             return flask.abort(401)
@@ -71,4 +78,3 @@ def create_login_manager(app, db):
 #    app.config['REMEMBER_COOKIE_DOMAIN']='.'+app.config['SERVER_NAME']
     login_manager.login_view = '/login'
     return login_manager
-
