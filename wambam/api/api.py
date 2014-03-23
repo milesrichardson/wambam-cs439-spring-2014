@@ -46,7 +46,7 @@ def create_database(app):
 
     michael = schema.Account(
     phone="7703629815",
-    phone_carrier="T-Mobile",
+    phone_carrier="AT&T",
     email="michael.hopkins@yale.edu",
     password_hash="blah",
     online=True,
@@ -127,7 +127,7 @@ def getTextRecipient(phone_number, phone_carrier):
     emailaddress = emailaddress.replace("-", "")
 
     if phone_carrier == "AT&T":
-      emailaddress += "@message.alltel.com"
+      emailaddress += "@txt.att.net"
     elif phone_carrier == "Boost Mobile":
       emailaddress += "@myboostmobile.com"
     elif phone_carrier == "MetroPCS":
