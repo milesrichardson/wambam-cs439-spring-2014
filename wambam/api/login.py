@@ -53,8 +53,14 @@ def create_login_manager(app, db):
                 flask.session['request_time'] = user.last_request
                 db.session.commit()
                 app.logger.debug("Good to go on login!")
-                print 'next value = %s' % flask.request.form['next']
-                return flask.redirect(flask.request.form['next'] or "/home")
+
+                try:
+                    next = flask.request.form['next']
+                except:
+                    next = "/home"
+
+                print 'next value = %s' % next
+                return flask.redirect(next)
         else:
             app.logger.debug("Abort 2.0")
             return flask.abort(401)
