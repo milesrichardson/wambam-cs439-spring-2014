@@ -26,7 +26,12 @@ def hello():
 
 @app.route("/mobile")
 def hello_mobile():
-    return render_template('login_mobile.html')
+    try:
+        pre_login_url = session['pre_login_url']
+    except KeyError:
+        pre_login_url = '/'
+
+    return render_template('login_mobile.html', pre_login_url=pre_login_url)
 
 @app.route("/home")
 def home():
