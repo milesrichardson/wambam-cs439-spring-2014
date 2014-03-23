@@ -19,7 +19,7 @@ flask_pos = []
 def hello():
     try:
         pre_login_url = session['pre_login_url']
-    except KeyError:
+    except:
         pre_login_url = '/'
 
     return render_template('login.html', pre_login_url=pre_login_url)
@@ -28,7 +28,7 @@ def hello():
 def hello_mobile():
     try:
         pre_login_url = session['pre_login_url']
-    except KeyError:
+    except:
         pre_login_url = '/'
 
     return render_template('login_mobile.html', pre_login_url=pre_login_url)
