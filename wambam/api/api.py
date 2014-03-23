@@ -323,8 +323,8 @@ def claim():
     fulfiller_id = int(current_user.get_id())
     fulfiller = schema.Account.query.get(fulfiller_id)
 
-    #TODO: make task_num equal to the actual number of the task
-    task_num = request.form['id'] #later on request.form['id']
+    #make task_num equal to the actual number of the task
+    task_num = request.form['id'] 
 
     # Get requester
     current_task = schema.Task.query.get(task_num)
