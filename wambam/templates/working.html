@@ -4,8 +4,8 @@
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <link rel="stylesheet" href="templates/jquery-toggles-master/toggles.css">
-    <link rel="stylesheet" href="templates/jquery-toggles-master/themes/toggles-iphone.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/toggles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/themes/toggles-iphone.css') }}">
     <style>
       input, select, textarea {
         box-sizing: border-box;
@@ -29,10 +29,9 @@
       #form { margin: 0; padding: 0; display:inline }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="templates/jquery-toggles-master/toggles.js"></script>
-    <script src="templates/jquery-toggles-master/toggles.min.js"></script>
+    <script src="{{ url_for('static', filename='jquery-toggles-master/toggles.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery-toggles-master/toggles.min.js') }}"> </script>
     <script>
-
       function setMapSize() {
          var mapHeight = $("body").height() - $("#buttonbar").height() - $("#header").height() - 60;
          $("#map-canvas").height(mapHeight);
