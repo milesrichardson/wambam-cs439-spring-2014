@@ -279,7 +279,7 @@ def is_session_valid():
 
 @app.before_request
 def before_request():
-    exempt_files = ['/check_email', '/check_phone', '/favicon.ico'
+    exempt_files = ['/check_email', '/check_phone', '/favicon.ico',
                     flask.url_for('static', filename='login.css'), 
                     flask.url_for('static', filename='login_mobile.css'),
                     flask.url_for('static', filename='login_validator.js')]
