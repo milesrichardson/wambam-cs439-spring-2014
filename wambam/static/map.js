@@ -40,7 +40,8 @@ function initialize() {
             marker.setPosition(e.latLng);
         }
         $("#lat").val(e.latLng.lat());
-        $("#lng").val(e.latLng.lng())
+        $("#lng").val(e.latLng.lng());
+        setMapSize();
     });
     setMapSize();
 }
