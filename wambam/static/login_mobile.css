@@ -34,8 +34,12 @@ table {
 
 input {
     width: 100%;
-    height: 45px;
-    width: 100%
+    height: 40px
+}
+
+select {
+    width: 100%;
+    height: 40px
 }
 
 input[type="submit"] {
