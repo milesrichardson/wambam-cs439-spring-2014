@@ -216,6 +216,7 @@ def submit():
     elif (expiration == "1wk"):
         expirationdate += datetime.timedelta(0,0,0,0,0,0,1)
 
+    # IMPORTANT: can't do arithmetic with localized timezones
     eastern = timezone('US/Eastern')
     expirationdate = eastern.localize(expirationdate)
 
