@@ -103,9 +103,9 @@ def dump_datetime(value):
     # Deserialize datetime object into string form for JSON processing.
     if value is None:
         return None
-    eastern = timezone('US/Eastern')
     currentTime = datetime.datetime.now()
     delta = value - currentTime
+    eastern = timezone('US/Eastern')
     valueEST = (datetime.datetime.now(pytz.utc) + delta).astimezone(eastern)
     if (value.date() == currentTime.date()):
         return valueEST.strftime("%I:%M %p %Z")
