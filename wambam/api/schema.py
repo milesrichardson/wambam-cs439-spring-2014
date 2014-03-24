@@ -7,6 +7,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 import datetime
 from pytz import timezone
 import pytz
+from wambam import app
 
 user_task = None
 Account = None
@@ -104,19 +105,19 @@ def dump_datetime(value):
         return None
     eastern = timezone('US/Eastern')
     currentTime = datetime.datetime.now()
-    app.logger.debug(currentTime)
-    app.logger.debug(value)
+    app.logger.debug(currentTime.strftime("%I:%M %p %Z"))
+    app.logger.debug(value.strftime("%I:%M %p %Z"))
     if (value.date() == currentTime.date()):
         value = eastern.localize(value)
-        app.logger.debug(value)
+        app.logger.debug(value.strftime("%I:%M %p %Z"))
         return value.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):
         value = eastern.localize(value)
-        app.logger.debug(value)
+        app.logger.debug(value.strftime("%I:%M %p %Z"))
         return value.strftime("%A %I:%M %p %Z")
     
     value = eastern.localize(value)
-    app.logger.debug(value)
+    app.logger.debug(value.strftime("%I:%M %p %Z"))
     return value.strftime("%B %d, %Y")
 
 def create_task_table(db):
