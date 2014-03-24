@@ -16,6 +16,7 @@ itsdangerous==0.23
 passlib==1.6.2
 phonenumbers==6.0.0
 python-dateutil==1.5
+pytz==2014.1.1
 requests==2.2.1
 six==1.5.2
 tropo-webapi-python==0.1.3
