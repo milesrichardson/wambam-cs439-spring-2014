@@ -204,7 +204,7 @@ def submit():
 
     # format for timedelta is (days, seconds, microseconds, 
     # milliseconds, minutes, hours, weeks)
-    expirationdate = datetime.datetime.now()
+    expirationdate = datetime.datetime.now(pytz.utc)
     app.logger.debug(expiration)
     if (expiration == "30min"):
         expirationdate += datetime.timedelta(0,0,0,0,30)

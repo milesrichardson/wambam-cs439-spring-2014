@@ -103,7 +103,7 @@ def dump_datetime(value):
     if value is None:
         return None
     eastern = timezone('US/Eastern')
-    currentTime = eastern.localize(datetime.datetime.now())
+    currentTime = eastern.localize(datetime.datetime.now(pytz.utc))
     value = eastern.localize(value)
     if (value.date() == currentTime.date()):
         return value.strftime("%I:%M %p %Z")
