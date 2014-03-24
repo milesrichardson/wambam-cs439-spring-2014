@@ -105,8 +105,8 @@ def dump_datetime(value):
         return None
     eastern = timezone('US/Eastern')
     currentTime = datetime.datetime.now()
-    delta = currentTime - value
-    valueEST = eastern.localize(datetime.datetime.now()) + delta
+    delta = value - currentTime
+    valueEST = (datetime.datetime.now(pytz.utc) + delta).astimezone(eastern)
     if (value.date() == currentTime.date()):
         return valueEST.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):
