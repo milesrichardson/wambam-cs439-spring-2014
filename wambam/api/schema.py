@@ -104,12 +104,13 @@ def dump_datetime(value):
         return None
     eastern = timezone('US/Eastern')
     currentTime = eastern.localize(datetime.datetime.now())
+    value = eastern.localize(value)
     if (value.date() == currentTime.date()):
-        return eastern.localize(value.strftime("%I:%M %p %Z"))
+        return value.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):
-        return eastern.localize(value.strftime("%A %I:%M %p %Z"))
+        return value.strftime("%A %I:%M %p %Z")
     
-    return eastern.localize(value.strftime("%B %d, %Y"))
+    return value.strftime("%B %d, %Y")
 
 def create_task_table(db):
     global Task
