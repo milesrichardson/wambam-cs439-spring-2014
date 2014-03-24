@@ -216,6 +216,9 @@ def submit():
     elif (expiration == "1wk"):
         expirationdate += datetime.timedelta(0,0,0,0,0,0,1)
 
+    eastern = timezone('US/Eastern')
+    expirationdate = eastern.localize(expirationdate)
+
     # Get requestor id 
     current_user = flask.ext.login.current_user
     requestor_id = int(current_user.get_id())
