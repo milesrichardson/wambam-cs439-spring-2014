@@ -67,14 +67,21 @@ def register():
     user["phone_carrier"] = request.form['phonecarrier']
     app.logger.debug("Before adding email after registration")    
     user["email"] = request.form['email']
+    app.logger.debug("Before adding password after registration")    
     user["pwd"] = request.form['password']
+    app.logger.debug("Before adding fname after registration")    
     user["first_name"] = request.form['firstname']
+    app.logger.debug("Before adding lname after registration")    
     user["last_name"] = request.form['lastname']
+    app.logger.debug("Before adding pcon after registration")    
     passwordconfirm = request.form['passwordconfirm']
+
+    app.logger.debug("Before constructing email")    
 
     # Email client to complete registration
     subject = "Complete Your WamBam! Registration"
     recipients = [user["email"]]
+    app.logger.debug("after bug")    
     body = "Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/home\r\n\r\nYours truly,\r\nThe WamBam! Team"
     html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/home<br><br>Yours truly,<br>The WamBam! Team</div>"
     emails.send_email(subject, recipients, body, html)
