@@ -204,8 +204,7 @@ def submit():
 
     # format for timedelta is (days, seconds, microseconds, 
     # milliseconds, minutes, hours, weeks)
-    eastern = timezone('US/Eastern')
-    expirationdate = eastern.localize(datetime.datetime.now())
+    expirationdate = datetime.datetime.now()
     app.logger.debug(expiration)
     if (expiration == "30min"):
         expirationdate += datetime.timedelta(0,0,0,0,30)
@@ -217,6 +216,8 @@ def submit():
     elif (expiration == "1wk"):
         expirationdate += datetime.timedelta(0,0,0,0,0,0,1)
 
+    eastern = timezone('US/Eastern')
+    expirationdate = eastern.localize(expirationdate)
 
     # Get requestor id 
     current_user = flask.ext.login.current_user
@@ -391,11 +392,10 @@ def claim():
     return render_template('confirmationwambam.html',
                             title = request.form['title'],
                             location = request.form['location'],
-                            bid = request.form['bid'],
                             expiration = request.form['expiration'],
                             description = request.form['description'],
                             email = request.form['email'],
-                            phone="770-362-9815",
+                            phone= requestor.phone,
                             desktop_client=request.cookies.get('mobile'))
 
 @app.route('/viewtaskdetails/<int:taskid>')
