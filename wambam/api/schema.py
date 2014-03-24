@@ -106,13 +106,10 @@ def dump_datetime(value):
     currentTime = eastern.localize(datetime.datetime.now())
     value = eastern.localize(value)
     if (value.date() == currentTime.date()):
-        value = eastern.localize(value)
         return value.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):
-        value = eastern.localize(value)
         return value.strftime("%A %I:%M %p %Z")
     
-    value = eastern.localize(value)
     return value.strftime("%B %d, %Y")
 
 def create_task_table(db):
