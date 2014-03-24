@@ -1,6 +1,7 @@
 function setMapSize() {
     var mapHeight = $("body").outerHeight() - $("#buttonbar").outerHeight() - $("#header").outerHeight() - $("#description").outerHeight();
     $("#map-canvas").height(mapHeight);
+    console.debug("setMapSize");
 }
 
 $(window).on('resize', function() { setMapSize(); });

@@ -1,0 +1,46 @@
+#info_window {
+    width: 330px;
+    text-align: center;
+    line-height: 1.35; 
+    overflow: hidden; 
+    word-wrap: break-word;
+} 
+
+#info_label { 
+    text-align: left;
+    font-weight: bold;
+    font-size: 12px; 
+    border: 0px; 
+    margin: 0px; 
+    padding: 0px
+}
+
+#info_content {
+    text-align: left;
+    font-size: 12px; 
+    padding-left: 10px
+}
+
+#info_label_details {
+    text-align: left;
+    font-weight: bold;
+    font-size: 12px; 
+    border: 0px;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 20px
+}
+
+#info_details {
+    text-align: left;
+    font-size: 12px; 
+}
+
+#info_button {
+    height: 30px;
+    width: 75px;
+    font-size: 15px;
+    color: white;
+    background: #0F4D92;
+    text-align: center
+}

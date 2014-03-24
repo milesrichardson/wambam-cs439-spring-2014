@@ -28,11 +28,13 @@ table {
 
 table input, select{
     width: 100%;
-    height: 45px;
+    height: 40px;
+    font-size: 16px
 }
 
 textarea {
     width: 100%;
+    font-size: 16px
 }
 
 input[type="submit"] {
