@@ -4,7 +4,7 @@ function setMapSize() {
 }
 
 $(window).on('resize', function() { setMapSize(); });
-$("#buttonbar").on('resize', function() { setMapSize(); });
+
 var map;
 function initialize() {
     var mapOptions = {
