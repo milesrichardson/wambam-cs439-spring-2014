@@ -34,15 +34,13 @@ body {
     margin: auto
 }
 
-#desc { 
-    color: black;
+#description { 
+    color: white;
     font-weight: bold;
-    font-size: 10px;
+    font-size: 16px;
     background: #0F4D92;
     padding-bottom: 5px;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto
+    text-align: center
 }
 
 #logoutbutton { 

@@ -35,7 +35,7 @@ def hello_mobile():
 
 @app.route("/home")
 def home():
-    return render_template('index.html')
+    return render_template('index1.html')
 
 @app.route("/working")
 def working():
