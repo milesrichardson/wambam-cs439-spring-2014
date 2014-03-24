@@ -202,14 +202,14 @@
                   $.ajax({
                       type: 'POST',
                       url: 'set_online',
-                      async: true
+                      async: false
                   });
               } else {
                   $('.toggle-off').show();
                   $.ajax({
                       type: 'POST',
                       url: 'set_offline',
-                      async: true
+                      async: false
                   });
               }
           });
