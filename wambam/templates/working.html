@@ -137,7 +137,7 @@
 
 
   <body>
-
+    {% include 'header.html' %}
     <div id="description">Claim a task and become a WamBam!</div>
     <div id="map-canvas"></div>
     <div id="buttonbar">
@@ -200,18 +200,16 @@
               if (active) {
                   $('.toggle-off').hide();
                   $.ajax({
-                      url: 'set_online',
                       type: 'POST',
-                      contentType: 'application/json',
-                      async: true,
+                      url: 'set_online',
+                      async: true
                   });
               } else {
                   $('.toggle-off').show();
                   $.ajax({
-                      url: 'set_offline',
                       type: 'POST',
-                      contentType: 'application/json',
-                      async: true,
+                      url: 'set_offline',
+                      async: true
                   });
               }
           });
