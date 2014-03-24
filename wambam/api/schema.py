@@ -5,6 +5,8 @@ import flask.ext.login
 
 from itsdangerous import URLSafeTimedSerializer as Serializer
 import datetime
+from pytz import timezone
+import pytz
 
 user_task = None
 Account = None
@@ -100,7 +102,8 @@ def dump_datetime(value):
     # Deserialize datetime object into string form for JSON processing.
     if value is None:
         return None
-    currentTime = datetime.datetime.now();
+    eastern = timezone('US/Eastern')
+    currentTime = eastern.localize(datetime.datetime.now())
     if (value.date() == currentTime.date()):
         return value.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):

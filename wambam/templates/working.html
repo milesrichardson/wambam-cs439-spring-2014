@@ -90,11 +90,12 @@
             var title = activeTasks[i]["short_title"];
             var bid = activeTasks[i]["bid"];
             var expiration = activeTasks[i]["expiration_datetime"];
-            var email = "michael.hopkins@yale.edu";
+            var email = "";
             var requestor = activeTasks[i]["requestor_id"];
             $.ajax({url:'api/account/' + requestor, 
                     success: function(data2) {
                       email = data2["email"];
+                      console.debug(email);
                     }, 
                     async: false});
             var id = activeTasks[i]["id"];

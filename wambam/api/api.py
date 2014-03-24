@@ -18,6 +18,10 @@ import schema
 import emails
 from wambam import app
 
+from pytz import timezone
+import pytz
+
+
 engine = None
 
 def create_app():
@@ -200,7 +204,8 @@ def submit():
 
     # format for timedelta is (days, seconds, microseconds, 
     # milliseconds, minutes, hours, weeks)
-    expirationdate = datetime.datetime.now()
+    eastern = timezone('US/Eastern')
+    expirationdate = eastern.localize(datetime.datetime.now())
     app.logger.debug(expiration)
     if (expiration == "30min"):
         expirationdate += datetime.timedelta(0,0,0,0,30)
@@ -212,8 +217,13 @@ def submit():
     elif (expiration == "1wk"):
         expirationdate += datetime.timedelta(0,0,0,0,0,0,1)
 
+
+    # Get requestor id 
+    current_user = flask.ext.login.current_user
+    requestor_id = int(current_user.get_id())
+
     task = schema.Task(
-        requestor_id='1',
+        requestor_id=requestor_id,
         latitude = lat,
         longitude = lng,
         short_title=title,
@@ -254,6 +264,7 @@ def submit():
     fulfillers = schema.Account.query.filter(schema.Account.online == True).all()
     fulfiller_phones = map(getPhone, fulfillers)
     fulfiller_carriers = map(getPhoneCarrier, fulfillers)
+
     text_fulfillers = map(getTextRecipient, fulfiller_phones, fulfiller_carriers)
 
     # Construct message for potential fulfillers
