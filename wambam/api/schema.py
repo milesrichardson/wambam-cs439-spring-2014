@@ -103,13 +103,15 @@ def dump_datetime(value):
     if value is None:
         return None
     eastern = timezone('US/Eastern')
-    currentTime = eastern.localize(datetime.datetime.now(pytz.utc))
-    value = eastern.localize(value)
+    currentTime = datetime.datetime.now()
     if (value.date() == currentTime.date()):
+        value = eastern.localize(value)
         return value.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):
+        value = eastern.localize(value)
         return value.strftime("%A %I:%M %p %Z")
     
+    value = eastern.localize(value)
     return value.strftime("%B %d, %Y")
 
 def create_task_table(db):
