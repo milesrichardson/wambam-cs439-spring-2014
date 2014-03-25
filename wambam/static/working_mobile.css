@@ -38,7 +38,6 @@ body {
 
 #buttonbar {
     height: 80px;
-    margin-bottom: 20px;
 }
 
 #buttonbar input[type="submit"] {
@@ -48,7 +47,7 @@ body {
     color: white;
     background: #0F4D92; 
     text-align: center;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
     padding: 0 10px;
 }
 
