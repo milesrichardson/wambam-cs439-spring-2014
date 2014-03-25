@@ -1,0 +1,66 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    border: 0
+}
+
+#contents {
+    text-align: center
+}
+
+#cool {
+    font-size:32px;
+    margin-top: 15px;
+}
+
+#desc {
+    font-size:20px;
+    margin: 15px 0 25px;
+}
+
+#confirmtable {
+    text-align: left;
+    margin: 0 auto;
+}
+
+label {
+    font-size: 16px
+}
+
+td:first-child {
+    width: 200px
+}
+
+#deliveryloc, #bid {
+    width: 250px;
+    font-size: 16px;
+    padding: 5px 5px 5px 0;
+}
+
+#expiration { 
+    width: 250px;
+    font-size: 16px;
+    padding: 5px 0;
+}
+
+#description { 
+    margin: 0 auto;
+    font-size: 16px;
+    text-align: left;
+}
+
+#contents input[type='submit'] {
+    height: 50px;
+    width: 225px;
+    font-size:16px;
+    color: white;
+    background: #0F4D92; 
+    text-align: center;
+    margin: 25px 15px 0 15px;
+}
