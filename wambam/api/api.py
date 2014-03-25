@@ -425,6 +425,8 @@ def view_task_details(taskid):
 
         return render_template('taskview.html',
                                 task_id = task.id,
+                                lat = task.latitude,
+                                lon = task.longitude,
                                 title = task.short_title,
                                 location = task.delivery_location,
                                 bid = "$%(bid).2f" % {"bid": task.bid},

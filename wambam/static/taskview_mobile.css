@@ -10,6 +10,11 @@ body {
     border: 0
 }
 
+#map-canvas {
+    height: 100px;
+    width: 100%
+}
+
 #contents {
     text-align: center
 }

@@ -7,10 +7,40 @@
         <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='taskview.css') }}">
         <link rel="stylesheet" type="text/css" media="screen and (max-device-width:700px)" href="{{ url_for('static', filename='taskview_mobile.css') }}">
   </head>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+  <script>
+      var map;
+
+      function initialize() {
+        var mapOptions = {
+        zoom: 15,
+        center: new google.maps.LatLng({{lat}}, {{lon}})
+        };
+
+        map = new google.maps.Map(document.getElementById('map-canvas'),
+                                  mapOptions);
+
+	      map.setOptions({styles: [
+	         {
+	           featureType: "poi",
+             elementType: "labels",
+	           stylers: [
+	             { visibility: "off" }
+	           ]
+	         }
+	       ]});
+          var myLatLng = new google.maps.LatLng({{lat}}, {{lon}});
+          var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+          });
+        }
+        google.maps.event.addDomListener(window, 'load', initialize);
+  </script>
   <body>
     {% include 'header.html' %}
-
+    <div id="map-canvas"></div>
     <div id="contents">
         <div id="cool"> You up for it? </div>
         <table id="confirmtable">

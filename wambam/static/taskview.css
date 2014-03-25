@@ -14,6 +14,11 @@ body {
     border: 0
 }
 
+#map-canvas {
+    height: 250px;
+    width: 100%
+}
+
 #contents {
     text-align: center
 }
