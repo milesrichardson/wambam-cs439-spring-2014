@@ -38,6 +38,7 @@ body {
 
 #buttonbar {
     height: 80px;
+    margin-bottom: 20px;
 }
 
 #buttonbar input[type="submit"] {
