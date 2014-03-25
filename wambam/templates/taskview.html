@@ -40,7 +40,6 @@
   </script>
   <body>
     {% include 'header.html' %}
-    <div id="map-canvas"></div>
     <div id="contents">
         <div id="cool"> You up for it? </div>
         <table id="confirmtable">
@@ -94,6 +93,11 @@
           <tr>
             <td colspan="2">
               <label>{{description}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <div id="map-canvas"></div>
             </td>
           </tr>
         </table>

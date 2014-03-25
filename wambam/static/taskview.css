@@ -15,6 +15,7 @@ body {
 }
 
 #map-canvas {
+    margin-top: 15px;
     height: 250px;
     width: 100%
 }
