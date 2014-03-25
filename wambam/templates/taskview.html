@@ -67,8 +67,8 @@
             </td>
           </tr>
         </table>
-      <form id="form" action="/claimtaskview">
-        <input type="hidden" value={{task_id}} />
+      <form id="form" action="/claimtask" method="POST">
+        <input name="id" type="hidden" value={{task_id}} />
         <input type="submit" value="Claim" /> 
       </form>
     </div>
