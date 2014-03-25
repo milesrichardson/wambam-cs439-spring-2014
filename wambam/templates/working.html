@@ -13,8 +13,7 @@
     <style>
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="{{ url_for('static', filename='map.js') }}"></script>
-    <script src="{{ url_for('static', filename='jquery-toggles-master/toggles.js') }}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
     <script src="{{ url_for('static', filename='jquery-toggles-master/toggles.min.js') }}"> </script>
     <script>
       if (!String.prototype.format) {
@@ -29,10 +28,18 @@
         };
       }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
     <script>
       var map;
       var infowindow = null;
+
+      function setMapSize() {
+          var mapHeight = $("body").outerHeight() - $("#buttonbar").outerHeight() - $("#header").outerHeight() - $("#description").outerHeight();
+          $("#map-canvas").height(mapHeight);
+          console.debug("setMapSize");
+      }
+
+      $(window).on('resize', function() { setMapSize(); });
+
       function initialize() {
         var mapOptions = {
         zoom: 15,
@@ -69,12 +76,6 @@
 '</td> </tr> </table>'+ 
           '<form action="/claimtask" method="POST">'+
           '<input type="submit" value="Claim" id="info_button">'+
-          '<input type="hidden" name="title" value="{0}">'+
-          '<input type="hidden" name="bid" value="{1}">'+
-          '<input type="hidden" name="location" value="{4}">'+
-          '<input type="hidden" name="description" value="{5}">'+
-          '<input type="hidden" name="expiration" value="{2}">'+
-          '<input type="hidden" name="email" value="{3}">'+
           '<input type="hidden" name="id" value="{6}">'+
           '</form> </div>';
 
@@ -119,16 +120,8 @@
           setMapSize();
       });
     }
-
     google.maps.event.addDomListener(window, 'load', initialize);
-/*
-[
-        ['GHeav Sandwich', 'Calhoun A31', '$10', '1 hour', 'Bring me a sandwich from GHeav with turkey, lettuce, tomato, cheese, and NO MAYO.', 'aayush.upadhyay@yale.edu', 41.3101, -72.9277],
-        ['A Little Lovin', 'Branford E32', '$0', '1 week', 'No description needed.', 'william.childs-klein@yale.edu', 41.3091, -72.9267],
-        ['Help with UML', 'Open Zoo', '$40', '1 day', 'I am so glad that we have a unified markup language, but I really need someone to teach me the basics for an hour or so.', 'ruzica.piskac@yale.edu', 41.3081, -72.9297],
-        ['WamBam! Development', 'CEID', '$30', '1 week', 'We need help testing out amazing product before it comes out to the Yale public.', 'brandon.smith@yale.edu', 41.3115, -72.9307],
-        ['Flying', 'Old Campus', '$1,000,000', '1 week', 'I want to learn to fly, preferably like superman, but I would be OK going Wonderwoman style with an invisible jet.', 'miles.richardson@yale.edu', 41.3103, -72.9317]
-      ];*/
+
     </script>
   </head>
 

@@ -106,7 +106,9 @@ def execute():
 
 @app.route("/confirm")
 def confirm():
-    return render_template('confirmation.html')
+    cool_word = api.get_cool_word()
+    return render_template('confirmation.html',
+                            cool_word = cool_word)
 
 if __name__ == "__main__":
     app.run(debug=True)

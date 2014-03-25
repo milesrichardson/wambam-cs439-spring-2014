@@ -323,29 +323,35 @@ def before_request():
             flask.session['request_time'] = user.last_request
             db.session.commit()
 
+def get_cool_word():
+    words = ["Sweet.", "Cool.", "Awesome.", "Dope.", "Word.", "Great.", "Wicked.", "Solid.", "Super.", "Super-duper.", "Excellent.", "Nice."]
+    index = random.randint(0, len(words) - 1)
+    return words[index]
     
 @app.route("/claimtask", methods=['POST'])
 def claim():
+  
+    #make task_num equal to the actual number of the task
+    task_num = int(request.form['id'])
+    task = schema.Task.query.get(task_num)
 
-    title = request.form['title']
-    location = request.form['location']
-    bid = request.form['bid']
-    expiration = request.form['expiration']
-    description = request.form['description']
-    email = request.form['email']
+    title = task.short_title
+    location = task.delivery_location
+    bid = task.bid
+    expiration = schema.dump_datetime(task.expiration_datetime)
+    description = task.long_title
 
     # Get fulfiller
     current_user = flask.ext.login.current_user
     fulfiller_id = int(current_user.get_id())
     fulfiller = schema.Account.query.get(fulfiller_id)
 
-    #make task_num equal to the actual number of the task
-    task_num = request.form['id'] 
 
     # Get requester
     current_task = schema.Task.query.get(task_num)
     requestor_id = current_task.requestor_id
     requestor = schema.Account.query.get(requestor_id)
+    email = requestor.email
 
     # add entry to account_task table
     conn = engine.connect()
@@ -390,14 +396,19 @@ def claim():
     # Send confirmation message to requestor
     emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
 
+    # Get confirmation word
+    cool_word = get_cool_word()
+
     app.logger.debug("Sent confirmation texts")   
     app.logger.debug("end claimtask")
     return render_template('confirmationwambam.html',
-                            title = request.form['title'],
-                            location = request.form['location'],
-                            expiration = request.form['expiration'],
-                            description = request.form['description'],
-                            email = request.form['email'],
+                            cool_word = cool_word,
+                            title = title,
+                            location = location,
+                            expiration = expiration,
+                            description = description,
+                            email = email,
+                            bid = "$%(bid).2f" % {"bid": bid},
                             phone= requestor.phone,
                             desktop_client=request.cookies.get('mobile'))
 
