@@ -424,6 +424,7 @@ def view_task_details(taskid):
         fulfiller = schema.Account.query.get(fulfiller_id)
 
         return render_template('taskview.html',
+                                task_id = task.id,
                                 title = task.short_title,
                                 location = task.delivery_location,
                                 bid = "$%(bid).2f" % {"bid": task.bid},
