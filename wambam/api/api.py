@@ -151,6 +151,7 @@ def getPhoneCarrier(fulfiller):
 
 @app.route("/set_online", methods=['POST'])
 def set_online():
+    app.logger.debug("Start set_online")
     # Get current user
     user = flask.ext.login.current_user
     user_id = int(user.get_id())
@@ -162,9 +163,12 @@ def set_online():
     # add and commit changes
     db.session.add(flask_user)
     db.session.commit()
+    app.logger.debug("End set_online")
+    return ""
 
 @app.route("/set_offline", methods=['POST'])
 def set_offline():
+    app.logger.debug("Start set_offline")
     # Get current user
     user = flask.ext.login.current_user
     user_id = int(user.get_id())
@@ -176,6 +180,8 @@ def set_offline():
     # add and commit changes
     db.session.add(flask_user)
     db.session.commit()
+    app.logger.debug("End set_offline")
+    return ""
 
 @app.route("/get_online")
 def get_online():

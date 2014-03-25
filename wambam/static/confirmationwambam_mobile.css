@@ -21,7 +21,7 @@ body {
 
 #desc {
     font-size:20px;
-    margin: 15px 0 25px;
+    margin: 10px 0 10px;
 }
 
 #confirmtable {
@@ -62,5 +62,5 @@ td:first-child {
     color: white;
     background: #0F4D92; 
     text-align: center;
-    margin: 25px 15px 0 15px;
+    margin: 25px 15px 15px 15px;
 }
