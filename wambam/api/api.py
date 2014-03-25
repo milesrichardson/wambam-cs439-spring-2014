@@ -328,12 +328,19 @@ def get_cool_word():
     index = random.randint(0, len(words) - 1)
     return words[index]
     
+@app.route("/sorry")
+def sorry():
+    return render_template('alreadyclaimed.html')
+
 @app.route("/claimtask", methods=['POST'])
 def claim():
   
     #make task_num equal to the actual number of the task
     task_num = int(request.form['id'])
     task = schema.Task.query.get(task_num)
+
+    if (task.status != "unassigned"):
+      return redirect('/sorry')
 
     title = task.short_title
     location = task.delivery_location
@@ -418,6 +425,9 @@ def view_task_details(taskid):
     if (task is None):
         return flask.redirect('/home')
     else:
+        if (task.status != "unassigned"):
+          return redirect('/sorry')
+
         # Get email address of logged in user 
         current_user = flask.ext.login.current_user
         fulfiller_id = int(current_user.get_id())
