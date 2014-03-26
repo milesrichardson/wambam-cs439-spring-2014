@@ -271,6 +271,10 @@ def submit():
 
     text_fulfillers = map(getTextRecipient, fulfiller_phones, fulfiller_carriers)
 
+    # Remove task requestor from list of potential fulfillers
+    if (text_fulfillers.count(text_recipient[0]) > 0):
+        text_fulfillers.remove(text_recipient[0])
+
     # Construct message for potential fulfillers
     msg_subject = "New Task Alert"
     msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + "."
