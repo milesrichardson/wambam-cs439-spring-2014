@@ -35,9 +35,8 @@ def create_database(app):
     db_name = uuid.uuid1().hex
 
     app.config['DEBUG'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + db_name + '.db'
 
-    print app.config['SQLALCHEMY_DATABASE_URI']
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://eaujvfqdwfoukl:8SKM3pitv5rggOhMQezrPy8F1x@ec2-54-197-250-40.compute-1.amazonaws.com:5432/deses460fbjk57'
 
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     
