@@ -36,7 +36,8 @@ def create_database(app):
 
     app.config['DEBUG'] = True
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://eaujvfqdwfoukl:8SKM3pitv5rggOhMQezrPy8F1x@ec2-54-197-250-40.compute-1.amazonaws.com:5432/deses460fbjk57'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://eaujvfqdwfoukl:8SKM3pitv5rggOhMQezrPy8F1x@ec2-54-197-250-40.compute-1.amazonaws.com:5432/deses460fbjk57'
+#    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
 
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     
@@ -46,18 +47,7 @@ def create_database(app):
 
     # Create the database tables.
     db.create_all()
-
-    # init db with account for Mike for ease of testing
-    michael = schema.Account(
-        phone='7703629815',
-        phone_carrier="AT&T",
-        email="michael.hopkins@yale.edu",
-        password_hash="blah",
-        online=True,
-        first_name="Michael",
-        last_name="Hopkins")
-
-    db.session.add(michael)
+    
     db.session.commit()
 
     return db

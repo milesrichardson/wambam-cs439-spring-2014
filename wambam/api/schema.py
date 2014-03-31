@@ -21,7 +21,7 @@ def create_account_task_join_table(db):
     account_task = db.Table('account_task',
                          db.Column('account_id', db.Integer, db.ForeignKey('account.id')),
                          db.Column('task_id', db.Integer, db.ForeignKey('task.id')),
-                         db.Column('status', db.Enum('active', 'inactive')),  
+                            db.Column('status', db.Enum('active', 'inactive', name='status_enum')),  
                          )
 
 
