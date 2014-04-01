@@ -9,11 +9,23 @@ from pytz import timezone
 import pytz
 from wambam import app
 
+current_schema_version = 1
+
+SchemaVersion = None
 user_task = None
 Account = None
 Task = None
 token_serializer = None
 token_duration = None
+
+#a table used to keep track of the version of the schema currently
+#stored in the database
+def create_schema_version_table(db):
+    global SchemaVersion
+    class SchemaVersion(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        version = db.Column(db.Integer)
+
 
 # a join table used for matching the fulfilling users and tasks
 def create_account_task_join_table(db):
@@ -168,6 +180,7 @@ def create_tables(app, db):
     global token_duration
     token_duration = app.config['REMEMBER_COOKIE_DURATION'].total_seconds()
 
+    create_schema_version_table(db)
     create_account_task_join_table(db)
     create_account_table(db)
     create_task_table(db)

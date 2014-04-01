@@ -10,6 +10,7 @@ import random
 import datetime
 import time
 import json
+import os
 
 import phonenumbers
 
@@ -31,13 +32,10 @@ def create_database(app):
     global engine
     # Create the Flask application and the Flask-SQLAlchemy object
     
-    # generate a new name for the database each time, for testing purposes
-    db_name = uuid.uuid1().hex
-
     app.config['DEBUG'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://eaujvfqdwfoukl:8SKM3pitv5rggOhMQezrPy8F1x@ec2-54-197-250-40.compute-1.amazonaws.com:5432/deses460fbjk57'
-#    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
+    #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
 
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     
@@ -45,11 +43,18 @@ def create_database(app):
     db = flask.ext.sqlalchemy.SQLAlchemy(app)
     schema.create_tables(app, db)
 
-    # Create the database tables.
-    db.create_all()
-    
-    db.session.commit()
 
+    if True:#schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+        print 'Migrating database'
+        db.drop_all()
+        db.create_all()
+
+        # Add the version to the database
+        version = schema.SchemaVersion(version=schema.current_schema_version)
+        db.session.add(version)
+        
+        db.session.commit()
+    
     return db
 
 
