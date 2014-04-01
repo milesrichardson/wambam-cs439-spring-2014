@@ -44,7 +44,7 @@ def create_database(app):
     schema.create_tables(app, db)
 
 
-    if True:#schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+    if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
         print 'Migrating database'
         db.drop_all()
         db.create_all()
