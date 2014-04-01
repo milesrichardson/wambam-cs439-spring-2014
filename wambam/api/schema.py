@@ -144,6 +144,8 @@ def create_task_table(db):
         
         fulfiller_accounts = db.relationship('Account', secondary=account_task,
                                             backref=db.backref('tasks', lazy='dynamic'))
+        venmo_status = db.Column(db.Enum('paid', 'unpaid',\
+                                 name='venmo_status'), default='unpaid')
 
 
         @property
@@ -166,13 +168,25 @@ def create_task_table(db):
                 'bid' : "$%(bid).2f" % {"bid": self.bid},
                 'expiration_datetime' : dump_datetime(self.expiration_datetime),
                 'status' : self.status,
-                'fulfiller_accounts' : self.serialize_fulfiller_accounts
+                'fulfiller_accounts' : self.serialize_fulfiller_accounts,
+                'venmo_status' : self.venmo_status,
             }
 
         @property
         def serialize_fulfiller_accounts(self):
             return [account.serialize_id for account in self.fulfiller_accounts]
         
+
+def create_feedback_table(db):
+    global Feedback
+    class Feedback(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+        rater_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+        rated_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+        rating = db.Column(db.Enum('positive', 'negative',\
+                           name='feedback_ratings'), nullable=True)
+
 
 def create_tables(app, db):
     global token_serializer

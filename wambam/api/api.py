@@ -21,21 +21,27 @@ from wambam import app
 
 from pytz import timezone
 import pytz
-
+import sqlite3
+import uuid
 
 engine = None
 
 def create_app():
     return flask.Flask(__name__)
 
+
 def create_database(app):
     global engine
     # Create the Flask application and the Flask-SQLAlchemy object
     
     app.config['DEBUG'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+    # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
     #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://root:@localhost/wambam'
+
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     
@@ -43,8 +49,8 @@ def create_database(app):
     db = flask.ext.sqlalchemy.SQLAlchemy(app)
     schema.create_tables(app, db)
 
-
-    if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+    # if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+    if True:
         print 'Migrating database'
         db.drop_all()
         db.create_all()
@@ -104,12 +110,26 @@ def get_all_claimed_tasks():
 
 @app.route('/tasks_for_requestor/<int:requestor>')
 def tasks_for_requestor(requestor):
-    return flask.jsonify(items=schema.Task.query.filter_by(requestor_id=requestor).all())
+    data = flask.jsonify(\
+        items=[item.serialize for item in\
+               schema.Task.query.filter_by(requestor_id=requestor).all()]
+    )
+    return data
 
 @app.route('/tasks_for_fulfiller/<int:fulfiller>')
 def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
-    return flask.jsonify(items=data)
+    return flask.jsonify(items=[item.serialize for item in data])
+
+# This is unnecessary but Michael requested it ;)
+@app.route('/get_tasks_as_requestor')
+def tasks_as_requestor():
+    return tasks_for_requestor(flask.ext.login.current_user.get_id())
+
+@app.route('/get_tasks_as_fulfiller')
+def tasks_as_fulfiller():
+    return tasks_for_fulfiller(flask.ext.login.current_user.get_id())    
+
 
 def getTextRecipient(phone_number, phone_carrier):
     emailaddress = phone_number
