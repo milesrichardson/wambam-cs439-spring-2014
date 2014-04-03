@@ -20,6 +20,7 @@
     <div id="description">Drop a pin where you need something.</div>
     <div id="map-canvas"></div>
     <div id="buttonbar">
+      {%if activated %}
       <form id="form" action="/working">
         <input type="submit" value="I want to work!">
       </form>
@@ -27,8 +28,11 @@
         <input type="hidden" id="lat" name="lat" type="text" />
         <input type="hidden" id="lng" name="lng" type="text" />
         <input type="hidden" id="browser_type" name="browser_type" type="text" />
-        <input id="create_task_button" type="submit" value="Get it done" style="display: none" /> 
+        <input id="create_task_button" type="submit" value="Get it done" style="display: none" />
       </form>
+      {% else %}
+      <div>Activate your account!!!</div>
+      {% endif %}
     </div>
   </body>
   <script>

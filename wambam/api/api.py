@@ -24,6 +24,8 @@ import pytz
 import sqlite3
 import uuid
 
+import string
+
 engine = None
 
 def create_app():
@@ -35,13 +37,14 @@ def create_database(app):
     # Create the Flask application and the Flask-SQLAlchemy object
     
     app.config['DEBUG'] = True
-    # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
     #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://root:@localhost/wambam'
 
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+#    db_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+ #   app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+db_name+'.db'
 
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     
@@ -49,8 +52,7 @@ def create_database(app):
     db = flask.ext.sqlalchemy.SQLAlchemy(app)
     schema.create_tables(app, db)
 
-    # if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
-    if True:
+    if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
         print 'Migrating database'
         db.drop_all()
         db.create_all()
@@ -81,6 +83,8 @@ def add_user(user_data):
     number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
 
     user = schema.Account(
+        email_hash=user_data["verification_address"],
+        activated=False,
         phone=number_formatted,
         phone_carrier=user_data["phone_carrier"],
         email=user_data["email"],
@@ -300,10 +304,6 @@ def submit():
     app.logger.debug("end submittask")
     return redirect(url_for('confirm'))
 
-@app.route("/protected")
-def protected():
-    return 'Hello World'
-
 def is_session_valid():
     user = flask.ext.login.current_user
     if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 36000000 < user.last_request:
@@ -320,26 +320,39 @@ def before_request():
     for f in exempt_files:
         if flask.request.path == f:
             return None
-    print flask.request.path;
+
     user = flask.ext.login.current_user
 
+    #trying to access the verification page
+    if flask.request.path.startswith('/v/'):
+        return None
+
+
+    #trying to access an unprotected page
     if flask.request.path == '/' or flask.request.path == '/mobile' or \
        flask.request.path == '/login' or flask.request.path == '/register':
 
+        #no need for them to access, go home
         if not user.is_anonymous() and is_session_valid():
             return flask.redirect('/home')
-
+    
+    #trying to access a protected page
     else:
+        #user is not valid
         if user.is_anonymous() or not is_session_valid():
-            app.logger.debug("Session is not valid")
-            print 'Setting pre_login_url = %s' % flask.request.path
-            if flask.request.path.startswith('/viewtaskdetails'):
+            if flask.request.path.startswith('/viewtaskdetails/'):
                 flask.session['pre_login_url'] = flask.request.path
             return flask.redirect('/')
+
         else: #session is valid
+            #update their token
             user.last_request = int(time.time())
             flask.session['request_time'] = user.last_request
             db.session.commit()
+            
+            #if they're not activated dont let them go anywhere
+            if not is_user_activated() and not (flask.request.path == '/home' or flask.request.path == '/logout'):
+                return flask.redirect('/home')
 
 def get_cool_word():
     words = ["Sweet.", "Cool.", "Awesome.", "Dope.", "Word.", "Great.", "Wicked.", "Solid.", "Super.", "Super-duper.", "Excellent.", "Nice."]
@@ -463,9 +476,26 @@ def view_task_details(taskid):
                                 email = fulfiller.email)
 
 
+def activate_user(verification_address):
+    account = schema.Account.query.filter_by(email_hash=verification_address).first()
+    print account
+    if account is None:
+        return None
+    else:
+        if account.activated:
+            return False
+        else:
+            account.activated = True
+            db.session.commit()
+            return True
+
+
 def is_email_used(email):
     result = schema.Account.query.filter_by(email=email).first() is not None
     return flask.jsonify(used=str(result))
+
+def is_user_activated():
+    return flask.ext.login.current_user.activated
 
 app.config['SECRET_KEY'] = str(random.SystemRandom().randint(0,1000000))
 app.config['REMEMBER_COOKIE_DURATION'] = datetime.timedelta(days=14)

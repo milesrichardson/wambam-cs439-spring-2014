@@ -34,6 +34,11 @@ body {
     padding-bottom: 20px
 }
 
+#buttonbar div {
+    margin-top: 30px;
+    font-size: 30px;
+}
+
 #buttonbar input[type="submit"] {
     height: 50px;
     width: 200px;

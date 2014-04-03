@@ -5,13 +5,11 @@ from flask_mail import Message
 from flask_mail import Mail
 import json
 import requests
+import hashlib
 
 from wambam import app
 import api
 import emails
-
-app.secret_key="wambam"
-
 
 flask_pos = []
 
@@ -21,6 +19,7 @@ def hello():
         pre_login_url = session['pre_login_url']
     except:
         pre_login_url = '/'
+
 
     return render_template('login.html', pre_login_url=pre_login_url)
 
@@ -35,7 +34,7 @@ def hello_mobile():
 
 @app.route("/home")
 def home():
-    return render_template('index1.html')
+    return render_template('index1.html', activated=api.is_user_activated())
 
 @app.route("/working")
 def working():
@@ -76,14 +75,23 @@ def register():
     app.logger.debug("Before adding pcon after registration")    
     passwordconfirm = request.form['passwordconfirm']
 
-    app.logger.debug("Before constructing email")    
+    verification_address = hashlib.sha224(user["email"] + app.config["SECRET_KEY"]).hexdigest()
+    user["verification_address"] = verification_address
+
+
+    app.logger.debug("Before constructing email")
 
     # Email client to complete registration
     subject = "Complete Your WamBam! Registration"
     recipients = [user["email"]]
-    app.logger.debug("after bug")    
-    body = "Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/home\r\n\r\nYours truly,\r\nThe WamBam! Team"
-    html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/home<br><br>Yours truly,<br>The WamBam! Team</div>"
+    app.logger.debug("after bug")
+
+    body = "Welcome to WamBam!\r\n\r\nYou're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/v/"+ verification_address + "\r\n\r\nYours truly,\r\nThe WamBam! Team"
+
+    html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>" +\
+           body + \
+           "</div>"
+
     emails.send_email(subject, recipients, body, html)
 
     app.logger.debug("Before adding user after registration")    
@@ -109,6 +117,20 @@ def confirm():
     cool_word = api.get_cool_word()
     return render_template('confirmation.html',
                             cool_word = cool_word)
+
+
+@app.route("/v/<verification_address>", methods=["GET"])
+def verify(verification_address):
+    result = api.activate_user(verification_address)
+    if result is None:
+        return redirect('/home')
+    if result:
+        message = "Congratulations your account is activated!"
+    else:
+        message = "Your account was already activated."
+
+    return render_template('activation.html', message=message)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
