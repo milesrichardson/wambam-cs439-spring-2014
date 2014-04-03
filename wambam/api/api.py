@@ -54,15 +54,14 @@ def create_database(app):
 
     if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
         print 'Migrating database'
+        db.session.commit()
         db.drop_all()
         db.create_all()
-
         # Add the version to the database
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
-        
         db.session.commit()
-    
+        print 'Done Migrating'
     return db
 
 
@@ -351,7 +350,7 @@ def before_request():
             db.session.commit()
             
             #if they're not activated dont let them go anywhere
-            if not is_user_activated() and not (flask.request.path == '/home' or flask.request.path == '/logout'):
+            if not is_user_activated() and not (flask.request.path == '/home' or flask.request.path == '/logout' or flask.request.path.endswith('.css') or flask.request.path.endswith('.js')):
                 return flask.redirect('/home')
 
 def get_cool_word():

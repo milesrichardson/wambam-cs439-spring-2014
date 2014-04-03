@@ -9,7 +9,7 @@ from pytz import timezone
 import pytz
 from wambam import app
 
-current_schema_version = 2
+current_schema_version = 3
 
 SchemaVersion = None
 user_task = None
@@ -41,6 +41,7 @@ def create_account_table(db):
     global Account
     class Account(db.Model):
         id = db.Column(db.Integer, primary_key=True)
+        shit=db.Column(db.Boolean)
         activated = db.Column(db.Boolean)
         password_hash = db.Column(db.String(255))
         email = db.Column(db.String(255), unique=True)
@@ -50,8 +51,7 @@ def create_account_table(db):
         online = db.Column(db.Boolean)
         first_name = db.Column(db.String(255))
         last_name = db.Column(db.String(255))
-        last_request = db.Column(db.Integer, default=0)
-        
+        last_request = db.Column(db.Integer, default=0)        
         
         fulfiller_tasks = db.relationship('Task', secondary=account_task,
                                           backref=db.backref('accounts', lazy='dynamic'))
