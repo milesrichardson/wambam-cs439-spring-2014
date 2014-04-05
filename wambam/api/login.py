@@ -23,24 +23,17 @@ def create_login_manager(app, db):
         except:
             return None
 
-    @app.route('/login', methods=['POST', 'GET'])
+    @app.route("/login", methods=["POST"])
     def user_login():
-        app.logger.debug("<< login")
-        if flask.request.method == 'POST':
-            data = flask.request.get_json()
-            remember = False
-            if data is not None:
-                username = data['userfield']
-                password = data['passwordfield']
-                remember = True
-            elif 'userfield' in flask.request.form:
-                username = flask.request.form['userfield']
-                password = flask.request.form['passwordfield']
-                if 'rememberfield' in flask.request.form:
-                    remember = True
+        if flask.request.method == "POST":
+            #used the login page
+            if "userfield" in flask.request.form:
+                username = flask.request.form["userfield"]
+                password = flask.request.form["passwordfield"]
+            #went through the register
             else:
-                username = flask.request.form['email']
-                password = flask.request.form['password']
+                username = flask.request.form["email"]
+                password = flask.request.form["password"]
                     
             user = schema.Account.query.filter(sqlalchemy.or_(schema.Account.email==username, schema.Account.phone==username)).filter_by(password_hash=password).first()
                     
@@ -50,22 +43,19 @@ def create_login_manager(app, db):
             else:
                 flask.ext.login.login_user(user, remember=True)
                 user.last_request = int(time.time())
-                flask.session['request_time'] = user.last_request
+                flask.session["request_time"] = user.last_request
                 db.session.commit()
-                app.logger.debug("Good to go on login!")
 
                 try:
-                    next = flask.request.form['next']
+                    next = flask.request.form["next"]
                 except:
                     next = "/home"
 
-                print 'next value = %s' % next
                 return flask.redirect(next)
         else:
-            app.logger.debug("Abort 2.0")
             return flask.abort(401)
 
-    @app.route('/logout')
+    @app.route("/logout")
     def user_logout():
         user = flask.ext.login.current_user
         if not user.is_anonymous():
@@ -75,6 +65,5 @@ def create_login_manager(app, db):
         flask.ext.login.logout_user()
         return flask.redirect("/")
 
-#    app.config['REMEMBER_COOKIE_DOMAIN']='.'+app.config['SERVER_NAME']
-    login_manager.login_view = '/login'
+    login_manager.login_view = "/login"
     return login_manager

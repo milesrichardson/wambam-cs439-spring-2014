@@ -1,32 +1,31 @@
-import flask
-import flask.ext.sqlalchemy
-import flask.ext.restless
-import flask.ext.login
-import uuid
-from flask import session, request, redirect, url_for, render_template
-from sqlalchemy import create_engine, select
-
 import random
 import datetime
 import time
 import json
 import os
+import uuid
+
+import flask
+from flask import session, request, redirect, url_for, render_template
+from flask.ext import sqlalchemy, restless, login as flask_login
+from flask_login import current_user
+from sqlalchemy import create_engine, select
 
 import phonenumbers
+
+import pytz
+from pytz import timezone
+
+import uuid
 
 import login
 import schema
 import emails
 from wambam import app
 
-from pytz import timezone
-import pytz
-import sqlite3
-import uuid
-
-import string
-
+#global variable for the flask engine
 engine = None
+
 
 def create_app():
     return flask.Flask(__name__)
@@ -34,26 +33,28 @@ def create_app():
 
 def create_database(app):
     global engine
-    # Create the Flask application and the Flask-SQLAlchemy object
+    # Create the Flask application and the Flask-SQLAlchemy object    
+    app.config["DEBUG"] = True
+
+    # get the database url from the environment variable
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+
     
-    app.config['DEBUG'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-
     #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://root:@localhost/wambam'
 
+    # sqlite fallback if you don't have postgresql installed
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
-#    db_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
- #   app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+db_name+'.db'
 
-    engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
     
     # get the database object
-    db = flask.ext.sqlalchemy.SQLAlchemy(app)
+    db = sqlalchemy.SQLAlchemy(app)
     schema.create_tables(app, db)
 
+    #update the schema to the current version if necessary
     if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
-        print 'Migrating database'
+        print "Migrating database"
+        #need to have a clean session before dropping tables
         db.session.commit()
         db.drop_all()
         db.create_all()
@@ -61,7 +62,7 @@ def create_database(app):
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
         db.session.commit()
-        print 'Done Migrating'
+        print "Done Migrating"
     return db
 
 
@@ -72,12 +73,14 @@ def create_api(app, db):
     # Create API endpoints, which will be available at /api/<tablename> by
     # default. Allowed HTTP methods can be specified as well.
     
-    manager.create_api(schema.Account, methods=['GET', 'POST', 'DELETE', 'PATCH'])
-    manager.create_api(schema.Task, methods=['GET', 'POST', 'DELETE'])
+    # allow clients to get entries and add entries
+    manager.create_api(schema.Account, methods=["GET", "POST"])
+    manager.create_api(schema.Task, methods=["GET", "POST"])
     return manager
 
 def add_user(user_data):
 
+    #format the phone number into a standard format
     number_object = phonenumbers.parse(user_data["phone"], "US")
     number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
 
@@ -95,15 +98,17 @@ def add_user(user_data):
     db.session.add(user)
     db.session.commit()
 
-@app.route('/get_all_tasks')
+#returns json with all of the tasks
+@app.route("/get_all_tasks")
 def get_all_tasks():
     return flask.jsonify(items=[i.serialize for i in schema.Task.query.all()])
 
-@app.route('/get_all_active_tasks')
+#returns json with all of the tasks that have not been assigned
+@app.route("/get_all_active_tasks")
 def get_all_active_tasks():
-    return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status='unassigned').all()])
+    return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status="unassigned").all()])
 
-@app.route('/get_all_claimed_tasks')
+@app.route("/get_all_claimed_tasks")
 def get_all_claimed_tasks():
     conn = engine.connect()
     query = select([schema.account_task])
@@ -111,7 +116,7 @@ def get_all_claimed_tasks():
 
     return flask.jsonify(items=[dict(i) for i in results])
 
-@app.route('/tasks_for_requestor/<int:requestor>')
+@app.route("/tasks_for_requestor/<int:requestor>")
 def tasks_for_requestor(requestor):
     data = flask.jsonify(\
         items=[item.serialize for item in\
@@ -119,19 +124,19 @@ def tasks_for_requestor(requestor):
     )
     return data
 
-@app.route('/tasks_for_fulfiller/<int:fulfiller>')
+@app.route("/tasks_for_fulfiller/<int:fulfiller>")
 def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=[item.serialize for item in data])
 
 # This is unnecessary but Michael requested it ;)
-@app.route('/get_tasks_as_requestor')
+@app.route("/get_tasks_as_requestor")
 def tasks_as_requestor():
-    return tasks_for_requestor(flask.ext.login.current_user.get_id())
+    return tasks_for_requestor(current_user.get_id())
 
-@app.route('/get_tasks_as_fulfiller')
+@app.route("/get_tasks_as_fulfiller")
 def tasks_as_fulfiller():
-    return tasks_for_fulfiller(flask.ext.login.current_user.get_id())    
+    return tasks_for_fulfiller(current_user.get_id())    
 
 
 def getTextRecipient(phone_number, phone_carrier):
@@ -155,23 +160,17 @@ def getTextRecipient(phone_number, phone_carrier):
       emailaddress += "@email.uscc.net"
     elif phone_carrier == "Virgin Mobile":
       emailaddress += "@vmobl.com"
-    else:                                  #else we assume 'Verizon Wirless'
+    else:                                  #else we assume Verizon Wirless
       emailaddress += "@vtext.com"
 
     return emailaddress
 
-def getPhone(fulfiller):
-    return fulfiller.phone
 
-def getPhoneCarrier(fulfiller):
-    return fulfiller.phone_carrier
-
-@app.route("/set_online", methods=['POST'])
+@app.route("/set_online", methods=["POST"])
 def set_online():
     app.logger.debug("Start set_online")
     # Get current user
-    user = flask.ext.login.current_user
-    user_id = int(user.get_id())
+    user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
 
     # Set user to be online
@@ -183,12 +182,11 @@ def set_online():
     app.logger.debug("End set_online")
     return ""
 
-@app.route("/set_offline", methods=['POST'])
+@app.route("/set_offline", methods=["POST"])
 def set_offline():
     app.logger.debug("Start set_offline")
     # Get current user
-    user = flask.ext.login.current_user
-    user_id = int(user.get_id())
+    user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
 
     # Set user to be offline
@@ -203,27 +201,26 @@ def set_offline():
 @app.route("/get_online")
 def get_online():
     # Get current user
-    user = flask.ext.login.current_user
-    user_id = int(user.get_id())
+    user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
 
     return flask.jsonify(online=flask_user.online);
 
-@app.route("/submittask", methods=['POST'])
+@app.route("/submittask", methods=["POST"])
 def submit():
-    title = request.form['title']
-    if not ('lat' in session) or not ('lng' in session):
+    title = request.form["title"]
+    if not ("lat" in session) or not ("lng" in session):
         app.logger.debug("No lat/lng for task")
-        return redirect(url_for('working'))
+        return redirect(url_for("working"))
 
-    lat = float(session['lat'])
-    lng = float(session['lng'])
+    lat = float(session["lat"])
+    lng = float(session["lng"])
     
-    location = request.form['location']
-    bid = request.form['bid']
+    location = request.form["location"]
+    bid = request.form["bid"]
     bid = bid.replace("$","");
-    expiration = request.form['expiration']
-    description = request.form['description']
+    expiration = request.form["expiration"]
+    description = request.form["description"]
 
     # format for timedelta is (days, seconds, microseconds, 
     # milliseconds, minutes, hours, weeks)
@@ -240,7 +237,6 @@ def submit():
         expirationdate += datetime.timedelta(0,0,0,0,0,0,1)
 
     # Get requestor id 
-    current_user = flask.ext.login.current_user
     requestor_id = int(current_user.get_id())
 
     task = schema.Task(
@@ -252,19 +248,17 @@ def submit():
         expiration_datetime=expirationdate,
         long_title=description,
         delivery_location=location,
-        status='unassigned')
+        status="unassigned")
 
     db.session.add(task)
     db.session.commit()
 
-    del session['lat']
-    del session['lng']
+    del session["lat"]
+    del session["lng"]
 
-    app.logger.debug('Before confirmation text')    
 
     # Get logged in user
-    user = flask.ext.login.current_user
-    user_id = int(user.get_id())
+    user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
   
     # Get phone info for requester
@@ -283,6 +277,12 @@ def submit():
     # Send alert text to all online fulfillers 
     # Probably want to do this asynchronously eventually
     fulfillers = schema.Account.query.filter(schema.Account.online == True).all()
+    def getPhone(fulfiller):
+        return fulfiller.phone
+
+    def getPhoneCarrbier(fulfiller):
+        return fulfiller.phone_carrier
+
     fulfiller_phones = map(getPhone, fulfillers)
     fulfiller_carriers = map(getPhoneCarrier, fulfillers)
 
@@ -300,77 +300,70 @@ def submit():
     emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
 
     app.logger.debug("Sent confirmation text")
-    app.logger.debug("end submittask")
-    return redirect(url_for('confirm'))
+    return redirect("/confirm")
 
 def is_session_valid():
-    user = flask.ext.login.current_user
-    if user.last_request == 0 or 'request_time' not in flask.session or flask.session['request_time'] + 36000000 < user.last_request:
+    if current_user.last_request == 0 or "request_time" not in session or session["request_time"] + 36000000 < current_user.last_request:
         return False
     return True
 
 @app.before_request
 def before_request():
-    exempt_files = ['/check_email', '/check_phone', '/favicon.ico',
-                    flask.url_for('static', filename='login.css'), 
-                    flask.url_for('static', filename='login_mobile.css'),
-                    flask.url_for('static', filename='login_validator.js')]
+    exempt_files = ["/check_email", "/check_phone", "/favicon.ico",
+                    url_for("static", filename="login.css"), 
+                    url_for("static", filename="login_mobile.css"),
+                    url_for("static", filename="login_validator.js")]
 
     for f in exempt_files:
-        if flask.request.path == f:
+        if request.path == f:
             return None
 
-    user = flask.ext.login.current_user
-
     #trying to access the verification page
-    if flask.request.path.startswith('/v/'):
+    if request.path.startswith("/v/"):
         return None
 
-
     #trying to access an unprotected page
-    if flask.request.path == '/' or flask.request.path == '/mobile' or \
-       flask.request.path == '/login' or flask.request.path == '/register':
+    if request.path == "/" or request.path == "/mobile" or \
+       request.path == "/login" or request.path == "/register":
 
         #no need for them to access, go home
-        if not user.is_anonymous() and is_session_valid():
-            return flask.redirect('/home')
+        if not current_user.is_anonymous() and is_session_valid():
+            return redirect("/home")
     
     #trying to access a protected page
     else:
         #user is not valid
-        if user.is_anonymous() or not is_session_valid():
-            if flask.request.path.startswith('/viewtaskdetails/'):
-                flask.session['pre_login_url'] = flask.request.path
-            return flask.redirect('/')
+        if current_user.is_anonymous() or not is_session_valid():
+            if request.path.startswith("/viewtaskdetails/"):
+                session["pre_login_url"] = request.path
+            return redirect("/")
 
         else: #session is valid
             #update their token
-            user.last_request = int(time.time())
-            flask.session['request_time'] = user.last_request
+            current_user.last_request = int(time.time())
+            session["request_time"] = current_user.last_request
             db.session.commit()
             
-            #if they're not activated dont let them go anywhere
-            if not is_user_activated() and not (flask.request.path == '/home' or flask.request.path == '/logout' or flask.request.path.endswith('.css') or flask.request.path.endswith('.js')):
-                return flask.redirect('/home')
+            #if they"re not activated dont let them go anywhere
+            if not current_user.activated and \
+               not (request.path == "/home" or request.path == "/logout" or request.path.endswith(".css") or request.path.endswith(".js")):
+                return redirect("/home")
 
+#used when you've created a task
 def get_cool_word():
-    words = ["Sweet.", "Cool.", "Awesome.", "Dope.", "Word.", "Great.", "Wicked.", "Solid.", "Super.", "Super-duper.", "Excellent.", "Nice."]
+    words = ["Sweet.", "Cool.", "Awesome.", "Dope.", "Word.", "Great.", "Wicked.", "Solid.", "Super.", "Super-duper.", "Excellent.", "Nice.", "Chill."]
     index = random.randint(0, len(words) - 1)
     return words[index]
     
-@app.route("/sorry")
-def sorry():
-    return render_template('alreadyclaimed.html')
-
-@app.route("/claimtask", methods=['POST'])
+@app.route("/claimtask", methods=["POST"])
 def claim():
   
     #make task_num equal to the actual number of the task
-    task_num = int(request.form['id'])
+    task_num = int(request.form["id"])
     task = schema.Task.query.get(task_num)
 
     if (task.status != "unassigned"):
-      return redirect('/sorry')
+      return redirect("/sorry")
 
     title = task.short_title
     location = task.delivery_location
@@ -379,7 +372,6 @@ def claim():
     description = task.long_title
 
     # Get fulfiller
-    current_user = flask.ext.login.current_user
     fulfiller_id = int(current_user.get_id())
     fulfiller = schema.Account.query.get(fulfiller_id)
 
@@ -395,11 +387,11 @@ def claim():
     results = conn.execute(schema.account_task.insert(), 
                            account_id=fulfiller.id, 
                            task_id=task_num, 
-                           status='inactive')
+                           status="inactive")
     
     # update task table
     temp = schema.Task.query.filter_by(id=int(task_num)).first()
-    temp.status = 'completed'
+    temp.status = "completed"
 
     # add and commit changes
     db.session.add(temp)
@@ -438,7 +430,7 @@ def claim():
 
     app.logger.debug("Sent confirmation texts")   
     app.logger.debug("end claimtask")
-    return render_template('confirmationwambam.html',
+    return render_template("confirmationwambam.html",
                             cool_word = cool_word,
                             title = title,
                             location = location,
@@ -447,23 +439,22 @@ def claim():
                             email = email,
                             bid = "$%(bid).2f" % {"bid": bid},
                             phone= requestor.phone,
-                            desktop_client=request.cookies.get('mobile'))
+                            desktop_client=request.cookies.get("mobile"))
 
-@app.route('/viewtaskdetails/<int:taskid>')
+@app.route("/viewtaskdetails/<int:taskid>")
 def view_task_details(taskid):
     task = schema.Task.query.filter_by(id=taskid).first()
     if (task is None):
-        return flask.redirect('/home')
+        return redirect("/home")
     else:
         if (task.status != "unassigned"):
-          return redirect('/sorry')
+          return redirect("/sorry")
 
         # Get email address of logged in user 
-        current_user = flask.ext.login.current_user
         fulfiller_id = int(current_user.get_id())
         fulfiller = schema.Account.query.get(fulfiller_id)
 
-        return render_template('taskview.html',
+        return render_template("taskview.html",
                                 task_id = task.id,
                                 lat = task.latitude,
                                 lon = task.longitude,
@@ -477,7 +468,6 @@ def view_task_details(taskid):
 
 def activate_user(verification_address):
     account = schema.Account.query.filter_by(email_hash=verification_address).first()
-    print account
     if account is None:
         return None
     else:
@@ -494,10 +484,10 @@ def is_email_used(email):
     return flask.jsonify(used=str(result))
 
 def is_user_activated():
-    return flask.ext.login.current_user.activated
+    return current_user.activated
 
-app.config['SECRET_KEY'] = str(random.SystemRandom().randint(0,1000000))
-app.config['REMEMBER_COOKIE_DURATION'] = datetime.timedelta(days=14)
+app.config["SECRET_KEY"] = "I have a secret....."
+app.config["REMEMBER_COOKIE_DURATION"] = datetime.timedelta(days=14)
 
 db = create_database(app)
 api_manager = create_api(app,db)
