@@ -41,7 +41,7 @@ def create_database(app):
     try:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
     except KeyError:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + uuid.uuid1().hex + '.db'
         using_sqllite = True
 
     
@@ -284,7 +284,7 @@ def submit():
     def getPhone(fulfiller):
         return fulfiller.phone
 
-    def getPhoneCarrbier(fulfiller):
+    def getPhoneCarrier(fulfiller):
         return fulfiller.phone_carrier
 
     fulfiller_phones = map(getPhone, fulfillers)

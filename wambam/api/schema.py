@@ -11,9 +11,10 @@ from wambam import app
 current_schema_version = 3
 
 SchemaVersion = None
-user_task = None
+account_task = None
 Account = None
 Task = None
+Feedback = None
 token_serializer = None
 token_duration = None
 
@@ -200,3 +201,5 @@ def create_tables(app, db):
     create_account_task_join_table(db)
     create_account_table(db)
     create_task_table(db)
+    create_feedback_table(db)
+
