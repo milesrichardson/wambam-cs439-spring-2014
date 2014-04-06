@@ -132,6 +132,15 @@ def get_all_claimed_tasks():
 
     return flask.jsonify(items=[dict(i) for i in results])
 
+@app.route("/cancel_task/<int:task_id>")
+def cancel_task(task_id):
+    task = schema.Task.query.get(int(task_id))
+    task.status = 'canceled'
+    db.session.add(task)
+    db.session.commit()
+    app.logger.debug("Canceled task with ID %d" % int(task_id))
+    return ""
+
 @app.route("/tasks_for_requestor/<int:requestor>")
 def tasks_for_requestor(requestor):
     data = flask.jsonify(\
