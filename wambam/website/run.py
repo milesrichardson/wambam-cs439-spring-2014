@@ -114,16 +114,16 @@ def create_requester_object(task):
     fulfiller_email = None
     fulfiller_phone = None
 
-    if (task.status == 'completed'):
+    if (task.status == "in_progress" or task.status == "completed"):
         #I am not sure if this is correct...
         fulfiller_id = task.fulfiller_accounts[0].id
-        fulfiller = schema.task.get(fulfiller_id)
+        fulfiller = schema.Account.query.get(fulfiller_id)
         fulfiller_email = fulfiller.email
         fulfiller_phone = fulfiller.phone
     
     expiration_date = schema.dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": task.bid}
-    
+    app.logger.debug(task.status)
     return {
         'task_id' : task.id,
         'fulfiller_email': fulfiller_email,
