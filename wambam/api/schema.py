@@ -76,7 +76,7 @@ def create_account_table(db):
 
         @property
         def serialize_fulfiller_tasks(self):
-            return [account.serialize_id for account in self.fulfiller_accounts]
+            return [account.serialize_id for account in self.fulfiller_tasks]
         
         def get_auth_token(self):
             token = token_serializer.dumps([str(self.id), self.password_hash])
