@@ -1,17 +1,16 @@
-from flask_mail import Message
-from flask_mail import Mail
+from flask_mail import Message, Mail
 from threading import Thread
 from wambam import app
 
 app.config.update(dict(
     DEBUG = True,
-    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_SERVER = "smtp.gmail.com",
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'wambamapp@gmail.com',
-    MAIL_PASSWORD = 'wambam123',
-    MAIL_DEFAULT_SENDER = 'wambamapp@gmail.com'
+    MAIL_USERNAME = "wambamapp@gmail.com",
+    MAIL_PASSWORD = "wambam123",
+    MAIL_DEFAULT_SENDER = "wambamapp@gmail.com"
 ))
 mail = Mail(app)
 

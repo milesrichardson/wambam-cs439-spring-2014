@@ -1,20 +1,20 @@
 import flask
-import flask.ext.sqlalchemy
-import flask.ext.restless
-import flask.ext.login
 
 from itsdangerous import URLSafeTimedSerializer as Serializer
 import datetime
+
 from pytz import timezone
 import pytz
+
 from wambam import app
 
 current_schema_version = 3
 
 SchemaVersion = None
-user_task = None
+account_task = None
 Account = None
 Task = None
+Feedback = None
 token_serializer = None
 token_duration = None
 
@@ -30,10 +30,10 @@ def create_schema_version_table(db):
 # a join table used for matching the fulfilling users and tasks
 def create_account_task_join_table(db):
     global account_task
-    account_task = db.Table('account_task',
-                         db.Column('account_id', db.Integer, db.ForeignKey('account.id')),
-                         db.Column('task_id', db.Integer, db.ForeignKey('task.id')),
-                            db.Column('status', db.Enum('active', 'inactive', name='status_enum')),  
+    account_task = db.Table("account_task",
+                         db.Column("account_id", db.Integer, db.ForeignKey("account.id")),
+                         db.Column("task_id", db.Integer, db.ForeignKey("task.id")),
+                            db.Column("status", db.Enum("active", "inactive", name="status_enum")),  
                          )
 
 
@@ -53,25 +53,25 @@ def create_account_table(db):
         last_name = db.Column(db.String(255))
         last_request = db.Column(db.Integer, default=0)        
         
-        fulfiller_tasks = db.relationship('Task', secondary=account_task,
-                                          backref=db.backref('accounts', lazy='dynamic'))
+        fulfiller_tasks = db.relationship("Task", secondary=account_task,
+                                          backref=db.backref("accounts", lazy="dynamic"))
 
         @property
         def serialize_id(self):
             return {
-                'id' : self.id
+                "id" : self.id
             }
         
         @property
         def serialize(self):
             return {
-               'id' : self.id,
-               'phone' : self.phone,
-               'phone_carrier' : self.phone_carrier,
-               'online' : self.online,
-               'first_name' : self.first_name,
-               'last_name' : self.last_name,
-               'fulfiller_tasks' : self.serialize_fulfiller_tasks
+               "id" : self.id,
+               "phone" : self.phone,
+               "phone_carrier" : self.phone_carrier,
+               "online" : self.online,
+               "first_name" : self.first_name,
+               "last_name" : self.last_name,
+               "fulfiller_tasks" : self.serialize_fulfiller_tasks
             }
 
         @property
@@ -120,7 +120,7 @@ def dump_datetime(value):
         return None
     currentTime = datetime.datetime.now()
     delta = value - currentTime
-    eastern = timezone('US/Eastern')
+    eastern = timezone("US/Eastern")
     valueEST = (datetime.datetime.now(pytz.utc) + delta).astimezone(eastern)
     # days will be negative if expiration date is in past
     if ((value - currentTime).days < 0):
@@ -136,7 +136,7 @@ def create_task_table(db):
     global Task
     class Task(db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        requestor_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+        requestor_id = db.Column(db.Integer, db.ForeignKey("account.id"))
         latitude = db.Column(db.Float())
         longitude = db.Column(db.Float())
         delivery_location = db.Column(db.String(255))
@@ -144,38 +144,38 @@ def create_task_table(db):
         long_title = db.Column(db.Text)
         bid = db.Column(db.Float())
         expiration_datetime = db.Column(db.DateTime)
-        status = db.Column(db.Enum('unassigned', 'in_progress', 'canceled',
-                                   'completed', 'expired',
-                                   name='task_status_types'))
+        status = db.Column(db.Enum("unassigned", "in_progress", "canceled",
+                                   "completed", "expired",
+                                   name="task_status_types"))
         
-        fulfiller_accounts = db.relationship('Account', secondary=account_task,
-                                            backref=db.backref('tasks', lazy='dynamic'))
-        venmo_status = db.Column(db.Enum('paid', 'unpaid',\
-                                 name='venmo_status'), default='unpaid')
+        fulfiller_accounts = db.relationship("Account", secondary=account_task,
+                                            backref=db.backref("tasks", lazy="dynamic"))
+        venmo_status = db.Column(db.Enum("paid", "unpaid",\
+                                 name="venmo_status"), default="unpaid")
 
 
         @property
         def serialize_id(self):
             return {
-                'id' : self.id
+                "id" : self.id
             }
 
         @property
         def serialize(self):
             #Return object data in easily serializeable format
             return {
-                'id' : str(self.id),
-                'requestor_id' : self.requestor_id,
-                'latitude' : str(self.latitude),
-                'longitude' : str(self.longitude),
-                'delivery_location' : self.delivery_location,
-                'short_title' : self.short_title,
-                'long_title' : self.long_title,
-                'bid' : "$%(bid).2f" % {"bid": self.bid},
-                'expiration_datetime' : dump_datetime(self.expiration_datetime),
-                'status' : self.status,
-                'fulfiller_accounts' : self.serialize_fulfiller_accounts,
-                'venmo_status' : self.venmo_status,
+                "id" : str(self.id),
+                "requestor_id" : self.requestor_id,
+                "latitude" : str(self.latitude),
+                "longitude" : str(self.longitude),
+                "delivery_location" : self.delivery_location,
+                "short_title" : self.short_title,
+                "long_title" : self.long_title,
+                "bid" : "$%(bid).2f" % {"bid": self.bid},
+                "expiration_datetime" : dump_datetime(self.expiration_datetime),
+                "status" : self.status,
+                "fulfiller_accounts" : self.serialize_fulfiller_accounts,
+                "venmo_status" : self.venmo_status,
             }
 
         @property
@@ -187,20 +187,22 @@ def create_feedback_table(db):
     global Feedback
     class Feedback(db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
-        rater_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-        rated_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-        rating = db.Column(db.Enum('positive', 'negative',\
-                           name='feedback_ratings'), nullable=True)
+        task_id = db.Column(db.Integer, db.ForeignKey("task.id"))
+        rater_account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
+        rated_account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
+        rating = db.Column(db.Enum("positive", "negative",\
+                           name="feedback_ratings"), nullable=True)
 
 
 def create_tables(app, db):
     global token_serializer
-    token_serializer = Serializer(app.config['SECRET_KEY'])
+    token_serializer = Serializer(app.config["SECRET_KEY"])
     global token_duration
-    token_duration = app.config['REMEMBER_COOKIE_DURATION'].total_seconds()
+    token_duration = app.config["REMEMBER_COOKIE_DURATION"].total_seconds()
 
     create_schema_version_table(db)
     create_account_task_join_table(db)
     create_account_table(db)
     create_task_table(db)
+    create_feedback_table(db)
+
