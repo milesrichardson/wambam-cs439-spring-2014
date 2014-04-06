@@ -140,6 +140,7 @@ def create_api(app, db):
     # allow clients to get entries and add entries
     manager.create_api(schema.Account, methods=["GET", "POST"])
     manager.create_api(schema.Task, methods=["GET", "POST"])
+    manager.create_api(schema.Feedback, methods=["GET", "POST"])
     return manager
 
 def add_user(user_data):
@@ -187,6 +188,37 @@ def cancel_task(task_id):
     db.session.add(task)
     db.session.commit()
     app.logger.debug("Canceled task with ID %d" % int(task_id))
+    return ""
+
+@app.route("/add_feedback")
+def add_feedback(methods=["GET"]):
+    try:
+        task_id = int(request.args.get('task_id'))
+
+        role = request.args.get('role')
+        if role not in ['requestor', 'fulfiller']:
+            raise Exception('Invalid role')
+
+        rating = request.args.get('rating') 
+        if rating not in ['positive', 'negative']:
+            raise Exception('Invalid rating')
+        
+        user_id = int(current_user.get_id())
+
+    except Exception as e:
+        print e
+        return "error"
+
+    feedback = schema.Feedback(
+        task_id = task_id,
+        account_id = user_id,
+        role = role,
+        rating = rating,
+    )
+
+    db.session.add(feedback)
+    db.session.commit()
+
     return ""
 
 @app.route("/tasks_for_requestor/<int:requestor>")
