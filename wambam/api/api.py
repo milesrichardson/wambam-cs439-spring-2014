@@ -35,15 +35,19 @@ def create_database(app):
     global engine
     # Create the Flask application and the Flask-SQLAlchemy object    
     app.config["DEBUG"] = True
+    using_sqllite = False
 
     # get the database url from the environment variable
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+    try:
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+    except KeyError:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
+        using_sqllite = True
 
     
     #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
 
     # sqlite fallback if you don't have postgresql installed
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
 
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
     
@@ -52,7 +56,7 @@ def create_database(app):
     schema.create_tables(app, db)
 
     #update the schema to the current version if necessary
-    if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+    if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
         print "Migrating database"
         #need to have a clean session before dropping tables
         db.session.commit()
