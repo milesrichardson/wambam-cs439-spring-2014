@@ -1,0 +1,22 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+html { 
+    height: 100%; 
+    width: 300px;
+}
+
+body {
+    height: 100%; 
+    margin: 0;
+    padding: 0;
+    border: 0
+}
+
+#accordion .ui-accordion-header {  
+    background-color: white;  
+    margin: 0px;  
+}  

@@ -1,5 +1,5 @@
 import flask
-import flask.ext.sqlalchemy
+from flask.ext import sqlalchemy
 import flask.ext.restless
 import flask.ext.login
 import uuid
@@ -34,26 +34,32 @@ def create_app():
 
 def create_database(app):
     global engine
-    # Create the Flask application and the Flask-SQLAlchemy object
+    # Create the Flask application and the Flask-SQLAlchemy object    
+    app.config["DEBUG"] = True
+    using_sqllite = False
+
+    # get the database url from the environment variable
+    try:
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+    except KeyError:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
+        using_sqllite = True
+
     
-    app.config['DEBUG'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-
     #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://root:@localhost/wambam'
 
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + uuid.uuid1().hex + '.db'
-#    db_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
- #   app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+db_name+'.db'
+    # sqlite fallback if you don't have postgresql installed
 
-    engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
     
     # get the database object
-    db = flask.ext.sqlalchemy.SQLAlchemy(app)
+    db = sqlalchemy.SQLAlchemy(app)
     schema.create_tables(app, db)
 
-    if schema.SchemaVersion.query.first().version is not schema.current_schema_version:
-        print 'Migrating database'
+    #update the schema to the current version if necessary
+    if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+        print "Migrating database"
+        #need to have a clean session before dropping tables
         db.session.commit()
         db.drop_all()
         db.create_all()
@@ -61,9 +67,22 @@ def create_database(app):
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
         db.session.commit()
+    # REMOVE THIS SOON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        user = schema.Account(
+            activated=True,
+            phone="770-362-9815",
+            phone_carrier="AT&T",
+            email="michael.hopkins@yale.edu",
+            password_hash="blah",
+            online=True,
+            first_name="Michael",
+            last_name="Hopkins")
+
+        db.session.add(user)
+        db.session.commit()
+
         print 'Done Migrating'
     return db
-
 
 def create_api(app, db):
     # Create the Flask-Restless API manager.
@@ -124,7 +143,7 @@ def tasks_for_fulfiller(fulfiller):
     data = schema.Task.query.filter(schema.Task.fulfiller_accounts.any(schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=[item.serialize for item in data])
 
-# This is unnecessary but Michael requested it ;)
+# This is unnecessary but Michael requested it ;) <------ :P
 @app.route('/get_tasks_as_requestor')
 def tasks_as_requestor():
     return tasks_for_requestor(flask.ext.login.current_user.get_id())
@@ -447,6 +466,7 @@ def claim():
                             email = email,
                             bid = "$%(bid).2f" % {"bid": bid},
                             phone= requestor.phone,
+
                             desktop_client=request.cookies.get('mobile'))
 
 @app.route('/viewtaskdetails/<int:taskid>')

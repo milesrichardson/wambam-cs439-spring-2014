@@ -1,3 +1,4 @@
+import flask
 from flask import Flask
 from flask import request, redirect, url_for, session
 from flask import render_template
@@ -9,6 +10,7 @@ import hashlib
 
 from wambam import app
 import api
+import schema
 import emails
 
 flask_pos = []
@@ -118,6 +120,50 @@ def confirm():
     return render_template('confirmation.html',
                             cool_word = cool_word)
 
+def create_requester_object(task):
+    task_id = task.id
+    fulfiller_email = None
+    fulfiller_phone = None
+
+    if (task.status == 'completed'):
+        #I am not sure if this is correct...
+        fulfiller_id = task.fulfiller_accounts[0].id
+        fulfiller = schema.task.get(fulfiller_id)
+        fulfiller_email = fulfiller.email
+        fulfiller_phone = fulfiller.phone
+    
+    expiration_date = schema.dump_datetime(task.expiration_datetime)
+    bid = "$%(bid).2f" % {"bid": task.bid}
+    
+    return {
+        'task_id' : task.id,
+        'fulfiller_email': fulfiller_email,
+        'fulfiller_phone': fulfiller_phone,
+        'expiration_date': expiration_date,
+        'bid': bid,
+        'lat': task.latitude,
+        'lon': task.longitude,
+        'delivery_location': task.delivery_location,
+        'title': task.short_title,
+        'description': task.long_title,
+        'status': task.status,
+        'venmo_status': task.venmo_status
+    }
+
+@app.route("/my_requester_tasks")
+def my_requester_tasks():
+    user_id = flask.ext.login.current_user.get_id()
+    tasks = schema.Task.query.filter_by(requestor_id=user_id).all()
+    requester_objects = map(create_requester_object, tasks)
+    return render_template("tasklist.html",
+                            tasks= requester_objects)
+
+@app.route("/my_fulfiller_tasks")
+def my_fulfiller_tasks():
+    user_id = flask.ext.login.current_user.get_id()
+    tasks = schema.Task.query.filter_by(fulfiller_id=user_id).all()
+    return render_template("tasklist.html",
+                            tasks= tasks)
 
 @app.route("/v/<verification_address>", methods=["GET"])
 def verify(verification_address):

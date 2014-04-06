@@ -1,0 +1,92 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+html { 
+    height: 100%; 
+    min-width: 700px;
+}
+
+body {
+    height: 100%; 
+    margin: 0;
+    padding: 0;
+    border: 0
+}
+
+#accordion .ui-accordion-header {  
+    background-color: #ffffff; /* Old browsers */  
+    background-image: -moz-linear-gradient(top, #ffffff 0%, #ffffff 100%); /* FF3.6+ */  
+    background-image: -webkit-gradient(linear, left top, left bottombottom, color-stop(0%,#ffffff), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */  
+    background-image: -webkit-linear-gradient(top, #ffffff 0%,#ffffff 100%); /* Chrome10+,Safari5.1+ */  
+    background-image: -o-linear-gradient(top, #ffffff 0%,#ffffff 100%); /* Opera 11.10+ */  
+    background-image: -ms-linear-gradient(top,  #ffffff 0%,#ffffff 100%); /* IE10+ */  
+    background-image: linear-gradient(to bottombottom,  #ffffff 0%,#ffffff 100%); /* W3C */  
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */  
+}  
+
+#contents {
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+#page_title {
+    text-align: center;
+    font-size:40px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#tabs {
+	  font-size: 20px;
+    margin-bottom: 10px;
+}
+
+#task_table {
+    width: 100%;
+}
+
+#left_col {
+    text-align: left;
+    width: 50%;
+}
+
+#right_col {
+    text-align: right;
+    margin-right: 10px;
+    width: 50%;
+}
+
+#task_entry {
+    overflow: hidden;
+}
+
+#button { 
+    font-size:15px;
+    padding: 3px 10px;
+    color: white;
+    font-weight: bold;
+    background: #0F4D92;
+    text-align: center;
+}
+
+#task_details {
+    width: 100%;
+}
+
+#task_details tr td:first-child {
+    padding-right: 30px;
+}
+
+#task_details tr td {
+    text-align: left;
+}
+
+#map-canvas {
+    height: 150px;
+    width: 400px;
+    text-align: center;
+    margin: 0 auto;
+}

@@ -122,7 +122,10 @@ def dump_datetime(value):
     delta = value - currentTime
     eastern = timezone('US/Eastern')
     valueEST = (datetime.datetime.now(pytz.utc) + delta).astimezone(eastern)
-    if (value.date() == currentTime.date()):
+    # days will be negative if expiration date is in past
+    if ((value - currentTime).days < 0):
+        return "Passed"
+    elif (value.date() == currentTime.date()):
         return valueEST.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):
         return valueEST.strftime("%A %I:%M %p %Z")
