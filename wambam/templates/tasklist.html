@@ -63,7 +63,7 @@
     <div id="accordion">
     {% for task in tasks %}
         {% if task.status == "unassigned" %}
-            <h3>
+            <h3 id="open_header">
               <table id="task_table">
                 <tr>
                   <td id="left_col">
@@ -80,7 +80,7 @@
             </h3>
         {% endif %}
         {% if task.status == "in_progress" %}
-            <h3>
+            <h3 id="in_progress_header">
               <table id="task_table">
                 <tr>
                   <td id="left_col">
