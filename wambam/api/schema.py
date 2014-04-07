@@ -235,7 +235,6 @@ def decrypt_string(enc):
 
 def encrypt_dictionary(plaintext):
     keys = plaintext.keys()
-    print keys
     encrypted = {}
     for k in keys:
         if isinstance(plaintext[k], basestring):

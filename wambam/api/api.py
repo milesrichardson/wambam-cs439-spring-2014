@@ -179,6 +179,7 @@ def get_all_active_tasks():
 
 @app.route("/get_all_claimed_tasks")
 def get_all_claimed_tasks():
+    #I don't think this works, but it's never used
     conn = engine.connect()
     query = select([schema.account_task])
     results = conn.execute(query)
