@@ -68,9 +68,69 @@ def create_database(app):
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
         db.session.commit()
+    # REMOVE THIS SOON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        user = schema.Account(
+            activated=True,
+            phone="7703629815",
+            phone_carrier="AT&T",
+            email="michael.hopkins@yale.edu",
+            password_hash="blah",
+            online=True,
+            first_name="Michael",
+            last_name="Hopkins")
+
+        task1 = schema.Task(
+            requestor_id=1,
+            latitude = 41.3111,
+            longitude = -72.9267,
+            short_title="Title 1",
+            bid=float(1),
+            expiration_datetime=datetime.datetime.now(),
+            long_title="This is description 1",
+            delivery_location="CEID",
+            status="in_progress")
+
+        task2 = schema.Task(
+            requestor_id=1,
+            latitude = 41.3121,
+            longitude = -72.9277,
+            short_title="Title 2",
+            bid=float(5),
+            expiration_datetime=datetime.datetime.now(),
+            long_title="This is description 2",
+            delivery_location="Saybrook",
+            status="unassigned")
+
+        task3 = schema.Task(
+            requestor_id=1,
+            latitude = 41.3101,
+            longitude = -72.9257,
+            short_title="Title 3",
+            bid=float(10),
+            expiration_datetime=datetime.datetime.now(),
+            long_title="This is description 3",
+            delivery_location="There",
+            status="completed")
+
+        task4 = schema.Task(
+            requestor_id=1,
+            latitude = 41.3131,
+            longitude = -72.9287,
+            short_title="Title 4",
+            bid=float(15),
+            expiration_datetime=datetime.datetime.now(),
+            long_title="This is description 4",
+            delivery_location="Here",
+            status="expired")
+
+        db.session.add(user)
+        db.session.add(task1) 
+        db.session.add(task2)
+        db.session.add(task3) 
+        db.session.add(task4) 
+        db.session.commit()
         print "Done Migrating"
     return db
-
 
 def create_api(app, db):
     # Create the Flask-Restless API manager.
@@ -82,6 +142,7 @@ def create_api(app, db):
     # allow clients to get entries and add entries
     manager.create_api(schema.Account, methods=["GET", "POST"])
     manager.create_api(schema.Task, methods=["GET", "POST"])
+    manager.create_api(schema.Feedback, methods=["GET", "POST"])
     return manager
 
 def add_user(user_data):
@@ -123,6 +184,46 @@ def get_all_claimed_tasks():
     results = conn.execute(query)
 
     return flask.jsonify(items=[dict(i) for i in results])
+
+@app.route("/cancel_task/<int:task_id>")
+def cancel_task(task_id):
+    task = schema.Task.query.get(int(task_id))
+    task.status = 'canceled'
+    db.session.add(task)
+    db.session.commit()
+    app.logger.debug("Canceled task with ID %d" % int(task_id))
+    return ""
+
+@app.route("/add_feedback")
+def add_feedback(methods=["GET"]):
+    try:
+        task_id = int(request.args.get('task_id'))
+
+        role = request.args.get('role')
+        if role not in ['requestor', 'fulfiller']:
+            raise Exception('Invalid role')
+
+        rating = request.args.get('rating') 
+        if rating not in ['positive', 'negative']:
+            raise Exception('Invalid rating')
+        
+        user_id = int(current_user.get_id())
+
+    except Exception as e:
+        print e
+        return "error"
+
+    feedback = schema.Feedback(
+        task_id = task_id,
+        account_id = user_id,
+        role = role,
+        rating = rating,
+    )
+
+    db.session.add(feedback)
+    db.session.commit()
+
+    return ""
 
 @app.route("/tasks_for_requestor/<int:requestor>")
 def tasks_for_requestor(requestor):
@@ -396,7 +497,7 @@ def claim():
     results = conn.execute(schema.account_task.insert(), 
                            account_id=fulfiller.id, 
                            task_id=task_num, 
-                           status="inactive")
+                           status="in_progress")
     
     # update task table
     temp = schema.Task.query.get(int(task_num))

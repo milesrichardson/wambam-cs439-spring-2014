@@ -41,7 +41,7 @@ def create_account_task_join_table(db):
     account_task = db.Table("account_task",
                          db.Column("account_id", db.Integer, db.ForeignKey("account.id")),
                          db.Column("task_id", db.Integer, db.ForeignKey("task.id")),
-                            db.Column("status", db.Enum("active", "inactive", name="status_enum")),  
+                         db.Column("status", db.Enum("active", "inactive", name="status_enum")),  
                          )
 
 
@@ -84,7 +84,7 @@ def create_account_table(db):
 
         @property
         def serialize_fulfiller_tasks(self):
-            return [account.serialize_id for account in self.fulfiller_accounts]
+            return [account.serialize_id for account in self.fulfiller_tasks]
         
         def get_auth_token(self):
             token = token_serializer.dumps([str(self.id), self.password])
@@ -127,7 +127,10 @@ def dump_datetime(value):
     delta = value - currentTime
     eastern = timezone("US/Eastern")
     valueEST = (datetime.datetime.now(pytz.utc) + delta).astimezone(eastern)
-    if (value.date() == currentTime.date()):
+    # days will be negative if expiration date is in past
+    if ((value - currentTime).days < 0):
+        return "Passed"
+    elif (value.date() == currentTime.date()):
         return valueEST.strftime("%I:%M %p %Z")
     elif ((value.date() - currentTime.date()).days < 7):
         return valueEST.strftime("%A %I:%M %p %Z")
@@ -195,8 +198,8 @@ def create_feedback_table(db):
     class Feedback(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         task_id = db.Column(db.Integer, db.ForeignKey("task.id"))
-        rater_account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
-        rated_account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
+        account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
+        role = db.Column(db.Enum("fulfiller", "requestor"))
         rating = db.Column(db.Enum("positive", "negative",\
                            name="feedback_ratings"), nullable=True)
 
