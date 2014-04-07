@@ -54,7 +54,7 @@ def create_account_table(db):
         password = db.Column(db.String(255))                #encrypted
         email = db.Column(db.String(255), unique=True)      #encrypted
         email_hash = db.Column(db.String(64), unique=True)
-        phone = db.Column(db.String(20), unique=True)       #encrypted
+        phone = db.Column(db.String(64), unique=True)       #encrypted
         phone_carrier = db.Column(db.String(255))           #encrypted
         online = db.Column(db.Boolean)
         first_name = db.Column(db.String(255))              #encrypted
