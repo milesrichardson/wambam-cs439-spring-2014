@@ -75,7 +75,7 @@ def create_database(app):
             phone="7703629815",
             phone_carrier="AT&T",
             email="michael.hopkins@yale.edu",
-            password_hash="blah",
+            password="blah",
             online=True,
             first_name="Michael",
             last_name="Hopkins")
@@ -131,9 +131,9 @@ def create_database(app):
         db.session.add(task4) 
         db.session.commit()
         print "Done Migrating"
-
-    if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
-        initialize_database()
+    try:
+        if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+            initialize_database()
     except:
         initialize_database()
 
