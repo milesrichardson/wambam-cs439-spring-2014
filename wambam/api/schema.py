@@ -13,7 +13,7 @@ from wambam import app
 
 
 
-current_schema_version = 4
+current_schema_version = 5
 
 SchemaVersion = None
 account_task = None
