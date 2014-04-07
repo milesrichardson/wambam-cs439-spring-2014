@@ -199,7 +199,7 @@ def create_feedback_table(db):
         id = db.Column(db.Integer, primary_key=True)
         task_id = db.Column(db.Integer, db.ForeignKey("task.id"))
         account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
-        role = db.Column(db.Enum("fulfiller", "requestor"))
+        role = db.Column(db.Enum("fulfiller", "requestor", name="feedback_role"))
         rating = db.Column(db.Enum("positive", "negative",\
                            name="feedback_ratings"), nullable=True)
 
