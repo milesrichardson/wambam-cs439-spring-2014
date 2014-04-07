@@ -58,7 +58,7 @@ def create_database(app):
     schema.create_tables(app, db)
 
     #update the schema to the current version if necessary
-    if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+    def initialize_database():
         print "Migrating database"
         #need to have a clean session before dropping tables
         db.session.commit()
@@ -68,6 +68,7 @@ def create_database(app):
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
         db.session.commit()
+
     # REMOVE THIS SOON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         user = schema.Account(
             activated=True,
@@ -130,6 +131,12 @@ def create_database(app):
         db.session.add(task4) 
         db.session.commit()
         print "Done Migrating"
+
+    if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+        initialize_database()
+    except:
+        initialize_database()
+
     return db
 
 def create_api(app, db):
