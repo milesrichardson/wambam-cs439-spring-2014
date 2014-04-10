@@ -77,6 +77,48 @@ def create_database(app):
             first_name="Michael",
             last_name="Hopkins")
 
+        task2 = schema.Task(
+            requestor_id=1,
+            latitude = 41.3121,
+            longitude = -72.9277,
+            short_title="Title 2",
+            bid=float(5),
+            expiration_datetime=datetime.datetime.now(),
+            long_title="This is description 2",
+            delivery_location="Saybrook",
+            status="unassigned")
+
+        task3 = schema.Task(
+            requestor_id=1,
+            latitude = 41.3101,
+            longitude = -72.9257,
+            short_title="Title 3",
+            bid=float(10),
+            expiration_datetime=datetime.datetime.now(),
+            long_title="This is description 3",
+            delivery_location="There",
+            status="canceled")
+
+        task4 = schema.Task(
+            requestor_id=1,
+            latitude = 41.3131,
+            longitude = -72.9287,
+            short_title="Title 4",
+            bid=float(15),
+            expiration_datetime=datetime.datetime.now(),
+            long_title="This is description 4",
+            delivery_location="Here",
+            status="expired")
+
+        db.session.add(user)
+        db.session.add(task2)
+        db.session.add(task3) 
+        db.session.add(task4) 
+        db.session.commit()
+        print "Done Migrating"
+    return db
+
+"""
         task1 = schema.Task(
             requestor_id=1,
             latitude = 41.3111,
@@ -120,15 +162,11 @@ def create_database(app):
             long_title="This is description 4",
             delivery_location="Here",
             status="expired")
-
-        db.session.add(user)
-        db.session.add(task1) 
-        db.session.add(task2)
-        db.session.add(task3) 
-        db.session.add(task4) 
-        db.session.commit()
-        print "Done Migrating"
-    return db
+"""
+     #   db.session.add(task1) 
+     #   db.session.add(task2)
+     #   db.session.add(task3) 
+     #   db.session.add(task4) 
 
 def create_api(app, db):
     # Create the Flask-Restless API manager.
@@ -248,6 +286,7 @@ def set_online():
 
 @app.route("/set_offline", methods=["POST"])
 def set_offline():
+
     app.logger.debug("Start set_offline")
     # Get current user
     user_id = int(current_user.get_id())
@@ -439,7 +478,6 @@ def claim():
     fulfiller_id = int(current_user.get_id())
     fulfiller = schema.Account.query.get(fulfiller_id)
 
-
     # Get requester
     current_task = schema.Task.query.get(task_num)
     requestor_id = current_task.requestor_id
@@ -451,11 +489,11 @@ def claim():
     results = conn.execute(schema.account_task.insert(), 
                            account_id=fulfiller.id, 
                            task_id=task_num, 
-                           status="in_progress")
+                           status="active")
     
     # update task table
     temp = schema.Task.query.filter_by(id=int(task_num)).first()
-    temp.status = "completed"
+    temp.status = "in_progress"
 
     # add and commit changes
     db.session.add(temp)
@@ -504,6 +542,97 @@ def claim():
                             bid = "$%(bid).2f" % {"bid": bid},
                             phone= requestor.phone,
                             desktop_client=request.cookies.get("mobile"))
+
+def create_fulfiller_object(task):
+    task_id = task.id
+    requester_id = task.requestor_id
+    requester = schema.Account.query.get(requester_id)
+    requester_email = requester.email
+    requester_phone = requester.phone
+
+    expiration_date = schema.dump_datetime(task.expiration_datetime)
+    bid = "$%(bid).2f" % {"bid": task.bid}
+    app.logger.debug(task.status)
+    return {
+        'task_id' : task.id,
+        'other_email': requester_email,
+        'other_phone': requester_phone,
+        'expiration_date': expiration_date,
+        'bid': bid,
+        'lat': task.latitude,
+        'lon': task.longitude,
+        'delivery_location': task.delivery_location,
+        'title': task.short_title,
+        'description': task.long_title,
+        'status': task.status,
+        'venmo_status': task.venmo_status
+    }
+
+def create_requester_object(task):
+    task_id = task.id
+    fulfiller_email = None
+    fulfiller_phone = None
+
+    if (task.status == "in_progress" or task.status == "completed"):
+        #I am not sure if this is correct...
+        fulfiller_id = task.fulfiller_accounts[0].id
+        fulfiller = schema.Account.query.get(fulfiller_id)
+        fulfiller_email = fulfiller.email
+        fulfiller_phone = fulfiller.phone
+    
+    expiration_date = schema.dump_datetime(task.expiration_datetime)
+    bid = "$%(bid).2f" % {"bid": task.bid}
+    app.logger.debug(task.status)
+    return {
+        'task_id' : task.id,
+        'other_email': fulfiller_email,
+        'other_phone': fulfiller_phone,
+        'expiration_date': expiration_date,
+        'bid': bid,
+        'lat': task.latitude,
+        'lon': task.longitude,
+        'delivery_location': task.delivery_location,
+        'title': task.short_title,
+        'description': task.long_title,
+        'status': task.status,
+        'venmo_status': task.venmo_status
+    }
+
+@app.route("/my_requester_tasks")
+def my_requester_tasks():
+    user_id = flask.ext.login.current_user.get_id()
+    tasks_open = schema.Task.query.filter_by(requestor_id=user_id).filter_by(status="unassigned").all()
+    tasks_in_progress = schema.Task.query.filter_by(requestor_id=user_id).filter_by(status="in_progress").all()
+    tasks_old = schema.Task.query.filter_by(requestor_id=user_id).filter(schema.Task.status!="unassigned").filter(schema.Task.status!="in_progress").all()
+    requester_objects_open = map(create_requester_object, tasks_open)
+    requester_objects_in_progress = map(create_requester_object, tasks_in_progress)
+    requester_objects_old = map(create_requester_object, tasks_old)
+    return render_template("tasklist.html",
+                            tasks= (requester_objects_open +
+                                    requester_objects_in_progress +
+                                    requester_objects_old))
+
+def get_task_from_account_task(account_task):
+    task_id = account_task.task_id
+    task = schema.Task.query.get(task_id)
+    return task
+
+@app.route("/my_fulfiller_tasks")
+def my_fulfiller_tasks():
+    user_id = flask.ext.login.current_user.get_id()
+
+    conn = engine.connect()
+    query = select([schema.account_task.c.task_id]).where(schema.account_task.c.account_id == user_id)
+    account_tasks = conn.execute(query)
+
+    tasks = map (get_task_from_account_task, account_tasks)
+    tasks_in_progress = [elem for elem in tasks if elem.status == "in_progress"]
+    tasks_old = [elem for elem in tasks if elem.status != "in_progress"]
+    fulfiller_objects_in_progress = map(create_fulfiller_object, tasks_in_progress)
+    fulfiller_objects_old = map(create_fulfiller_object, tasks_old)
+    return render_template("tasklist.html",
+                            tasks= (fulfiller_objects_in_progress +
+                                    fulfiller_objects_old))
 
 @app.route("/viewtaskdetails/<int:taskid>")
 def view_task_details(taskid):

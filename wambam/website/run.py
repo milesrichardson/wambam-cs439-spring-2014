@@ -2,6 +2,7 @@ import flask
 from flask import Flask
 from flask import request, redirect, url_for, session, render_template
 from flask_mail import Message, Mail
+from sqlalchemy import create_engine, select
 
 import json
 import requests
@@ -126,8 +127,8 @@ def create_requester_object(task):
     app.logger.debug(task.status)
     return {
         'task_id' : task.id,
-        'fulfiller_email': fulfiller_email,
-        'fulfiller_phone': fulfiller_phone,
+        'other_email': fulfiller_email,
+        'other_phone': fulfiller_phone,
         'expiration_date': expiration_date,
         'bid': bid,
         'lat': task.latitude,
@@ -139,20 +140,6 @@ def create_requester_object(task):
         'venmo_status': task.venmo_status
     }
 
-@app.route("/my_requester_tasks")
-def my_requester_tasks():
-    user_id = flask.ext.login.current_user.get_id()
-    tasks = schema.Task.query.filter_by(requestor_id=user_id).all()
-    requester_objects = map(create_requester_object, tasks)
-    return render_template("tasklist.html",
-                            tasks= requester_objects)
-
-@app.route("/my_fulfiller_tasks")
-def my_fulfiller_tasks():
-    user_id = flask.ext.login.current_user.get_id()
-    tasks = schema.Task.query.filter_by(fulfiller_id=user_id).all()
-    return render_template("tasklist.html",
-                            tasks= tasks)
 
 @app.route("/sorry")
 def sorry():
