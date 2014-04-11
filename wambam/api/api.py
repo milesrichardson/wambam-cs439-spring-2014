@@ -21,6 +21,8 @@ import uuid
 import login
 import schema
 import emails
+
+
 from wambam import app
 
 #global variable for the flask engine
@@ -56,7 +58,7 @@ def create_database(app):
     schema.create_tables(app, db)
 
     #update the schema to the current version if necessary
-    if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+    def initialize_database():
         print "Migrating database"
         #need to have a clean session before dropping tables
         db.session.commit()
@@ -66,13 +68,14 @@ def create_database(app):
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
         db.session.commit()
+
     # REMOVE THIS SOON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         user = schema.Account(
             activated=True,
             phone="7703629815",
             phone_carrier="AT&T",
             email="michael.hopkins@yale.edu",
-            password_hash="blah",
+            password="blah",
             online=True,
             first_name="Michael",
             last_name="Hopkins")
@@ -163,10 +166,6 @@ def create_database(app):
             delivery_location="Here",
             status="expired")
 """
-     #   db.session.add(task1) 
-     #   db.session.add(task2)
-     #   db.session.add(task3) 
-     #   db.session.add(task4) 
 
 def create_api(app, db):
     # Create the Flask-Restless API manager.
@@ -178,6 +177,7 @@ def create_api(app, db):
     # allow clients to get entries and add entries
     manager.create_api(schema.Account, methods=["GET", "POST"])
     manager.create_api(schema.Task, methods=["GET", "POST"])
+    manager.create_api(schema.Feedback, methods=["GET", "POST"])
     return manager
 
 def add_user(user_data):
@@ -185,17 +185,19 @@ def add_user(user_data):
     #format the phone number into a standard format
     number_object = phonenumbers.parse(user_data["phone"], "US")
     number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
+    user_data["phone"] = number_formatted
+    encrypted = schema.encrypt_dictionary(user_data)
 
     user = schema.Account(
         email_hash=user_data["verification_address"],
         activated=False,
-        phone=number_formatted,
-        phone_carrier=user_data["phone_carrier"],
-        email=user_data["email"],
-        password_hash=user_data["pwd"],
+        phone=encrypted["phone"],
+        phone_carrier=encrypted["phone_carrier"],
+        email=encrypted["email"],
+        password=encrypted["pwd"],
         online=True,
-        first_name=user_data["first_name"],
-        last_name=user_data["last_name"])
+        first_name=encrypted["first_name"],
+        last_name=encrypted["last_name"])
 
     db.session.add(user)
     db.session.commit()
@@ -212,11 +214,52 @@ def get_all_active_tasks():
 
 @app.route("/get_all_claimed_tasks")
 def get_all_claimed_tasks():
+    #I don't think this works, but it's never used
     conn = engine.connect()
     query = select([schema.account_task])
     results = conn.execute(query)
 
     return flask.jsonify(items=[dict(i) for i in results])
+
+@app.route("/cancel_task/<int:task_id>")
+def cancel_task(task_id):
+    task = schema.Task.query.get(int(task_id))
+    task.status = 'canceled'
+    db.session.add(task)
+    db.session.commit()
+    app.logger.debug("Canceled task with ID %d" % int(task_id))
+    return ""
+
+@app.route("/add_feedback")
+def add_feedback(methods=["GET"]):
+    try:
+        task_id = int(request.args.get('task_id'))
+
+        role = request.args.get('role')
+        if role not in ['requestor', 'fulfiller']:
+            raise Exception('Invalid role')
+
+        rating = request.args.get('rating') 
+        if rating not in ['positive', 'negative']:
+            raise Exception('Invalid rating')
+        
+        user_id = int(current_user.get_id())
+
+    except Exception as e:
+        print e
+        return "error"
+
+    feedback = schema.Feedback(
+        task_id = task_id,
+        account_id = user_id,
+        role = role,
+        rating = rating,
+    )
+
+    db.session.add(feedback)
+    db.session.commit()
+
+    return ""
 
 @app.route("/tasks_for_requestor/<int:requestor>")
 def tasks_for_requestor(requestor):
@@ -249,21 +292,21 @@ def getTextRecipient(phone_number, phone_carrier):
     emailaddress = emailaddress.replace("-", "")
 
     if phone_carrier == "AT&T":
-      emailaddress += "@txt.att.net"
+        emailaddress += "@txt.att.net"
     elif phone_carrier == "Boost Mobile":
-      emailaddress += "@myboostmobile.com"
+        emailaddress += "@myboostmobile.com"
     elif phone_carrier == "MetroPCS":
-      emailaddress += "@mymetropcs.com"
+        emailaddress += "@mymetropcs.com"
     elif phone_carrier == "Sprint":
-      emailaddress += "@messaging.sprintpcs.com"
+        emailaddress += "@messaging.sprintpcs.com"
     elif phone_carrier == "T-Mobile":
-      emailaddress += "@tmomail.net"
+        emailaddress += "@tmomail.net"
     elif phone_carrier == "U.S. Cellular":
-      emailaddress += "@email.uscc.net"
+        emailaddress += "@email.uscc.net"
     elif phone_carrier == "Virgin Mobile":
-      emailaddress += "@vmobl.com"
+        emailaddress += "@vmobl.com"
     else:                                  #else we assume Verizon Wirless
-      emailaddress += "@vtext.com"
+        emailaddress += "@vtext.com"
 
     return emailaddress
 
@@ -316,14 +359,9 @@ def submit():
         app.logger.debug("No lat/lng for task")
         return redirect(url_for("working"))
 
-    lat = float(session["lat"])
-    lng = float(session["lng"])
-    
-    location = request.form["location"]
     bid = request.form["bid"]
     bid = bid.replace("$","");
     expiration = request.form["expiration"]
-    description = request.form["description"]
 
     # format for timedelta is (days, seconds, microseconds, 
     # milliseconds, minutes, hours, weeks)
@@ -341,16 +379,21 @@ def submit():
 
     # Get requestor id 
     requestor_id = int(current_user.get_id())
+    
+    encrypted = schema.encrypt_dictionary(request.form)
+    lat_encrypted = schema.encrypt_string(session["lat"])
+    lng_encrypted = schema.encrypt_string(session["lng"])
+    bid_encrypted = schema.encrypt_string(bid)
 
     task = schema.Task(
         requestor_id=requestor_id,
-        latitude = lat,
-        longitude = lng,
-        short_title=title,
-        bid=float(bid),
+        latitude = lat_encrypted,
+        longitude = lng_encrypted,
+        short_title=encrypted["title"],
+        bid=bid_encrypted,
         expiration_datetime=expirationdate,
-        long_title=description,
-        delivery_location=location,
+        long_title=encrypted["description"],
+        delivery_location=encrypted["location"],
         status="unassigned")
 
     db.session.add(task)
@@ -361,12 +404,12 @@ def submit():
 
 
     # Get logged in user
-    user_id = int(current_user.get_id())
-    flask_user = schema.Account.query.get(user_id)
-  
+    first_name = schema.decrypt_string(current_user.first_name)
+    last_name = schema.decrypt_string(current_user.last_name)
+
     # Get phone info for requester
-    phone_number = flask_user.phone
-    phone_carrier = flask_user.phone_carrier
+    phone_number = schema.decrypt_string(current_user.phone)
+    phone_carrier = schema.decrypt_string(current_user.phone_carrier)
     text_recipient = map(getTextRecipient, [phone_number], [phone_carrier])
 
     # Construct message for requester
@@ -381,10 +424,10 @@ def submit():
     # Probably want to do this asynchronously eventually
     fulfillers = schema.Account.query.filter(schema.Account.online == True).all()
     def getPhone(fulfiller):
-        return fulfiller.phone
-
+        return schema.decrypt_string(fulfiller.phone)
+        
     def getPhoneCarrier(fulfiller):
-        return fulfiller.phone_carrier
+        return schema.decrypt_string(fulfiller.phone_carrier)
 
     fulfiller_phones = map(getPhone, fulfillers)
     fulfiller_carriers = map(getPhoneCarrier, fulfillers)
@@ -397,7 +440,7 @@ def submit():
 
     # Construct message for potential fulfillers
     msg_subject = "New Task Alert"
-    msg_body = flask_user.first_name + " " + flask_user.last_name + " has created a task for '" + title + "'. Click the following link for more details: http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + "."
+    msg_body = first_name + " " + last_name + " has created a task for '" + title + "'. Click the following link for more details: http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + " ."
 
     # Mail message to potential fulfillers
     emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
@@ -451,6 +494,7 @@ def before_request():
             if not current_user.activated and \
                not (request.path == "/home" or request.path == "/logout" or request.path.endswith(".css") or request.path.endswith(".js")):
                 return redirect("/home")
+                
 
 #used when you've created a task
 def get_cool_word():
@@ -468,21 +512,23 @@ def claim():
     if (task.status != "unassigned"):
       return redirect("/sorry")
 
-    title = task.short_title
-    location = task.delivery_location
-    bid = task.bid
+    decrypted_task = schema.decrypt_object(task)
+    title = decrypted_task["short_title"]
+    location = decrypted_task["delivery_location"]
+    bid = float(decrypted_task["bid"])
     expiration = schema.dump_datetime(task.expiration_datetime)
-    description = task.long_title
+    description = decrypted_task["long_title"]
 
     # Get fulfiller
-    fulfiller_id = int(current_user.get_id())
-    fulfiller = schema.Account.query.get(fulfiller_id)
+    fulfiller = current_user
+    decrypted_fulfiller = schema.decrypt_object(fulfiller)
 
     # Get requester
     current_task = schema.Task.query.get(task_num)
     requestor_id = current_task.requestor_id
     requestor = schema.Account.query.get(requestor_id)
-    email = requestor.email
+    decrypted_requestor = schema.decrypt_object(requestor)
+    email = decrypted_requestor["email"]
 
     # add entry to account_task table
     conn = engine.connect()
@@ -492,37 +538,37 @@ def claim():
                            status="active")
     
     # update task table
-    temp = schema.Task.query.filter_by(id=int(task_num)).first()
+    temp = schema.Task.query.get(int(task_num))
     temp.status = "in_progress"
 
-    # add and commit changes
-    db.session.add(temp)
+    # commit changes
+    # db.session.add(temp)
     db.session.commit()
 
     app.logger.debug("Before confirmation text")    
 
     # Send confirmation text to fulfiller
-    fulfiller_number = fulfiller.phone
-    fulfiller_carrier = fulfiller.phone_carrier
+    fulfiller_number = decrypted_fulfiller["phone"]
+    fulfiller_carrier = decrypted_fulfiller["phone_carrier"]
     text_fulfiller = getTextRecipient(fulfiller_number, fulfiller_carrier)
     app.logger.debug("Email address: " + text_fulfiller)
 
     # Construct message to send to fulfiller
     msg_subject = "Task Claimed"
-    msg_body = "You have claimed the task '" + title + "'. Get in touch with " + requestor.first_name + " " + requestor.last_name + " at " + requestor.phone + "."
+    msg_body = "You have claimed the task '" + title + "'. Get in touch with " + decrypted_requestor["first_name"] + " " + decrypted_requestor["last_name"] + " at " + decrypted_requestor["phone"] + "."
 
     # Send message to fulfiller
     emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
 
     # Send confirmation text to requestor
-    requestor_number = requestor.phone
-    requestor_carrier = requestor.phone_carrier
+    requestor_number = decrypted_requestor["phone"]
+    requestor_carrier = decrypted_requestor["phone_carrier"]
     text_requestor = getTextRecipient(requestor_number, requestor_carrier)
     app.logger.debug("Email address: " + text_requestor)
 
     # Construct message to send to requestor
     msg_subject = "Your task has been claimed!"
-    msg_body = fulfiller.first_name + " " + fulfiller.last_name + " has claimed your task '" + title + "'. You can get in touch with " + fulfiller.first_name + " at " + fulfiller.phone + "."
+    msg_body = decrypted_fulfiller["first_name"] + " " + decrypted_fulfiller["last_name"] + " has claimed your task '" + title + "'. You can get in touch with " + decrypted_fulfiller["first_name"] + " at " + decrypted_fulfiller["phone"] + "."
 
     # Send confirmation message to requestor
     emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
@@ -540,7 +586,7 @@ def claim():
                             description = description,
                             email = email,
                             bid = "$%(bid).2f" % {"bid": bid},
-                            phone= requestor.phone,
+                            phone = decrypted_requestor["phone"],
                             desktop_client=request.cookies.get("mobile"))
 
 def create_fulfiller_object(task):
@@ -636,7 +682,8 @@ def my_fulfiller_tasks():
 
 @app.route("/viewtaskdetails/<int:taskid>")
 def view_task_details(taskid):
-    task = schema.Task.query.filter_by(id=taskid).first()
+    task = schema.Task.query.get(taskid)
+    task_decrypted = decrypt_object(task)
     if (task is None):
         return redirect("/home")
     else:
@@ -644,18 +691,17 @@ def view_task_details(taskid):
           return redirect("/sorry")
 
         # Get email address of logged in user 
-        fulfiller_id = int(current_user.get_id())
-        fulfiller = schema.Account.query.get(fulfiller_id)
+        email = schema.decrypt_string(current_user.email)
 
         return render_template("taskview.html",
                                 task_id = task.id,
-                                lat = task.latitude,
-                                lon = task.longitude,
-                                title = task.short_title,
-                                location = task.delivery_location,
-                                bid = "$%(bid).2f" % {"bid": task.bid},
+                                lat = task_decrypted["latitude"],
+                                lon = task_decrypted["longitude"],
+                                title = task_decrypted["short_title"],
+                                location = task_decrypted["delivery_location"],
+                                bid = "$%(bid).2f" % {"bid": task_decrypted["bid"]},
                                 expiration = schema.dump_datetime(task.expiration_datetime),
-                                description = task.long_title,
+                                description = task_decrypted["long_title"],
                                 email = fulfiller.email)
 
 
@@ -673,13 +719,19 @@ def activate_user(verification_address):
 
 
 def is_email_used(email):
-    result = schema.Account.query.filter_by(email=email).first() is not None
+    result = schema.Account.query.filter_by(email=schema.encrypt_string(email)).first() is not None
+    return flask.jsonify(used=str(result))
+
+def is_phone_used(phone):
+    number_object = phonenumbers.parse(phone, "US")
+    number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
+    result = schema.Account.query.filter_by(phone=schema.encrypt_string(number_formatted)).first() is not None
     return flask.jsonify(used=str(result))
 
 def is_user_activated():
     return current_user.activated
 
-app.config["SECRET_KEY"] = "I have a secret....."
+app.config["SECRET_KEY"] = "I have a secret."
 app.config["REMEMBER_COOKIE_DURATION"] = datetime.timedelta(days=14)
 
 db = create_database(app)

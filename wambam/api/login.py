@@ -1,6 +1,7 @@
 import schema
 import flask.ext.login
 import sqlalchemy
+import phonenumbers
 import time
 
 login_manager = None
@@ -34,8 +35,16 @@ def create_login_manager(app, db):
             else:
                 username = flask.request.form["email"]
                 password = flask.request.form["password"]
-                    
-            user = schema.Account.query.filter(sqlalchemy.or_(schema.Account.email==username, schema.Account.phone==username)).filter_by(password_hash=password).first()
+            
+            if "@"  not in username:
+                #phone number
+                number_object = phonenumbers.parse(username, "US")
+                username = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
+
+            username = schema.encrypt_string(username)
+            password = schema.encrypt_string(password)
+
+            user = schema.Account.query.filter(sqlalchemy.or_(schema.Account.email==username, schema.Account.phone==username)).filter_by(password=password).first()
                     
             if user is None:
                 app.logger.debug("abort")
