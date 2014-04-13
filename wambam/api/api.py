@@ -21,26 +21,35 @@ import login
 import schema
 import emails
 
+import datetime
 
 from wambam import app
 
 #global variable for the flask engine
 engine = None
 
-# def register_events():
-#     # standard decorator style
-#     @event.listens_for(schema.Account, 'load')
-#     def receive_load(target, context):
-#         "listen for the 'load' event"
-#         print '--------- WOAH ----------'
+def register_events():
+    ''' Event hooks for SQLAlchemy models. '''
+
+    # When task data is pulled out: check for expiry
+    @event.listens_for(schema.Task, 'load')
+    def receive_load(target, context):
+        for task in context.query.all():
+            if datetime.datetime.now() > task.expiration_datetime:
+                app.logger.debug("Expiring task with id " + `task.id` + \
+                                 "(expired " + `task.expiration_datetime` + "'")
+                task.status = 'expired'
+
+                db.session.add(task)
+                db.session.commit()
 
 def create_app():
-    # register_events()
     return flask.Flask(__name__)
 
 
 def create_database(app):
     global engine
+
     # Create the Flask application and the Flask-SQLAlchemy object    
     app.config["DEBUG"] = True
     using_sqllite = False
@@ -92,7 +101,7 @@ def create_database(app):
             longitude = -72.9277,
             short_title="Title 2",
             bid=float(5),
-            expiration_datetime=datetime.datetime.now(),
+            expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
             long_title="This is description 2",
             delivery_location="Saybrook",
             status="unassigned")
@@ -131,6 +140,9 @@ def create_database(app):
             initialize_database()
     except:
         initialize_database()
+
+    # Register SQLAlchemy event hooks
+    register_events()
 
     return db
 
