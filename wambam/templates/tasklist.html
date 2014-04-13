@@ -24,12 +24,15 @@
         center: new google.maps.LatLng(lat, lon)
         };
 
-        // cancel button stuff
-        cancel_buttons = document.getElementsByClassName('cancel_button')
-        for button in cancel_buttons {
-          button.parentNode.onClick = function(button.parentNode.task_id) {
-            console.debug(button.parentNode.task_id);
-          }
+        // // cancel button stuff
+        // var cancel_buttons = document.getElementsByClassName('cancel_button')
+        // for (button in cancel_buttons) {
+        //   var task_id_button = button.getElementsByName("task_id");
+        //   if (task_id_button) {
+        //     console.debug("found one!");
+        //     console.debug(task_id_button);
+        //   }
+
 
         }
 
@@ -79,8 +82,8 @@
                     {{task.title}}
                   </td>
                   <td id="right_col">
-                    <form action="/cancel">
-                      <input type="submit" class="cancel_button" value="Cancel"></input>
+                    <form action="/cancel" class="cancel_button">
+                      <input type="submit" value="Cancel"></input>
                       <input type="hidden" name="task_id" value="{{task.task_id}}"></input>
                     </form>
                   </td>
