@@ -109,6 +109,9 @@ def confirm():
     cool_word = api.get_cool_word()
     return render_template("confirmation.html",
                             cool_word = cool_word)
+@app.route("/tasklist")
+def tasklist():
+    return render_template('tasklist.html')
 
 def create_requester_object(task):
     task_id = task.id

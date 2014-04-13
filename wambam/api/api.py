@@ -248,13 +248,25 @@ def get_all_claimed_tasks():
 
     return flask.jsonify(items=[dict(i) for i in results])
 
-@app.route("/cancel_task/<int:task_id>")
+@app.route("/cancel_task")
 def cancel_task(task_id):
+    task_id = request.form(["task_id"])
     task = schema.Task.query.get(int(task_id))
     task.status = 'canceled'
     db.session.add(task)
     db.session.commit()
     app.logger.debug("Canceled task with ID %d" % int(task_id))
+    return ""
+
+@app.route("/finish_task")
+def finish_task(task_id):
+    task_id = request.form(["task_id"])
+    task = schema.Task.query.get(int(task_id))
+    # mark task "done" when both people say it's done
+    task.status = 'done'
+    db.session.add(task)
+    db.session.commit()
+    app.logger.debug("Marked task 'done' with ID %d" % int(task_id))
     return ""
 
 @app.route("/add_feedback")
