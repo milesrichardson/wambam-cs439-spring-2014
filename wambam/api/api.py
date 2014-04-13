@@ -4,6 +4,7 @@ import time
 import json
 import os
 import uuid
+import requests
 
 import flask
 from flask import session, request, redirect, url_for, render_template
@@ -15,8 +16,6 @@ import phonenumbers
 
 import pytz
 from pytz import timezone
-
-import uuid
 
 import login
 import schema
@@ -713,6 +712,92 @@ def view_task_details(taskid):
                                 email = fulfiller.email)
 
 
+def redirect_to_venmo():
+    return redirect("https://api.venmo.com/v1/oauth/authorize?client_id=1687&scope=make_payments%20access_profile&response_type=token")
+
+@app.route("/venmo_auth")
+def get_venmo_token():
+    token = request.args.get("access_token", None)
+    redirect_to = session["post_venmo_url"]
+    del session["post_venmo_url"]
+
+    if token is not None:
+        current_user.venmo_token = schema.encrypt_string(token)
+        db.session.add(current_user)
+        db.session.commit()
+        return redirect(redirect_to)
+    else:
+        return redirect("/task_view")
+
+@app.route("/setup_venmo_id")
+def setup_venmo_id():
+    #get venmo token somehow
+    if current_user.venmo_token == "":
+        session["post_venmo_url"] = request.path
+        return redirect_to_venmo()
+        #redirect authenticate to venmo
+    else:
+        url = "https://api.venmo.com/v1/me?access_token=" + schema.decrypt_string(current_user.venmo_token)
+        response = requests.get(url)
+        current_user.venmo_token = "";
+        response_dict = json.loads(response.text)
+        if "error" not in response_dict:
+            venmo_id = response_dict["data"]["user"]["id"]
+            current_user.venmo_id = schema.encrypt_string(venmo_id)
+            db.session.add(current_user)
+            db.session.commit()
+        return redirect("/task_view")
+
+ 
+@app.route("/venmo_make_payment")
+def make_venmo_payment():
+    task_id = int(request.args.get("task_id", None))
+    if task_id is None:
+        return ""
+    task = schema.Task.query.get(task_id)
+    if current_user.venmo_token == "":
+        session["post_venmo_url"] = request.path
+        return redirect_to_venmo()
+    else:
+        if task.requestor_id is not current_user.id:
+            return ""
+        #make the payment
+        conn = engine.connect()
+        query = select([schema.account_task.c.account_id]).where(schema.account_task.c.task_id == task_id)
+        fulfiller_account = conn.execute(query)[0]
+
+        data = {
+            "access_token":schema.decrypt_string(current_user.venmo_token),
+            "user_id":schema.decrypt_string(schema.Account.get(fulfiller_account.account_id).venmo_id)
+            "note":"A Wambam! payment for: " + schema.decrypt_string(task.title)
+            "amount":schema.decrypt_string(task.bid)
+        }
+        response = requests.post("https://api.venmo.com/v1/payments", data)
+        response_dict = json.loads(response.text)
+        if response_dict["data"]["payment"]["status"] == "failed":
+            #some shit happened
+            pass
+
+        db.session.add(current_user)
+        db.session.commit()
+        return ""
+
+@app.route("/can_use_venmo")
+def can_use_venmo():
+    task_id = int(request.args.get("task_id", None))
+    if task_id is None:
+        return "False"
+    task = schema.Task.query.get(task_id)
+    conn = engine.connect()
+    query = select([schema.account_taks.c.account_id]).where(schema.account_task.c.task_id == task_id)
+    fulfiller_account = conn.execute(query)[0]
+    
+    if schema.Account.get(fulfiller_account.account_id).venmo_id == "":
+        return "False"
+    return "True"
+
+
+
 def activate_user(verification_address):
     account = schema.Account.query.filter_by(email_hash=verification_address).first()
     if account is None:
@@ -722,6 +807,7 @@ def activate_user(verification_address):
             return False
         else:
             account.activated = True
+            db.session.add(account)
             db.session.commit()
             return True
 

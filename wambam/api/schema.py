@@ -60,6 +60,8 @@ def create_account_table(db):
         first_name = db.Column(db.String(255))              #encrypted
         last_name = db.Column(db.String(255))               #encrypted
         last_request = db.Column(db.Integer, default=0)        
+        venmo_token = db.Column(db.String(255), default="") #encrypted
+        venmo_id = db.Column(db.String(255), default="")    #encrypted
         
         fulfiller_tasks = db.relationship("Task", secondary=account_task,
                                           backref=db.backref("accounts", lazy="dynamic"))
