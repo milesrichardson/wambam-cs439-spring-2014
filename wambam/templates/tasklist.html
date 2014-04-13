@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    <title>My Tasks</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+
+    
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='tasklist.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='index1_mobile.css') }}">
+		
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <script src="{{ url_for('static', filename='logout_location.js') }}"></script>
+    <script type="text/javascript">
+      document.cookie = "mobile=" + (screen.width < 700) + ";path=/";
+    </script>
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <H1 id="header_title">
+    	My Tasks
+    </H1>
+    <div id="tabbed_section">
+    	<a href="somewhere">As Requester</a>
+    	<span> | </span>
+    	<a href="somewhere else">As Fulfiller</a>
+    </div>
+    <div id="tasks_table">
+    	<table>
+    		<th>
+	    		<tr>
+	    			<td>Open:</td>
+	    			<td>Foo</td>
+	    			<td>
+	    				<a href="indecisive">Cancel</a>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>In Progress:</td>
+	    			<td>Foo</td>
+	    			<td>
+	    				<a href="PAY UP!">Pay</a>
+	    			</td>
+	    			<td>
+	    				<a href="thumbs up">Thumbs Up</a>
+	    			</td>
+	    			<td>
+	    				<a href="thumbs down">Thumbs Down</a> 			
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Completed/Filled:</td>
+	    			<td>Foo</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Expired:</td>
+	    			<td>Foo</td>
+	    		</tr>
+    		</th>
+    	</table>
+    </div>
+</html>

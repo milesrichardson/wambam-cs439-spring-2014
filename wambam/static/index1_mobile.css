@@ -1,0 +1,52 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+html { 
+    height: 100%
+}
+
+body {
+    height: 100%;
+    margin: 0; 
+    padding: 0;
+    border: 0
+}
+
+
+#toolbar { 
+    display: block;
+    margin: auto
+}
+
+#description { 
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    background: #0F4D92;
+    padding-bottom: 5px;
+    text-align: center
+}
+
+#buttonbar {
+    height: 80px;
+}
+
+#buttonbar div {
+    margin-top: 15px;
+    font-size: 30px;
+    text-align: center;
+}
+
+#buttonbar input[type="submit"] {
+    height: 50px;
+    width: 100%;
+    font-size:20px;
+    color: white;
+    background: #0F4D92; 
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 0 10px;
+}

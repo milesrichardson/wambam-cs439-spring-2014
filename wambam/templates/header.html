@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='header.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='header_mobile.css') }}">
+  </head>
+  <body>
+    <div id="header">
+      <div id="title">Wambam!</div>
+      <span id="logoutdiv">
+        <form action="/logout">
+          <input type="submit" id="logoutbutton" value="Log Out"></input>
+        </form>
+      </span>
+    </div>
+  </body>
+</html>

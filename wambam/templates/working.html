@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='working.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='working_mobile.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='infowindow.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='infowindow_mobile.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/toggles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/themes/toggles-iphone.css') }}">
+    <style>
+    </style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+    <script src="{{ url_for('static', filename='jquery-toggles-master/toggles.min.js') }}"> </script>
+    <script>
+      if (!String.prototype.format) {
+        String.prototype.format = function() {
+          var args = arguments;
+          return this.replace(/{(\d+)}/g, function(match, number) { 
+            return typeof args[number] != 'undefined'
+              ? args[number]
+              : match
+            ;
+          });
+        };
+      }
+    </script>
+    <script>
+      var map;
+      var infowindow = null;
+
+      function setMapSize() {
+          var mapHeight = $("body").outerHeight() - $("#buttonbar").outerHeight() - $("#header").outerHeight() - $("#description").outerHeight() - 25;
+          $("#map-canvas").height(mapHeight);
+          console.debug("setMapSize");
+      }
+
+      $(window).on('resize', function() { setMapSize(); });
+
+      function initialize() {
+        var mapOptions = {
+        zoom: 15,
+        center: new google.maps.LatLng(41.3111, -72.9267)
+        };
+
+        map = new google.maps.Map(document.getElementById('map-canvas'),
+                                  mapOptions);
+
+	      map.setOptions({styles: [
+	         {
+	           featureType: "poi",
+             elementType: "labels",
+	           stylers: [
+	             { visibility: "off" }
+	           ]
+	         }
+	       ]});
+
+     var contentString = '<div id="info_window">'+
+          '<h1> {0} ({1}) </h1>'+
+          '<table> <tr>'+
+          '<td id="info_label">Requester Email:</td>'+
+          '<td id="info_content">{3}</td>'+
+          '</tr> <tr>'+
+          '<td id="info_label">Delivery Location:</td>'+
+          '<td id="info_content">{4}</td>'+
+          '</tr> <tr>'+
+          '<td id="info_label">Expires:</td>'+
+          '<td id="info_content">{2}</td>'+
+          '</tr> <tr>'+
+          '<td id="info_label_details"> Details:</td>'+
+          '</tr><td id="info_details" colspan="2"> {5}'+
+'</td> </tr> </table>'+ 
+          '<form action="/claimtask" method="POST">'+
+          '<input type="submit" value="Claim" id="info_button">'+
+          '<input type="hidden" name="id" value="{6}">'+
+          '</form> </div>';
+
+      infowindow = new google.maps.InfoWindow({
+            content: "foo",
+            maxWidth: 400
+      });
+
+      $.get('get_all_active_tasks', function(data) {
+          var activeTasks = data["items"];
+          
+          for (var i = 0; i < activeTasks.length; i++) {
+            var title = activeTasks[i]["short_title"];
+            var bid = activeTasks[i]["bid"];
+            var expiration = activeTasks[i]["expiration_datetime"];
+            var email = "";
+            var requestor = activeTasks[i]["requestor_id"];
+            $.ajax({url:'api/account/' + requestor, 
+                    success: function(data2) {
+                      email = data2["email"];
+                      console.debug(email);
+                    }, 
+                    async: false});
+            var id = activeTasks[i]["id"];
+            var location = activeTasks[i]["delivery_location"];
+            var description = activeTasks[i]["long_title"];
+            var lat = parseFloat(activeTasks[i]["latitude"]);
+            var lng = parseFloat(activeTasks[i]["longitude"]);
+            var myLatLng = new google.maps.LatLng(lat, lng);
+            var info = contentString.format(title,bid,expiration,email, location, description, id);
+            var marker = new google.maps.Marker({
+              position: myLatLng,
+              map: map,
+              html: info
+            });
+
+            google.maps.event.addListener(marker, 'click', function() {
+              infowindow.setContent(this.html);
+              infowindow.open(map, this);
+            });
+          }
+          setMapSize();
+      });
+    }
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+
+
+
+
+
+  <body>
+    {% include 'header.html' %}
+    <div id="description">Claim a task and become a WamBam!</div>
+    <div id="map-canvas"></div>
+    <div id="buttonbar">
+      <form id="form" action="/home">
+        <div>
+          <label id="alert_label" for="alerts">Text Message Alerts for New Tasks?</label>
+          <div id="slider" class="toggle-iphone"></div>
+        </div>
+        <input id="button" type="submit" value="Actually, I don't want to work!">
+      </form>
+    </div>
+
+
+
+
+
+  <script>
+    function setSliderPos() {
+        if (screen.width >= 700) {
+            var labelLeftPos = $("#alert_label").offset().left;
+            var labelBottomPos = $("#alert_label").offset().top;
+            var labelWidth = $("#alert_label").width();
+            var windowHeight = $(window).height();
+            $("#slider").css({
+               "top": (labelBottomPos + 20) + "px",
+               "left": (labelLeftPos + labelWidth / 2 - 60) + "px",
+               "right": ""
+            });
+        }
+        else {
+            var labelBottomPos = $("#alert_label").offset().top;
+            console.log(labelBottomPos);
+            $("#slider").css({
+              "top": labelBottomPos + "px",
+              "right": (10) + "px",
+              "left": ""
+            });
+        }
+    }
+    setSliderPos();
+    $(window).on('resize', function() { setMapSize(); setSliderPos()});
+    $(window).on('load', function() { setMapSize(); setSliderPos()});
+    $.ajax({
+        url: 'get_online',
+        type: 'GET',
+        contentType: 'application/json',
+        async: false,
+        success: function(data) {
+          $('.toggle-iphone').toggles({
+            drag:false,
+            text: {
+              on: 'YESSS',
+              off: 'NAH'
+            },
+            on: data["online"],
+            width: 120,
+            height: 40
+          });
+         $('.toggle-iphone').on('toggle', function (e, active) {
+              if (active) {
+                  $('.toggle-off').hide();
+                  $.ajax({
+                      type: 'POST',
+                      url: 'set_online',
+                      async: true
+                  });
+              } else {
+                  $('.toggle-off').show();
+                  $.ajax({
+                      type: 'POST',
+                      url: 'set_offline',
+                      async: true
+                  });
+              }
+          });
+    }});
+
+  </script>
+  </body>
+</html>

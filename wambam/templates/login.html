@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript">
+      if (screen.width < 700) {
+	document.location="mobile";
+      }
+      document.cookie = "mobile=false;path=/";
+    </script>
+
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
+  </head>
+  <body>
+    <div id="header">
+      <table id="headertable">
+        <tr>
+          <td id="title">WamBam!</td>
+          <td id="loginentry">
+            <div id="login">
+              <table id="logintable">
+                <tr id="loginlabels">
+                  <td>Email or Phone</td>
+                  <td>Password</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <form action="/login" method="POST">
+                    <td>
+                      <input class="logininput" type="text" name="userfield">
+                    </td>
+                    <td>
+                      <input class="logininput" type="password" name="passwordfield">
+                    </td>
+                    <td>
+                      <input id="loginbutton" type="submit" name="loginbutton" value="Log In">
+                      <input name="next" type="hidden" value="{{pre_login_url}}"/>
+                    </td>
+                  </form>
+                </tr>
+              </table>
+            </div>         
+          </td> 
+        </tr>
+      </table>
+    </div>
+    <div id="registrationdiv">
+      <form id="registerform" action="/register" method="POST">
+        <table id="registrationtable">
+          <tr>
+            <td colspan="2"> <div id="registertitle"> New to WamBam!? </div> </td>
+          </tr>
+	  <tr>
+            <td>
+              <label for="firstname">First Name</label>
+            </td>
+            <td>
+              <input type="text" name="firstname">
+            </td>
+            <td>
+              <div id="firstnameerror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="lastname">Last Name</label>
+            </td>
+            <td>
+              <input type="text" name="lastname">
+            </td>
+            <td>
+              <div id="lastnameerror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="phone">Phone Number</label>
+            </td>
+            <td>
+              <input type="text" name="phone">
+            </td>
+            <td>
+              <div id="phoneerror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="phonecarrier">Phone Carrier</label>
+            </td>
+            <td>
+              <select name="phonecarrier" form="registerform">
+                <option selected="selected" value="AT&T">AT&T</option>
+                <option value="Boost Mobile">Boost Mobile</option>
+                <option value="MetroPCS">MetroPCS</option>
+                <option value="Sprint">Sprint</option>
+                <option value="T-Mobile">T-Mobile</option>
+                <option value="U.S. Cellular">U.S. Cellular</option>
+                <option value="Virgin Mobile">Virgin Mobile</option>
+                <option value="Verizon Wireless">Verizon Wireless</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="email">Email Address</label>
+            </td>
+            <td>
+              <input type="text" name="email">
+            </td>
+            <td>
+              <div id="emailerror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="password">Password</label>
+            </td>
+            <td>
+              <input type="password" name="password" id="password">
+            </td>
+            <td>
+              <div id="passworderror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="passwordconfirm">Confirm Password</label>
+            </td>
+            <td>
+              <input type="password" name="passwordconfirm">
+            </td>
+            <td>
+              <div id="passwordconfirmerror"> </div>
+            </td>
+          </tr>
+          <tr>
+            <td id="submitcol" colspan="2"> <input type="submit" id="register" name="register" value="Register"></td>
+          </tr>
+        </table>
+      </form>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/additional-methods.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='login_validator.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+html {
+    min-width: 700px 
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    border: 0
+}
+
+#addtaskdiv { 
+    margin-top: 70px;
+    text-align: center
+} 
+
+#addtasktitle { 
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 20px 
+}
+
+#addtasktable { 
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto
+}
+
+#addtasktable  td:first-child > label {
+    font-size: 20px;
+    padding-right: 20px;
+}
+
+select, input[type="text"] {
+    width: 250px;
+    font-size: 20px;
+    padding: 5px 5px;
+}
+
+textarea { 
+    width: 415px;
+    resize: none;
+    padding-left: 5px;
+    margin: 20px 0 10px 0;
+}
+
+#submitcol { 
+    text-align: center
+}
+
+#addtaskform input[type='submit']{
+    height: 50px;
+    width: 150px;
+    font-size:20px;
+    color: white;
+    background: #0F4D92;
+    text-align: center
+}
+
+label.error {
+    color: red 
+}

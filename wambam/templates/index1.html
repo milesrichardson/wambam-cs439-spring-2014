@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='index1.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='index1_mobile.css') }}">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <script src="{{ url_for('static', filename='logout_location.js') }}"></script>
+    <script type="text/javascript">
+      document.cookie = "mobile=" + (screen.width < 700) + ";path=/";
+    </script>
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <div id="description">Drop a pin where you need something.</div>
+    <div id="map-canvas"></div>
+    <div id="buttonbar">
+      {%if activated %}
+      <form id="form" action="/working">
+        <input type="submit" value="I want to work!">
+      </form>
+      <form id="form" action="/addtask" method="POST">
+        <input type="hidden" id="lat" name="lat" type="text" />
+        <input type="hidden" id="lng" name="lng" type="text" />
+        <input type="hidden" id="browser_type" name="browser_type" type="text" />
+        <input id="create_task_button" type="submit" value="Get it done" style="display: none" />
+      </form>
+      {% else %}
+      <div>Activate your account!!!</div>
+      {% endif %}
+    </div>
+  </body>
+  <script>
+    $("#buttonbar").on('resize', function() { setMapSize(); });
+  </script>
+</html>

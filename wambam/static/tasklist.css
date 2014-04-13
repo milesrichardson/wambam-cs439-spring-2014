@@ -1,0 +1,36 @@
+input, select, textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+html { 
+    min-width: 700px; 
+    height: 100%
+}
+
+body {
+    height: 100%;
+    margin: 0; 
+    padding: 0;
+    border: 0
+}
+
+#header_title {
+    text-align: center;
+    padding-bottom: 10px;
+    /*color: #FFFFFF;*/
+    font-size:40px
+}
+
+#tabbed_section {
+	text-align: center;
+	padding: 10px;
+	font-size: 20px;
+}
+
+#tasks_table table {
+	text-align: left;
+	padding: 10px;
+	margin: 0 auto;
+}

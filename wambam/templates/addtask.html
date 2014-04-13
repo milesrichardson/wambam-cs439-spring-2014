@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='addtask.css') }}">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='addtask_mobile.css') }}">
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <div id="addtaskdiv">
+
+    {% macro desktop_table_layout() -%}
+      {% if desktop_client %}
+        </td>
+        <td>
+      {% endif %}
+    {%- endmacro %}
+
+      <form id="addtaskform" action="/submittask" method="POST">
+        <table id="addtasktable">
+          <tr>
+            <td colspan="2"> <div id="addtasktitle"> Create a Task </div> </td>
+          </tr>
+          <tr>
+            <td><label for="title">Title</label></td>
+            <td>
+              <input type="text" name="title" maxlength="255">
+            {{ desktop_table_layout() }}
+              <div id="titleerror"></div></td>
+          </tr>
+          <tr>
+            <td><label for="location">Delivery Location</label></td>
+            <td>
+              <input type="text" name="location" maxlength="255">
+            {{ desktop_table_layout() }}
+              <div id="locationerror"></div></td>
+          </tr>
+          <tr>
+            <td><label for="bid">Bid Amount ($)</label></td>
+            <td>
+              <input type="text" name="bid">
+            {{ desktop_table_layout() }}
+              <div id="biderror"></div></td>
+          </tr>
+          <tr>
+            <td><label for="expiration">Task Expiration</label></td>
+            <td>
+              <select  name="expiration" form="addtaskform">
+                <option value="30min">30 minutes</option>
+                <option selected="selected" value="1hr">1 hour</option>
+                <option value="1day">1 day</option>
+                <option value="1wk">1 week</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <textarea rows="4" form="addtaskform" placeholder="Description of task (optional)" name="description"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td id="submitcol" colspan="2">
+              <input type="submit" name="submit" value="WamBam!">
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/additional-methods.min.js"></script>
+    <script>
+      jQuery.validator.addMethod("dollars", function(value) {
+		      return /^\$?([0-9]{0,9})((\.([0-9]{2}))?)$/.test(value);
+	      }, "Please specify a valid dollar amount"
+      );
+
+      $( "#addtaskform" ).validate(
+      {
+      
+        rules: {
+          title: {
+            required: true,
+          },
+          location: {
+            required: true,
+          },
+          bid: {
+            required: true,
+            dollars: true
+          }
+        }, 
+        errorPlacement: function(error, element) {
+            if (element.attr("name") == "title" )
+                error.appendTo("#titleerror");
+            else if  (element.attr("name") == "location" )
+                error.appendTo("#locationerror");
+            else if  (element.attr("name") == "bid" )
+                error.appendTo("#biderror");
+        }
+      });
+
+      $.validator.messages.required = 'WamBam! needs this information!';
+    </script>
+  </body>
+</html>
