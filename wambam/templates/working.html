@@ -91,14 +91,8 @@
             var title = activeTasks[i]["short_title"];
             var bid = activeTasks[i]["bid"];
             var expiration = activeTasks[i]["expiration_datetime"];
-            var email = "";
+            var email = activeTasks[i]["requestor_email"];
             var requestor = activeTasks[i]["requestor_id"];
-            $.ajax({url:'api/account/' + requestor, 
-                    success: function(data2) {
-                      email = data2["email"];
-                      console.debug(email);
-                    }, 
-                    async: false});
             var id = activeTasks[i]["id"];
             var location = activeTasks[i]["delivery_location"];
             var description = activeTasks[i]["long_title"];
