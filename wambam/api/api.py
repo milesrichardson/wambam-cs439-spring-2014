@@ -42,7 +42,7 @@ def create_database(app):
     try:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
     except KeyError:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/' + uuid.uuid1().hex + '.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///home/accts/mgh6/Desktop/wambam/wambam/wambam/' + uuid.uuid1().hex + '.db'
         using_sqllite = True
 
     
@@ -118,7 +118,15 @@ def create_database(app):
         db.session.add(task4) 
         db.session.commit()
         print "Done Migrating"
+
+    try:
+        if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+            initialize_database()
+    except:
+        initialize_database()
+
     return db
+
 
 """
         task1 = schema.Task(
