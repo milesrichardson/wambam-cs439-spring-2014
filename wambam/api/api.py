@@ -622,6 +622,7 @@ def create_fulfiller_object(task):
     }
 
 def create_requester_object(task):
+    task_decrypted = decrypt_object(task)
     task_id = task.id
     fulfiller_email = None
     fulfiller_phone = None
@@ -630,11 +631,12 @@ def create_requester_object(task):
         #I am not sure if this is correct...
         fulfiller_id = task.fulfiller_accounts[0].id
         fulfiller = schema.Account.query.get(fulfiller_id)
-        fulfiller_email = fulfiller.email
-        fulfiller_phone = fulfiller.phone
+        fulfiller_decrypted = decrypt_object(fulfiller)
+        fulfiller_email = fulfiller_decrypted["email"]
+        fulfiller_phone = fulfiller_decrypted["phone"]
     
     expiration_date = schema.dump_datetime(task.expiration_datetime)
-    bid = "$%(bid).2f" % {"bid": task.bid}
+    bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
     app.logger.debug(task.status)
     return {
         'task_id' : task.id,
@@ -751,7 +753,7 @@ def setup_venmo_id():
  
 @app.route("/venmo_make_payment")
 def make_venmo_payment():
-    task_id = int(request.args.get("task_id", None))
+    task_id = request.form["task_id"]
     if task_id is None:
         return ""
     task = schema.Task.query.get(task_id)
@@ -768,8 +770,8 @@ def make_venmo_payment():
 
         data = {
             "access_token":schema.decrypt_string(current_user.venmo_token),
-            "user_id":schema.decrypt_string(schema.Account.get(fulfiller_account.account_id).venmo_id)
-            "note":"A Wambam! payment for: " + schema.decrypt_string(task.title)
+            "user_id":schema.decrypt_string(schema.Account.get(fulfiller_account.account_id).venmo_id),
+            "note":"A Wambam! payment for: " + schema.decrypt_string(task.title),
             "amount":schema.decrypt_string(task.bid)
         }
         response = requests.post("https://api.venmo.com/v1/payments", data)
