@@ -35,7 +35,7 @@ def register_events():
     @event.listens_for(schema.Task, 'load')
     def receive_load(target, context):
         for task in context.query.all():
-            if datetime.datetime.now() > task.expiration_datetime:
+            if datetime.datetime.now() > task.expiration_datetime and task.status == "unassigned":
                 app.logger.debug("Expiring task with id " + `task.id` + \
                                  "(expired " + `task.expiration_datetime` + "'")
                 task.status = 'expired'
@@ -782,7 +782,7 @@ def setup_venmo_id():
         return redirect("/task_view")
 
  
-@app.route("/venmo_make_payment")
+@app.route("/venmo_make_payment", methods=["POST"])
 def make_venmo_payment():
     task_id = request.form["task_id"]
     if task_id is None:

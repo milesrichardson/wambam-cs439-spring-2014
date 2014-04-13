@@ -46,19 +46,31 @@
   <script>
   $(function() {
     $( "#accordion" ).accordion();
+    $( "#accordion input[type=submit]" ).click(
+        function(event) {
+            var form = $(this).parents('form:first');
+            console.debug(form.attr("id"));
+            form.submit();
+//console.debug($(event.target).parent());
+          
+ //         $($(event.target).parent()).sumbit()
+     })
   });
   </script>
 </head>
 <body>
   {% include 'header.html' %}
   <div id="contents">
+
     <div id="page_title"> My Tasks </div>
     <div id="tabs">
     	<a href="my_requester_tasks">As Requester</a>
     	<span> | </span>
     	<a href="my_fulfiller_tasks">As Fulfiller</a>
     </div>
+
     <div id="accordion">
+      
     {% for task in tasks %}
         {% if task.status == "unassigned" %}
             <h3 id="open_header">
@@ -86,13 +98,13 @@
                   <td id="right_col">
                     <div id="in_progress_buttons">
                       {% if task.object_type == "requester"%}
-                        {% if task.fulfiller_has_venmo == "True" %}
+                        {% if task.fulfiller_has_venmo == "true" %}
                           <div>
-                            <form action="/venmo_make_payment">
-                              <input type="submit" id="button" value="Pay with Venmo"></input>
-                              <input type="hidden" id="task_id" value="{{task.task_id}}"></input>
-                            </form>
-                          </div>
+        <form id="form{{task.task_id}}" action="/venmo_make_payment" method="POST">
+          <input type="submit"  id="button" value="Pay with Venmo"></input>
+          <input type="hidden"  name="task_id" id="task_id" value="{{task.task_id}}"></input>
+        </form>
+      </div>
                         {% else %}
                           <div>
                               <input type="submit" id="button_dull" value="Fulfiller Doesn't Have Venmo" disabled></input>
