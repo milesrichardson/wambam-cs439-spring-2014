@@ -10,7 +10,7 @@ import flask
 from flask import session, request, redirect, url_for, render_template
 from flask.ext import sqlalchemy, restless, login as flask_login
 from flask_login import current_user
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, event
 
 import phonenumbers
 
@@ -27,8 +27,15 @@ from wambam import app
 #global variable for the flask engine
 engine = None
 
+# def register_events():
+#     # standard decorator style
+#     @event.listens_for(schema.Account, 'load')
+#     def receive_load(target, context):
+#         "listen for the 'load' event"
+#         print '--------- WOAH ----------'
 
 def create_app():
+    # register_events()
     return flask.Flask(__name__)
 
 
@@ -42,7 +49,7 @@ def create_database(app):
     try:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
     except KeyError:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///home/accts/mgh6/Desktop/wambam/wambam/wambam/' + uuid.uuid1().hex + '.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///tmp/' + uuid.uuid1().hex + '.db'
         using_sqllite = True
 
     
@@ -768,8 +775,8 @@ def make_venmo_payment():
 
         data = {
             "access_token":schema.decrypt_string(current_user.venmo_token),
-            "user_id":schema.decrypt_string(schema.Account.get(fulfiller_account.account_id).venmo_id)
-            "note":"A Wambam! payment for: " + schema.decrypt_string(task.title)
+            "user_id":schema.decrypt_string(schema.Account.get(fulfiller_account.account_id).venmo_id),
+            "note":"A Wambam! payment for: " + schema.decrypt_string(task.title),
             "amount":schema.decrypt_string(task.bid)
         }
         response = requests.post("https://api.venmo.com/v1/payments", data)
