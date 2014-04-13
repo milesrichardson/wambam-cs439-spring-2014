@@ -98,6 +98,15 @@ body {
     text-align: center;
 }
 
+#button_dull { 
+    font-size:15px;
+    padding: 5px 10px;
+    color: white;
+    font-weight: bold;
+    background: #84b6cd;
+    text-align: center;
+}
+
 #task_details {
     width: 100%;
 }

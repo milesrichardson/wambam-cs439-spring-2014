@@ -76,6 +76,7 @@ def create_database(app):
             email="michael.hopkins@yale.edu",
             password="blah",
             online=True,
+            venmo_id="1020501350678528475",
             first_name="Michael",
             last_name="Hopkins")
 
@@ -597,60 +598,66 @@ def claim():
                             desktop_client=request.cookies.get("mobile"))
 
 def create_fulfiller_object(task):
+    task_decrypted = schema.decrypt_object(task)
     task_id = task.id
     requester_id = task.requestor_id
     requester = schema.Account.query.get(requester_id)
-    requester_email = requester.email
-    requester_phone = requester.phone
+    requester_decrypted = schema.decrypt_object(requester)
+    requester_email = requester_decrypted["email"]
+    requester_phone = requester_decrypted["phone"]
 
     expiration_date = schema.dump_datetime(task.expiration_datetime)
-    bid = "$%(bid).2f" % {"bid": task.bid}
+    bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
     app.logger.debug(task.status)
     return {
-        'task_id' : task.id,
-        'other_email': requester_email,
-        'other_phone': requester_phone,
-        'expiration_date': expiration_date,
-        'bid': bid,
-        'lat': task.latitude,
-        'lon': task.longitude,
-        'delivery_location': task.delivery_location,
-        'title': task.short_title,
-        'description': task.long_title,
-        'status': task.status,
-        'venmo_status': task.venmo_status
+        "object_type": "fulfiller",
+        "task_id": task.id,
+        "other_email": requester_email,
+        "other_phone": requester_phone,
+        "expiration_date": expiration_date,
+        "bid": bid,
+        "lat": task_decrypted["latitude"],
+        "lon": task_decrypted["longitude"],
+        "delivery_location": task_decrypted["delivery_location"],
+        "title": task_decrypted["short_title"],
+        "description": task_decrypted["long_title"],
+        "status": task.status,
     }
 
 def create_requester_object(task):
-    task_decrypted = decrypt_object(task)
+    task_decrypted = schema.decrypt_object(task)
     task_id = task.id
     fulfiller_email = None
     fulfiller_phone = None
+    fulfiller_has_venmo = "false"
 
     if (task.status == "in_progress" or task.status == "completed"):
         #I am not sure if this is correct...
         fulfiller_id = task.fulfiller_accounts[0].id
         fulfiller = schema.Account.query.get(fulfiller_id)
-        fulfiller_decrypted = decrypt_object(fulfiller)
+        fulfiller_decrypted = schema.decrypt_object(fulfiller)
         fulfiller_email = fulfiller_decrypted["email"]
         fulfiller_phone = fulfiller_decrypted["phone"]
+        fulfiller_has_venmo = can_use_venmo(task.id)
     
     expiration_date = schema.dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
     app.logger.debug(task.status)
     return {
-        'task_id' : task.id,
-        'other_email': fulfiller_email,
-        'other_phone': fulfiller_phone,
-        'expiration_date': expiration_date,
-        'bid': bid,
-        'lat': task.latitude,
-        'lon': task.longitude,
-        'delivery_location': task.delivery_location,
-        'title': task.short_title,
-        'description': task.long_title,
-        'status': task.status,
-        'venmo_status': task.venmo_status
+        "object_type": "requester",
+        "task_id": task.id,
+        "other_email": fulfiller_email,
+        "other_phone": fulfiller_phone,
+        "expiration_date": expiration_date,
+        "bid": bid,
+        "lat": task_decrypted["latitude"],
+        "lon": task_decrypted["longitude"],
+        "delivery_location": task_decrypted["delivery_location"],
+        "title": task_decrypted["short_title"],
+        "description": task_decrypted["long_title"],
+        "status": task.status,
+        "venmo_status": task.venmo_status,
+        "fulfiller_has_venmo": fulfiller_has_venmo
     }
 
 @app.route("/my_requester_tasks")
@@ -671,6 +678,11 @@ def get_task_from_account_task(account_task):
     task_id = account_task.task_id
     task = schema.Task.query.get(task_id)
     return task
+
+def get_account_from_account_task(account_task):
+    account_id = account_task.account_id
+    account = schema.Account.query.get(account_id)
+    return account
 
 @app.route("/my_fulfiller_tasks")
 def my_fulfiller_tasks():
@@ -766,11 +778,13 @@ def make_venmo_payment():
         #make the payment
         conn = engine.connect()
         query = select([schema.account_task.c.account_id]).where(schema.account_task.c.task_id == task_id)
-        fulfiller_account = conn.execute(query)[0]
+        account_tasks = conn.execute(query)
+        accounts = map (get_account_from_account_task, account_tasks)
+        fulfiller_account = accounts[0]
 
         data = {
             "access_token":schema.decrypt_string(current_user.venmo_token),
-            "user_id":schema.decrypt_string(schema.Account.get(fulfiller_account.account_id).venmo_id),
+            "user_id":schema.decrypt_string(schema.Account.get(fulfiller_account.id).venmo_id),
             "note":"A Wambam! payment for: " + schema.decrypt_string(task.title),
             "amount":schema.decrypt_string(task.bid)
         }
@@ -784,21 +798,19 @@ def make_venmo_payment():
         db.session.commit()
         return ""
 
-@app.route("/can_use_venmo")
-def can_use_venmo():
-    task_id = int(request.args.get("task_id", None))
+def can_use_venmo(task_id):
     if task_id is None:
-        return "False"
+        return "false"
     task = schema.Task.query.get(task_id)
     conn = engine.connect()
-    query = select([schema.account_taks.c.account_id]).where(schema.account_task.c.task_id == task_id)
-    fulfiller_account = conn.execute(query)[0]
-    
-    if schema.Account.get(fulfiller_account.account_id).venmo_id == "":
-        return "False"
-    return "True"
+    query = select([schema.account_task.c.account_id]).where(schema.account_task.c.task_id == task_id)
+    account_tasks = conn.execute(query)
+    accounts = map (get_account_from_account_task, account_tasks)
+    fulfiller_account = accounts[0]
 
-
+    if schema.Account.query.get(fulfiller_account.id).venmo_id == "":
+        return "false"
+    return "true"
 
 def activate_user(verification_address):
     account = schema.Account.query.filter_by(email_hash=verification_address).first()
