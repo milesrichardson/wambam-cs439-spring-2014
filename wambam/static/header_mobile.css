@@ -14,7 +14,8 @@
 }
 
 #headerbuttons {
-    width: 250px;
+    width: 300px;
+    margin: 0 auto;
 }
 
 #logoutbutton { 
@@ -22,7 +23,7 @@
     color: white;
     padding: 5px 3px;
     background: #0F4D92;
-    width: 100px;
+    width: 150px;
     float: right;
 }
 
@@ -31,6 +32,6 @@
     color: white;
     padding: 5px 3px;
     background: #0F4D92;
-    width: 100px;
+    width: 150px;
     float: left;
 }

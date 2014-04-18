@@ -78,10 +78,6 @@ body {
     width: 50%;
 }
 
-#task_entry {
-    overflow: hidden;
-}
-
 #button { 
     font-size:15px;
     padding: 5px 10px;
