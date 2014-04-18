@@ -14,6 +14,8 @@ body {
     width: 100%;
 }
 
+.ui-accordion .ui-accordion-content {padding: 1em 0;}
+
 #contents {
     width: 100%;
 }
@@ -61,6 +63,7 @@ body {
 #tabs {
 	  font-size: 20px;
     margin-bottom: 10px;
+    margin-left: 10px
 }
 
 #task_table {
