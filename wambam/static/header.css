@@ -15,8 +15,9 @@
 #headerbuttons {
     position:absolute; 
     right:30px;
-    top: 20px;
+    top: 10px;
     width: 250px;
+    margin: 0 auto;
 }
 
 #logoutbutton { 

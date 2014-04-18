@@ -10,17 +10,6 @@ body {
     border: 0
 }
 
-#accordion {
-    margin-bottom: 50px;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-#tabs {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
 #accordion .ui-accordion-header#open_header {  
     background-color: #90EE90; /* Old browsers */  
     background-image: -moz-linear-gradient(top, #90EE90 0%, #90EE90 100%); /* FF3.6+ */  
@@ -52,11 +41,6 @@ body {
     background-image: -ms-linear-gradient(top,  #FFB6C1 0%,#FFB6C1 100%); /* IE10+ */  
     background-image: linear-gradient(to bottombottom,  #FFB6C1 0%,#FFB6C1 100%); /* W3C */  
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFB6C1', endColorstr='#FFB6C1',GradientType=0 ); /* IE6-9 */  
-}
-
-#contents {
-    margin-left: 75px;
-    margin-right: 75px;
 }
 
 #page_title {
