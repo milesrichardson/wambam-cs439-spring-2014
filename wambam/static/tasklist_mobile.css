@@ -14,7 +14,10 @@ body {
     width: 100%;
 }
 
-.ui-accordion .ui-accordion-content {padding: 1em 0;}
+.ui-accordion .ui-accordion-content {
+    padding: 0; 
+    margin: 0;
+}
 
 #contents {
     width: 100%;
