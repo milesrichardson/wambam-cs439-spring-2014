@@ -18,6 +18,13 @@ body {
 
 #accordion {
     margin-bottom: 50px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#tabs {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 #accordion .ui-accordion-header#open_header {  

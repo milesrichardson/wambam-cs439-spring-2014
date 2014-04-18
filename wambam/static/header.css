@@ -23,3 +23,15 @@
     right:30px;
     top: 20px;
 }
+
+#historybutton { 
+    font-size:15px;
+    padding: 3px 10px;
+    color: white;
+    font-weight: bold;
+    background: #0F4D92;
+    text-align: center;
+    position:absolute; 
+    left:30px;
+    top: 20px;
+}

@@ -24,20 +24,6 @@
         center: new google.maps.LatLng(lat, lon)
         };
 
-        // // cancel button stuff
-        // var cancel_buttons = document.getElementsByClassName('cancel_button')
-        // for (button in cancel_buttons) {
-        //   var task_id_button = button.getElementsByName("task_id");
-        //   if (task_id_button) {
-        //     console.debug("found one!");
-        //     console.debug(task_id_button);
-        //   }
-
-
-        }
-
-
-
         map = new google.maps.Map(document.getElementById(id),
                                   mapOptions);
 
@@ -65,9 +51,6 @@
             var form = $(this).parents('form:first');
             console.debug(form.attr("id"));
             form.submit();
-//console.debug($(event.target).parent());
-          
- //         $($(event.target).parent()).sumbit()
      })
   });
   </script>
@@ -95,7 +78,7 @@
                   </td>
                   <td id="right_col">
                     <form action="/cancel" class="cancel_button">
-                      <input type="submit" value="Cancel"></input>
+                      <input type="submit" id="button" value="Cancel"></input>
                       <input type="hidden" name="task_id" value="{{task.task_id}}"></input>
                     </form>
                   </td>
@@ -176,7 +159,7 @@
                   {% endif %}
                   <tr>
                     <td>
-                      <label>Delivery Location</label>
+                      <label><b>Delivery Location:</b></label>
                     </td>
                     <td>
                       <label>{{task.delivery_location}}</label>
@@ -184,7 +167,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <label>Bid Amount</label>
+                      <label><b>Bid Amount:</b></label>
                     </td>
                     <td>
                       <label>{{task.bid}}</label>
@@ -192,7 +175,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <label>Task Expiration</label>
+                      <label><b>Task Expiration:</b></label>
                     </td>
                     <td>
                       <label>{{task.expiration_date}}</label>
@@ -201,7 +184,7 @@
                   <tr>
                     <td>
                       <br>
-                      <label>Description:</label>
+                      <label><b>Description:</b></label>
                     </td>
                     <td></td>
                   </tr>
