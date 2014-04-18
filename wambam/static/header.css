@@ -12,6 +12,13 @@
     font-size:40px 
 }
 
+#headerbuttons {
+    position:absolute; 
+    right:30px;
+    top: 20px;
+    width: 250px;
+}
+
 #logoutbutton { 
     font-size:15px;
     padding: 3px 10px;
@@ -19,9 +26,7 @@
     font-weight: bold;
     background: #0F4D92;
     text-align: center;
-    position:absolute; 
-    right:30px;
-    top: 20px;
+    float: right;
 }
 
 #historybutton { 
@@ -31,7 +36,5 @@
     font-weight: bold;
     background: #0F4D92;
     text-align: center;
-    position:absolute; 
-    left:30px;
-    top: 20px;
+    float: left;
 }

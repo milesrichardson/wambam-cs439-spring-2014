@@ -4,7 +4,7 @@ input, select, textarea {
     -webkit-box-sizing: border-box;
 }
 html {
-    min-width: 700px
+    min-width: 1000px
 }
 
 body {

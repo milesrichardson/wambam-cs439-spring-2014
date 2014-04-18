@@ -5,7 +5,7 @@ input, select, textarea {
 }
 
 html {
-    min-width: 700px;
+    min-width: 1000px;
     height: 100%
 }
 
