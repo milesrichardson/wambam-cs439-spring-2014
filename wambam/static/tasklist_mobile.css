@@ -74,7 +74,6 @@ body {
 
 #right_col {
     text-align: right;
-    margin-right: 10px;
     width: 50%;
 }
 
@@ -101,7 +100,7 @@ body {
 }
 
 #task_details tr td:first-child {
-    padding-right: 30px;
+
 }
 
 #task_details tr td {
@@ -120,7 +119,6 @@ body {
 
 .map-canvas {
     height: 150px;
-    width: 400px;
+    width: 100%;
     text-align: center;
-    margin: 0 auto;
 }
