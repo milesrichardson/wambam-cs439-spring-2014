@@ -137,9 +137,7 @@ def create_database(app):
         print "Done Migrating"
 
     try:
-       # CHANGE THIS
-       # if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
-        if True:
+        if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
             initialize_database()
     except:
         initialize_database()
