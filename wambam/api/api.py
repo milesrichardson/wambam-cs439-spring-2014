@@ -250,11 +250,16 @@ def get_all_claimed_tasks():
 
 @app.route("/cancel_task")
 def cancel_task(task_id):
-    task_id = request.form(["task_id"])
+    task_id = request.form["task_id"]
     task = schema.Task.query.get(int(task_id))
-    task.status = 'canceled'
+    
+    # Only cancel the tsak if it is still in_progress
+    if (task.status == "in_progress"):
+        task.status = "canceled"
+
     db.session.add(task)
     db.session.commit()
+
     app.logger.debug("Canceled task with ID %d" % int(task_id))
     return ""
 
@@ -344,7 +349,7 @@ def getTextRecipient(phone_number, phone_carrier):
         emailaddress += "@email.uscc.net"
     elif phone_carrier == "Virgin Mobile":
         emailaddress += "@vmobl.com"
-    else:                                  #else we assume Verizon Wirless
+    else:                                  #else we assume Verizon Wireless
         emailaddress += "@vtext.com"
 
     return emailaddress
