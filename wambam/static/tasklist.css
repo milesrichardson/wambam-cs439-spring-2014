@@ -92,11 +92,20 @@ body {
     width: 50%;
 }
 
-#task_entry {
+.task_entry {
     overflow: hidden;
 }
 
 #button { 
+    font-size:15px;
+    padding: 5px 10px;
+    color: white;
+    font-weight: bold;
+    background: #0F4D92;
+    text-align: center;
+}
+
+.button { 
     font-size:15px;
     padding: 5px 10px;
     color: white;

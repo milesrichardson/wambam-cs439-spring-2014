@@ -12,10 +12,10 @@
   </style>
     <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='tasklist.css') }}">
     <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='tasklist_mobile.css') }}">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
   <script>
       function createMap(lat, lon, id) {
         var map;
@@ -27,15 +27,15 @@
         map = new google.maps.Map(document.getElementById(id),
                                   mapOptions);
 
-	      map.setOptions({styles: [
-	         {
-	           featureType: "poi",
+        map.setOptions({styles: [
+           {
+             featureType: "poi",
              elementType: "labels",
-	           stylers: [
-	             { visibility: "off" }
-	           ]
-	         }
-	       ]});
+             stylers: [
+               { visibility: "off" }
+             ]
+           }
+         ]});
           var myLatLng = new google.maps.LatLng(lat, lon);
           var marker = new google.maps.Marker({
             position: myLatLng,
@@ -44,15 +44,45 @@
         }
   </script>
   <script>
-  $(function() {
-    $( "#accordion" ).accordion();
-    $( "#accordion input[type=submit]" ).click(
-        function(event) {
-            var form = $(this).parents('form:first');
-            console.debug(form.attr("id"));
-            form.submit();
-     })
-  });
+      var div_id = "";
+      var task_id = "";
+
+      $(function() {
+        $( "#accordion" ).accordion();
+        $( "#accordion input[type=submit]" ).click(
+            function(event) {
+                var form = $(this).parents('form:first');
+                var input_id = $(this).attr("id");
+                task_id = input_id.substring(1)
+                div_id = "#d" + task_id;
+                console.debug(div_id);
+                if (form.attr("id") == "cancel_form") {
+                    console.debug("Cancel request");
+                    $.ajax({
+                        url: "cancel_task/" + task_id,
+                        type: 'POST',
+                        async: false,
+                        success: function(data) {
+                            var map = $("#map-canvas" + task_id)
+
+                            $(data).insertAfter(div_id)
+                            var new_head = $(div_id).next("h3")
+                            var new_div = new_head.next("div")
+
+                            var div = $(div_id)
+                            var head = div.prev("h3")
+                            div.remove();
+                            head.remove();
+                            $("#map-canvas" + task_id).replaceWith(map);
+                            $("#accordion").accordion("destroy").accordion();
+                        }
+                    })
+                }
+                else {                
+                    form.submit();
+                }
+         })
+      });
   </script>
 </head>
 <body>
@@ -69,142 +99,7 @@
     <div id="accordion">
       
     {% for task in tasks %}
-        {% if task.status == "unassigned" %}
-            <h3 id="open_header">
-              <table id="task_table">
-                <tr>
-                  <td id="left_col">
-                    {{task.title}}
-                  </td>
-                  <td id="right_col">
-                    <form action="/cancel_task" class="cancel_button">
-                      <input type="submit" id="button" value="Cancel"></input>
-                      <input type="hidden" name="task_id" value="{{task.task_id}}"></input>
-                    </form>
-                  </td>
-                </tr>
-              </table>
-            </h3>
-        {% elif task.status == "in_progress" %}
-            <h3 id="in_progress_header">
-              <table id="task_table">
-                <tr>
-                  <td id="left_col">
-                    {{task.title}}
-                  </td>
-                  <td id="right_col">
-                    <div id="in_progress_buttons">
-                      {% if task.object_type == "requester"%}
-                        {% if task.fulfiller_has_venmo == "true" %}
-                          <div>
-        <form id="form{{task.task_id}}" action="/venmo_make_payment" method="POST">
-          <input type="submit"  id="button" value="Pay with Venmo"></input>
-          <input type="hidden"  name="task_id" id="task_id" value="{{task.task_id}}"></input>
-        </form>
-      </div>
-                        {% else %}
-                          <div>
-                              <input type="submit" id="button_dull" value="Fulfiller Doesn't Have Venmo" disabled></input>
-                          </div>
-                        {% endif %}
-                      {% endif %}
-                      <div>
-                        <form action="/rate_up">
-                          <input id="thumb" type="image" src="{{ url_for('static', filename='thumbs_up.png') }}" alt="Submit"> </input>
-                          <input type="hidden" id="task_id" value="{{task.task_id}}"></input>
-                        </form>
-                      </div>
-                      <div>
-                        <form action="/rate_down">
-                          <input id="thumb" type="image" src="{{ url_for('static', filename='thumbs_down.png') }}" alt="Submit"> </input>
-                          <input type="hidden" id="task_id" value="{{task.task_id}}"></input>
-                        </form>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </h3>
-        {% else %}
-            <h3 id="closed_header">
-              <table id="task_table">
-                <tr>
-                  <td id="left_col">
-                    {{task.title}}
-                  </td>
-                </tr>
-              </table>
-            </h3>
-        {% endif %}
-            <div id="task_entry">
-              <p>
-                <table id="task_details">
-                  {% if task.other_phone != None %}
-                  <tr>
-                    <td>
-                      <label>Phone number</label>
-                    </td>
-                    <td>
-                      <label>{{task.other_phone}}</label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label>Email</label>
-                    </td>
-                    <td>
-                      <label>{{task.other_email}}</label>
-                    </td>
-                  </tr>
-                  {% endif %}
-                  <tr>
-                    <td>
-                      <label><b>Delivery Location:</b></label>
-                    </td>
-                    <td>
-                      <label>{{task.delivery_location}}</label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label><b>Bid Amount:</b></label>
-                    </td>
-                    <td>
-                      <label>{{task.bid}}</label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label><b>Task Expiration:</b></label>
-                    </td>
-                    <td>
-                      <label>{{task.expiration_date}}</label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <br>
-                      <label><b>Description:</b></label>
-                    </td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td colspan="2">
-                      <label>{{task.description}}</label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td id="map_col" colspan="2">
-                      <br>
-                      <div class="map-canvas" id="map-canvas{{task.task_id}}"></div>
-                      <script>
-                        createMap({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}")
-                      </script>
-                    </td>
-                  </tr>
-                </table>
-              </p>
-            </div>
+        {% include 'accordion_entry.html' %}
     {% endfor %}
     </div>
   </div>

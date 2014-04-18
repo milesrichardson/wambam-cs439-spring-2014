@@ -248,20 +248,29 @@ def get_all_claimed_tasks():
 
     return flask.jsonify(items=[dict(i) for i in results])
 
-@app.route("/cancel_task")
+@app.route("/cancel_task/<int:task_id>", methods=["POST"])
 def cancel_task(task_id):
-    task_id = request.form["task_id"]
-    task = schema.Task.query.get(int(task_id))
+    app.logger.debug("Enter cancel_task")
+    app.logger.debug("After task_id: " + str(task_id))
+    task = schema.Task.query.get(task_id)
     
-    # Only cancel the tsak if it is still in_progress
-    if (task.status == "in_progress"):
+    app.logger.debug("Task status: " + task.status)
+    app.logger.debug("Referrer: " + request.referrer)
+
+    # Only cancel the task if it is still in_progress
+    if (task.status == "unassigned"):
         task.status = "canceled"
 
     db.session.add(task)
     db.session.commit()
 
+    if "requester" in request.referrer:
+        returnObject = create_requester_object(task)
+    else: 
+        returnObject = create_fulfiller_obkect(task)    
+
     app.logger.debug("Canceled task with ID %d" % int(task_id))
-    return ""
+    return render_template("accordion_entry.html", task=returnObject)
 
 @app.route("/finish_task")
 def finish_task(task_id):
