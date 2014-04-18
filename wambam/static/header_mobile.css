@@ -4,7 +4,7 @@
     background: #0F4D92;
     text-align: center;
     vertical-align: middle;
-    padding: 5px 0;
+    padding: 5px 0px 30px 0px;
     position: relative;
 }
 
@@ -14,8 +14,7 @@
 }
 
 #headerbuttons {
-    width: 300px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 #logoutbutton { 
@@ -23,7 +22,8 @@
     color: white;
     padding: 5px 3px;
     background: #0F4D92;
-    width: 150px;
+    width: 50%;
+    height: 25px;
     float: right;
 }
 
@@ -32,6 +32,7 @@
     color: white;
     padding: 5px 3px;
     background: #0F4D92;
-    width: 150px;
+    width: 50%;
+    height: 25px;
     float: left;
 }
