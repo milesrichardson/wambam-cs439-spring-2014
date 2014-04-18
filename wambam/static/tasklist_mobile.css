@@ -110,6 +110,7 @@ body {
 
 #task_details tr td {
     text-align: left;
+    vertical-align: top;
 }
 
 #thumb {
