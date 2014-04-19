@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<h3 id="open_header">
+  <table id="task_table">
+    <tr>
+      <td id="left_col">
+        {{task.title}}
+      </td>
+      <td id="right_col">
+        <form action="/cancel_task" id="cancel_form" class="cancel_button" method="POST">
+          <input type="submit" class="button" id="i{{task.task_id}}" value="Cancel"></input>
+          <input type="hidden" name="task_id" value="{{task.task_id}}"></input>
+        </form>
+      </td>
+    </tr>
+  </table>
+</h3>

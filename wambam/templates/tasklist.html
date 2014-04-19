@@ -17,31 +17,46 @@
   <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
   <script>
-      function createMap(lat, lon, id) {
-        var map;
-        var mapOptions = {
-        zoom: 15,
-        center: new google.maps.LatLng(lat, lon)
-        };
+      var lats = [];
+      var lons = [];
+      var ids = [];
 
-        map = new google.maps.Map(document.getElementById(id),
-                                  mapOptions);
+      function addStuff(lat, lon, id) {
+          console.debug("lat: " + lat)
+          lats.push(lat)
+          lons.push(lon)
+          ids.push(id)
+      }
 
-        map.setOptions({styles: [
-           {
-             featureType: "poi",
-             elementType: "labels",
-             stylers: [
-               { visibility: "off" }
-             ]
-           }
-         ]});
-          var myLatLng = new google.maps.LatLng(lat, lon);
-          var marker = new google.maps.Marker({
-            position: myLatLng,
-            map: map,
-          });
+      function initialize() {
+        for (var i = 0; i < lats.length; i++) {
+            var map;
+            var mapOptions = {
+            zoom: 15,
+            center: new google.maps.LatLng(lats[i], lons[i])
+            };
+
+            map = new google.maps.Map(document.getElementById(ids[i]),
+                                      mapOptions);
+
+            map.setOptions({styles: [
+               {
+                 featureType: "poi",
+                 elementType: "labels",
+                 stylers: [
+                   { visibility: "off" }
+                 ]
+               }
+             ]});
+              var myLatLng = new google.maps.LatLng(lats[i], lons[i]);
+              var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+              });
+            }
         }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
   </script>
   <script>
       var div_id = "";
@@ -102,6 +117,11 @@
         {% include 'accordion_entry.html' %}
     {% endfor %}
     </div>
+      {% for task in tasks %}
+        <script> 
+            addStuff({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}");
+        </script>
+      {% endfor %}
   </div>
 </body>
 </html>

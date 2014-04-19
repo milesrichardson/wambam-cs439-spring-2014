@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<h3 id="in_progress_header">
+  <table id="task_table">
+    <tr>
+      <td id="left_col">
+        {{task.title}}
+      </td>
+      <td id="right_col">
+        <div id="in_progress_buttons">
+          {% if task.object_type == "requester"%}
+            {% if task.fulfiller_has_venmo == "true" %}
+              <div>
+                <form id="form{{task.task_id}}" action="/venmo_make_payment" method="POST">
+                  <input type="submit"  id="button" value="Pay with Venmo"></input>
+                  <input type="hidden"  name="task_id" id="task_id" value="{{task.task_id}}"></input>
+                </form>
+              </div>
+            {% else %}
+              <div>
+                  <input type="submit" id="button_dull" value="Fulfiller Doesn't Have Venmo" disabled></input>
+              </div>
+            {% endif %}
+          {% endif %}
+          <div>
+            <form action="/rate_up">
+              <input id="thumb" type="image" src="{{ url_for('static', filename='thumbs_up.png') }}" alt="Submit"> </input>
+              <input type="hidden" id="task_id" value="{{task.task_id}}"></input>
+            </form>
+          </div>
+          <div>
+            <form action="/rate_down">
+              <input id="thumb" type="image" src="{{ url_for('static', filename='thumbs_down.png') }}" alt="Submit"> </input>
+              <input type="hidden" id="task_id" value="{{task.task_id}}"></input>
+            </form>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</h3>
