@@ -174,7 +174,7 @@ def create_task_table(db):
             num_tasks = len(Feedback.query.filter_by(account_id = self.requestor_id).all())
             num_positive = len(Feedback.query.filter_by(account_id = self.requestor_id, rating = "positive").all())
             if num_tasks == 0:
-                score = "this is " + Account.query.get(self.requestor_id).first_name + "'s first post!"
+                score = Account.query.get(self.requestor_id).first_name + " doesn't have any feedback yet!"
             else:
                 score = str(int(num_positive * 100 / num_tasks)) + "%"
 
