@@ -171,10 +171,19 @@ def create_task_table(db):
 
         @property
         def serialize(self):
+            # calculate score to serialize
+            num_tasks = len(Feedback.query.filter_by(account_id = self.requestor_id).all())
+            num_positive = len(Feedback.query.filter_by(account_id = self.requestor_id, rating = "positive").all())
+            if num_tasks == 0:
+                score = Account.query.get(self.requestor_id).first_name + " doesn't have any feedback yet!"
+            else:
+                score = str(int(num_positive * 100 / num_tasks)) + "%"
+
             #Return object data in easily serializeable format
             return {
                 "id" : str(self.id),
                 "requestor_id" : self.requestor_id,
+                "requestor_score" : score,
                 "requestor_email": self.serialize_requestor_email,
                 "latitude" : decrypt_string(self.latitude),
                 "longitude" : decrypt_string(self.longitude),

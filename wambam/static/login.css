@@ -107,3 +107,8 @@ label.error {
     color: red;
     font-size: 12px; 
 }
+
+#error_login {
+    color: red;
+    font-size: 14px; 
+}
