@@ -311,8 +311,8 @@ def add_feedback(task_id, rating):
     try:
         task = schema.Task.query.get(int(task_id))
 
-        rating = request.args.get('rating') 
         if rating not in ['positive', 'negative']:
+            app.logger.debug("RATING: " + rating)
             raise Exception('Invalid rating')
         
         user_id = int(current_user.get_id())
