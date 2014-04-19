@@ -96,6 +96,28 @@ def create_database(app):
             first_name="Michael",
             last_name="Hopkins")
 
+        user2 = schema.Account(
+            activated=True,
+            phone="2034420233",
+            phone_carrier="AT&T",
+            email="miles.richardson@yale.edu",
+            password="blah",
+            online=True,
+            venmo_id="1020501350678528478",
+            first_name="Miles",
+            last_name="Richardson")
+
+        task1 = schema.Task(
+            requestor_id=2,
+            latitude = 41.3121,
+            longitude = -72.9277,
+            short_title="Claim task",
+            bid=float(5),
+            expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
+            long_title="This is a task that will be claimed",
+            delivery_location="Saybrook",
+            status="unassigned")
+
         task2 = schema.Task(
             requestor_id=1,
             latitude = 41.3121,
@@ -130,6 +152,8 @@ def create_database(app):
             status="expired")
 
         db.session.add(user)
+        db.session.add(user2)
+        db.session.add(task1)
         db.session.add(task2)
         db.session.add(task3) 
         db.session.add(task4) 
@@ -272,25 +296,26 @@ def cancel_task(task_id):
     app.logger.debug("Canceled task with ID %d" % int(task_id))
     return render_template("accordion_entry.html", task=returnObject)
 
-@app.route("/finish_task")
+@app.route("/finish_task/<int:task_id>", methods=["POST"])
 def finish_task(task_id):
-    task_id = request.form(["task_id"])
-    task = schema.Task.query.get(int(task_id))
+    task = schema.Task.query.get(task_id)
     # mark task "done" when both people say it's done
-    task.status = 'done'
+    task.status = 'completed'
     db.session.add(task)
     db.session.commit()
     app.logger.debug("Marked task 'done' with ID %d" % int(task_id))
     return ""
 
-@app.route("/add_feedback/<int:task_id>/<string:rating>/", methods=["POST"])
-def add_feedback(task_id, rating):
+@app.route("/add_feedback")
+def add_feedback(methods=["GET"]):
     try:
+        task_id = int(request.args.get('task_id'))
 
-        # GET ROLE here for current user either requestor or fulfiller
+        role = request.args.get('role')
         if role not in ['requestor', 'fulfiller']:
             raise Exception('Invalid role')
 
+        rating = request.args.get('rating') 
         if rating not in ['positive', 'negative']:
             raise Exception('Invalid rating')
         
@@ -476,7 +501,8 @@ def submit():
     app.logger.debug("Email address: " + text_recipient[0])
 
     # Mail message to requester asynchronously
-    emails.send_email(msg_subject, text_recipient, msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, text_recipient, msg_body, msg_body)
 
     # Send alert text to all online fulfillers 
     # Probably want to do this asynchronously eventually
@@ -501,9 +527,10 @@ def submit():
     msg_body = first_name + " " + last_name + " has created a task for '" + title + "'. Click the following link for more details: http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + " ."
 
     # Mail message to potential fulfillers
-    emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
+        app.logger.debug("Sent confirmation text")
 
-    app.logger.debug("Sent confirmation text")
     return redirect("/confirm")
 
 def is_session_valid():
@@ -566,6 +593,7 @@ def claim():
   
     #make task_num equal to the actual number of the task
     task_num = int(request.form["id"])
+    print task_num
     task = schema.Task.query.get(task_num)
 
     if (task.status != "unassigned"):
@@ -617,7 +645,8 @@ def claim():
     msg_body = "You have claimed the task '" + title + "'. Get in touch with " + decrypted_requestor["first_name"] + " " + decrypted_requestor["last_name"] + " at " + decrypted_requestor["phone"] + "."
 
     # Send message to fulfiller
-    emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
 
     # Send confirmation text to requestor
     requestor_number = decrypted_requestor["phone"]
@@ -630,7 +659,8 @@ def claim():
     msg_body = decrypted_fulfiller["first_name"] + " " + decrypted_fulfiller["last_name"] + " has claimed your task '" + title + "'. You can get in touch with " + decrypted_fulfiller["first_name"] + " at " + decrypted_fulfiller["phone"] + "."
 
     # Send confirmation message to requestor
-    emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
 
     # Get confirmation word
     cool_word = get_cool_word()
@@ -752,10 +782,19 @@ def my_fulfiller_tasks():
                             tasks= (fulfiller_objects_in_progress +
                                     fulfiller_objects_old))
 
+@app.route("/viewtaskjson/<int:taskid>") 
+def view_task_json(taskid):
+    task = schema.Task.query.get(taskid)
+    task_decrypted = schema.decrypt_object(task)
+    if (task is None):
+        return flask.jsonify([])
+    else:
+        return flask.jsonify(task_decrypted)
+
 @app.route("/viewtaskdetails/<int:taskid>")
 def view_task_details(taskid):
     task = schema.Task.query.get(taskid)
-    task_decrypted = decrypt_object(task)
+    task_decrypted = schema.decrypt_object(task)
     if (task is None):
         return redirect("/home")
     else:
