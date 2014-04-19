@@ -236,16 +236,16 @@ def pad_string(raw):
 
 def encrypt_string(plain):
     #add characters until the string has a length multiple of 16
-#    return plain
-    return b64encode(encrypter.encrypt(pad_string(plain)))
+    return plain
+#    return b64encode(encrypter.encrypt(pad_string(plain)))
 
 def decrypt_string(enc):
     #remove spaces from end of string
-#    return enc
-    try:
-        return encrypter.decrypt(b64decode(enc)).rstrip()
-    except:
-        return enc
+    return enc
+#    try:
+#        return encrypter.decrypt(b64decode(enc)).rstrip()
+#    except:
+#        return enc
 
 
 def encrypt_dictionary(plaintext):
