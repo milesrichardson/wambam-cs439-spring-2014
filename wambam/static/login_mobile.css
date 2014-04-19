@@ -54,3 +54,8 @@ input[type="submit"] {
 label.error {
     color: red;
 }
+
+#error_login {
+    color: red;
+    font-size: 14px; 
+}

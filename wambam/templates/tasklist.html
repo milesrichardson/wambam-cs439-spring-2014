@@ -20,6 +20,8 @@
       var lats = [];
       var lons = [];
       var ids = [];
+      var maps = [];
+      var locs =[]
 
       function addStuff(lat, lon, id) {
           console.debug("lat: " + lat)
@@ -27,6 +29,17 @@
           lons.push(lon)
           ids.push(id)
       }
+      $(document).ready(function(){
+              console.debug(":/");
+        $("#accordion").accordion({
+            activate: function (event, ui) {
+              var active = $("#accordion").accordion( "option", "active" );
+              console.debug(active);
+              google.maps.event.trigger(maps[active], "resize");
+              maps[active].setCenter(locs[active]);
+            }
+        });
+      });
 
       function initialize() {
         for (var i = 0; i < lats.length; i++) {
@@ -53,7 +66,13 @@
                 position: myLatLng,
                 map: map,
               });
+              maps.push(map);
+              locs.push(myLatLng);
             }
+
+          for (var i = 0; i < ids.length; i++) {
+
+          }  
         }
 
         google.maps.event.addDomListener(window, 'load', initialize);
@@ -63,7 +82,7 @@
       var task_id = "";
 
       $(function() {
-        $( "#accordion" ).accordion();
+        console.debug("HERE");
         $( "#accordion input[type=submit]" ).click(
             function(event) {
                 var form = $(this).parents('form:first');
@@ -89,7 +108,13 @@
                             div.remove();
                             head.remove();
                             $("#map-canvas" + task_id).replaceWith(map);
-                            $("#accordion").accordion("destroy").accordion();
+                            $("#accordion").accordion("destroy").accordion({
+                                  change: function (event, ui) { 
+                                    console.debug("YAY");
+                                    var active = $("#accordion").accordion( "option", "active" );
+                                    google.maps.event.trigger(maps[active - 1], "reset");
+                                  }
+                             })
                         }
                     })
                 }
@@ -110,7 +135,13 @@
                             div.remove();
                             head.remove();
                             $("#map-canvas" + task_id).replaceWith(map);
-                            $("#accordion").accordion("destroy").accordion();
+                            $("#accordion").accordion("destroy").accordion({
+                                  change: function (event, ui) { 
+                                    console.debug("YAY");
+                                    var active = $("#accordion").accordion( "option", "active" );
+                                    google.maps.event.trigger(maps[active - 1], "reset");
+                                  }
+                             })
                         }
                     })
                 }
@@ -131,7 +162,13 @@
                             div.remove();
                             head.remove();
                             $("#map-canvas" + task_id).replaceWith(map);
-                            $("#accordion").accordion("destroy").accordion();
+                            $("#accordion").accordion("destroy").accordion({
+                                  change: function (event, ui) { 
+                                    console.debug("YAY");
+                                    var active = $("#accordion").accordion( "option", "active" );
+                                    google.maps.event.trigger(maps[active - 1], "reset");
+                                  }
+                             })
                         }
                     })
                 }
