@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+{% if task.status == "unassigned" %}
+    {% include 'accordion_header_unassigned.html' %}
+{% elif task.status == "in_progress" %}
+    {% include 'accordion_header_in_progress.html' %}
+{% else %}
+    {% include 'accordion_header_closed.html' %}
+{% endif %}
+    {% include 'accordion_content.html' %}

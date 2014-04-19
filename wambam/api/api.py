@@ -283,16 +283,14 @@ def finish_task(task_id):
     app.logger.debug("Marked task 'done' with ID %d" % int(task_id))
     return ""
 
-@app.route("/add_feedback")
-def add_feedback(methods=["GET"]):
+@app.route("/add_feedback/<int:task_id>/<string:rating>/", methods=["POST"])
+def add_feedback(task_id, rating):
     try:
-        task_id = int(request.args.get('task_id'))
 
-        role = request.args.get('role')
+        # GET ROLE here for current user either requestor or fulfiller
         if role not in ['requestor', 'fulfiller']:
             raise Exception('Invalid role')
 
-        rating = request.args.get('rating') 
         if rating not in ['positive', 'negative']:
             raise Exception('Invalid rating')
         
