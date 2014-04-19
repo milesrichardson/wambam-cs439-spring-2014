@@ -93,6 +93,48 @@
                         }
                     })
                 }
+                if (form.attr("id") == "thumbs_up_form") {
+                    $.ajax({
+                        url: "add_feedback/" + task_id + "/positive",
+                        type: 'POST',
+                        async: false,
+                        success: function(data) {
+                            var map = $("#map-canvas" + task_id)
+
+                            $(data).insertAfter(div_id)
+                            var new_head = $(div_id).next("h3")
+                            var new_div = new_head.next("div")
+
+                            var div = $(div_id)
+                            var head = div.prev("h3")
+                            div.remove();
+                            head.remove();
+                            $("#map-canvas" + task_id).replaceWith(map);
+                            $("#accordion").accordion("destroy").accordion();
+                        }
+                    })
+                }
+                if (form.attr("id") == "thumbs_down_form") {
+                    $.ajax({
+                        url: "add_feedback/" + task_id +  + "/negative",
+                        type: 'POST',
+                        async: false,
+                        success: function(data) {
+                            var map = $("#map-canvas" + task_id)
+
+                            $(data).insertAfter(div_id)
+                            var new_head = $(div_id).next("h3")
+                            var new_div = new_head.next("div")
+
+                            var div = $(div_id)
+                            var head = div.prev("h3")
+                            div.remove();
+                            head.remove();
+                            $("#map-canvas" + task_id).replaceWith(map);
+                            $("#accordion").accordion("destroy").accordion();
+                        }
+                    })
+                }
                 else {                
                     form.submit();
                 }
