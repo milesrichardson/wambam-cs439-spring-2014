@@ -8,6 +8,10 @@ import json
 import requests
 import sys
 
+TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wambam/templates')
+
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wambam/static')
+
 sys.path.append("wambam/api")
 
 import api
@@ -21,7 +25,7 @@ class TestWambam(unittest.TestCase):
     def setUp(self):
         self.app = api.create_app()
         self.app_client = self.app.test_client()
-        self.app.config["SECRET_KEY"] = "I have a secret....."
+        self.app.config["SECRET_KEY"] = "I have a secret."
         self.app.config["REMEMBER_COOKIE_DURATION"] = datetime.timedelta(days=14)
         self.db = api.create_database(self.app)
         self.api_manager = api.create_api(self.app,self.db)
@@ -30,14 +34,16 @@ class TestWambam(unittest.TestCase):
         #self.addBaseTasks()
 
 
-    def login(self, username, password):
-        return self.app.post('/login', data=dict(
+    def testLogin(self):
+        username = "michael.hopkins@yale.edu"
+        password = "blah"
+        return self.app_client.post('/login', data=dict(
             userfield=username,
             passfield=password
         ), follow_redirects=True)
 
-    def logout(self):
-        return self.app.get('/logout', follow_redirects=True)
+    def testLogout(self):
+        return self.app_client.get('/logout', follow_redirects=True)
 
     def testBaseTask(self):
         result = self.app_client.get('/get_all_tasks', follow_redirects=True)

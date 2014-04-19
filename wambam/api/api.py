@@ -267,7 +267,7 @@ def cancel_task(task_id):
     if "requester" in request.referrer:
         returnObject = create_requester_object(task)
     else: 
-        returnObject = create_fulfiller_obkect(task)    
+        returnObject = create_fulfiller_object(task)    
 
     app.logger.debug("Canceled task with ID %d" % int(task_id))
     return render_template("accordion_entry.html", task=returnObject)
@@ -335,6 +335,13 @@ def tasks_as_requestor():
 @app.route("/get_tasks_as_fulfiller")
 def tasks_as_fulfiller():
     return tasks_for_fulfiller(current_user.get_id())    
+
+@app.route("/get_user")
+def user():
+    if not current_user.is_authenticated():
+        return flask.jsonify([])
+
+    return flask.jsonify(current_user.serialize)
 
 
 def getTextRecipient(phone_number, phone_carrier):
@@ -511,7 +518,8 @@ def before_request():
     exempt_files = ["/check_email", "/check_phone", "/favicon.ico",
                     url_for("static", filename="login.css"), 
                     url_for("static", filename="login_mobile.css"),
-                    url_for("static", filename="login_validator.js")]
+                    url_for("static", filename="login_validator.js"),
+                    "/get_user"]
 
     for f in exempt_files:
         if request.path == f:
@@ -523,7 +531,7 @@ def before_request():
 
     #trying to access an unprotected page
     if request.path == "/" or request.path == "/mobile" or \
-       request.path == "/login" or request.path == "/register":
+        request.path == "/login" or request.path == "/register":  
 
         #no need for them to access, go home
         if not current_user.is_anonymous() and is_session_valid():
