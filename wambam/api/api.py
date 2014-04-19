@@ -36,8 +36,6 @@ def register_events():
     def receive_load(target, context):
         for task in context.query.all():
             if datetime.datetime.now() > task.expiration_datetime and task.status == "unassigned":
-                app.logger.debug("Expiring task with id " + `task.id` + \
-                                 "(expired " + `task.expiration_datetime` + "'")
                 task.status = 'expired'
 
                 db.session.add(task)
@@ -274,13 +272,8 @@ def get_all_claimed_tasks():
 
 @app.route("/cancel_task/<int:task_id>", methods=["POST"])
 def cancel_task(task_id):
-    app.logger.debug("Enter cancel_task")
-    app.logger.debug("After task_id: " + str(task_id))
     task = schema.Task.query.get(task_id)
     
-    app.logger.debug("Task status: " + task.status)
-    app.logger.debug("Referrer: " + request.referrer)
-
     # Only cancel the task if it is still in_progress
     if (task.status == "unassigned"):
         task.status = "canceled"
@@ -293,7 +286,6 @@ def cancel_task(task_id):
     else: 
         returnObject = create_fulfiller_object(task)    
 
-    app.logger.debug("Canceled task with ID %d" % int(task_id))
     return render_template("accordion_entry.html", task=returnObject)
 
 @app.route("/finish_task/<int:task_id>", methods=["POST"])
@@ -303,7 +295,6 @@ def finish_task(task_id):
     task.status = 'completed'
     db.session.add(task)
     db.session.commit()
-    app.logger.debug("Marked task 'done' with ID %d" % int(task_id))
     return ""
 
 @app.route("/add_feedback/<int:task_id>/<string:rating>", methods=["POST"])
@@ -323,7 +314,6 @@ def add_feedback(task_id, rating):
             role = "fulfiller"
 
     except Exception as e:
-        print e
         return "error"
 
     feedback = schema.Feedback(
@@ -400,7 +390,6 @@ def getTextRecipient(phone_number, phone_carrier):
 
 @app.route("/set_online", methods=["POST"])
 def set_online():
-    app.logger.debug("Start set_online")
     # Get current user
     user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
@@ -411,13 +400,11 @@ def set_online():
     # add and commit changes
     db.session.add(flask_user)
     db.session.commit()
-    app.logger.debug("End set_online")
     return ""
 
 @app.route("/set_offline", methods=["POST"])
 def set_offline():
 
-    app.logger.debug("Start set_offline")
     # Get current user
     user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
@@ -428,7 +415,6 @@ def set_offline():
     # add and commit changes
     db.session.add(flask_user)
     db.session.commit()
-    app.logger.debug("End set_offline")
     return ""
 
 @app.route("/get_online")
@@ -443,7 +429,6 @@ def get_online():
 def submit():
     title = request.form["title"]
     if not ("lat" in session) or not ("lng" in session):
-        app.logger.debug("No lat/lng for task")
         return redirect(url_for("working"))
 
     bid = request.form["bid"]
@@ -453,12 +438,10 @@ def submit():
     # format for timedelta is (days, seconds, microseconds, 
     # milliseconds, minutes, hours, weeks)
     expirationdate = datetime.datetime.now()
-    app.logger.debug(expiration)
     if (expiration == "30min"):
         expirationdate += datetime.timedelta(0,0,0,0,30)
     elif (expiration == "1hr"):
         expirationdate += datetime.timedelta(0,0,0,0,0,1)
-        app.logger.debug("1 hour")
     elif (expiration == "1day"):
         expirationdate += datetime.timedelta(1)
     elif (expiration == "1wk"):
@@ -499,10 +482,11 @@ def submit():
     phone_carrier = schema.decrypt_string(current_user.phone_carrier)
     text_recipient = map(getTextRecipient, [phone_number], [phone_carrier])
 
+
+
     # Construct message for requester
     msg_subject = "Order Submitted"
     msg_body = "Your task request for '" + title + " has been placed! We'll text you when someone claims your task."
-    app.logger.debug("Email address: " + text_recipient[0])
 
     # Mail message to requester asynchronously
     if request.referrer and request.referrer != '/test':
@@ -533,7 +517,6 @@ def submit():
     # Mail message to potential fulfillers
     if request.referrer and request.referrer != '/test':
         emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
-        app.logger.debug("Sent confirmation text")
 
     return redirect("/confirm")
 
@@ -597,7 +580,6 @@ def claim():
   
     #make task_num equal to the actual number of the task
     task_num = int(request.form["id"])
-    print task_num
     task = schema.Task.query.get(task_num)
 
     if (task.status != "unassigned"):
@@ -636,13 +618,11 @@ def claim():
     # db.session.add(temp)
     db.session.commit()
 
-    app.logger.debug("Before confirmation text")    
 
     # Send confirmation text to fulfiller
     fulfiller_number = decrypted_fulfiller["phone"]
     fulfiller_carrier = decrypted_fulfiller["phone_carrier"]
     text_fulfiller = getTextRecipient(fulfiller_number, fulfiller_carrier)
-    app.logger.debug("Email address: " + text_fulfiller)
 
     # Construct message to send to fulfiller
     msg_subject = "Task Claimed"
@@ -656,7 +636,6 @@ def claim():
     requestor_number = decrypted_requestor["phone"]
     requestor_carrier = decrypted_requestor["phone_carrier"]
     text_requestor = getTextRecipient(requestor_number, requestor_carrier)
-    app.logger.debug("Email address: " + text_requestor)
 
     # Construct message to send to requestor
     msg_subject = "Your task has been claimed!"
@@ -669,8 +648,6 @@ def claim():
     # Get confirmation word
     cool_word = get_cool_word()
 
-    app.logger.debug("Sent confirmation texts")   
-    app.logger.debug("end claimtask")
     return render_template("confirmationwambam.html",
                             cool_word = cool_word,
                             title = title,
@@ -693,7 +670,6 @@ def create_fulfiller_object(task):
 
     expiration_date = schema.dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
-    app.logger.debug(task.status)
     return {
         "object_type": "fulfiller",
         "task_id": task.id,
@@ -727,7 +703,6 @@ def create_requester_object(task):
     
     expiration_date = schema.dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
-    app.logger.debug(task.status)
     return {
         "object_type": "requester",
         "task_id": task.id,

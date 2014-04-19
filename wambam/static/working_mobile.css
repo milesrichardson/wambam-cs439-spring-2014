@@ -40,20 +40,15 @@ body {
     height: 80px;
 }
 
-#buttonbar input[type="submit"] {
+#buttonbar input[type="submit"], #toggle_work {
     height: 50px;
     width: 100%;
-    font-size:20px;
+    font-size:15px;
     color: white;
     background: #0F4D92; 
     text-align: center;
     margin-bottom: 5px;
     padding: 0 10px;
-}
-
-#slider { 
-    display: inline-block;
-    position: absolute
 }
 
 #buttonbar > form > div:first-child {

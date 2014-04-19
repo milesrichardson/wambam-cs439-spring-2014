@@ -13,7 +13,7 @@ from wambam import app
 
 
 
-current_schema_version = 5
+current_schema_version = 1
 
 SchemaVersion = None
 account_task = None
@@ -51,14 +51,14 @@ def create_account_table(db):
         encrypted_columns = ["password", "email", "phone", "phone_carrier", "first_name", "last_name"]
         id = db.Column(db.Integer, primary_key=True)
         activated = db.Column(db.Boolean)
-        password = db.Column(db.String(255))                #encrypted
-        email = db.Column(db.String(255), unique=True)      #encrypted
+        password = db.Column(db.String(360))                #encrypted
+        email = db.Column(db.String(360), unique=True)      #encrypted
         email_hash = db.Column(db.String(64), unique=True)
         phone = db.Column(db.String(64), unique=True)       #encrypted
-        phone_carrier = db.Column(db.String(255))           #encrypted
+        phone_carrier = db.Column(db.String(360))           #encrypted
         online = db.Column(db.Boolean)
-        first_name = db.Column(db.String(255))              #encrypted
-        last_name = db.Column(db.String(255))               #encrypted
+        first_name = db.Column(db.String(360))              #encrypted
+        last_name = db.Column(db.String(360))               #encrypted
         last_request = db.Column(db.Integer, default=0)        
         venmo_token = db.Column(db.String(255), default="") #encrypted
         venmo_id = db.Column(db.String(255), default="")    #encrypted
@@ -148,8 +148,8 @@ def create_task_table(db):
         requestor_id = db.Column(db.Integer, db.ForeignKey("account.id"))
         latitude = db.Column(db.String())                  #encrypted
         longitude = db.Column(db.String())                 #encrypted
-        delivery_location = db.Column(db.String(255))      #encrypted
-        short_title = db.Column(db.String(255))            #encrypted
+        delivery_location = db.Column(db.String(360))      #encrypted
+        short_title = db.Column(db.String(360))            #encrypted
         long_title = db.Column(db.String())                #encrypted
         bid = db.Column(db.String())                       #encrypted
         expiration_datetime = db.Column(db.DateTime)
@@ -242,11 +242,11 @@ def encrypt_string(plain):
 def decrypt_string(enc):
     #remove spaces from end of string
     return enc
-"""    try:
-        return encrypter.decrypt(b64decode(enc)).rstrip()
-    except:
-        return enc
-"""
+#    try:
+#        return encrypter.decrypt(b64decode(enc)).rstrip()
+#    except:
+#        return enc
+
 
 def encrypt_dictionary(plaintext):
     keys = plaintext.keys()
