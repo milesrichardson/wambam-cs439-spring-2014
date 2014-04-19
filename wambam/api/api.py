@@ -283,18 +283,20 @@ def finish_task(task_id):
     app.logger.debug("Marked task 'done' with ID %d" % int(task_id))
     return ""
 
-@app.route("/add_feedback/<int:task_id>/<string:rating>/", methods=["POST"])
+@app.route("/add_feedback/<int:task_id>/<string:rating>", methods=["POST"])
 def add_feedback(task_id, rating):
     try:
-
-        # GET ROLE here for current user either requestor or fulfiller
-        if role not in ['requestor', 'fulfiller']:
-            raise Exception('Invalid role')
+        task = schema.Task.query.get(int(task_id))
 
         if rating not in ['positive', 'negative']:
             raise Exception('Invalid rating')
         
         user_id = int(current_user.get_id())
+
+        if user_id == task.requestor_id:
+            role = "requestor"
+        else:
+            role = "fulfiller"
 
     except Exception as e:
         print e
@@ -307,6 +309,9 @@ def add_feedback(task_id, rating):
         rating = rating,
     )
 
+    task.status = "completed"
+
+    db.session.add(task)
     db.session.add(feedback)
     db.session.commit()
 
