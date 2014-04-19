@@ -1,9 +1,11 @@
 import os
 import uuid
+import hashlib
 import unittest
 import datetime
 import tempfile
 import json
+import requests
 import sys
 
 sys.path.append("wambam/api")
@@ -11,14 +13,18 @@ sys.path.append("wambam/api")
 import api
 import schema
 
+num_base_users = 1
+num_base_tasks = 4
+
 class TestWambam(unittest.TestCase):
 
     def setUp(self):
         self.app = api.create_app()
+        self.app_client = self.app.test_client()
         self.app.config["SECRET_KEY"] = "I have a secret....."
         self.app.config["REMEMBER_COOKIE_DURATION"] = datetime.timedelta(days=14)
         self.db = api.create_database(self.app)
-        api_manager = api.create_api(self.app,self.db)
+        self.api_manager = api.create_api(self.app,self.db)
 
         #self.addBaseUsers()
         #self.addBaseTasks()
@@ -33,13 +39,28 @@ class TestWambam(unittest.TestCase):
     def logout(self):
         return self.app.get('/logout', follow_redirects=True)
 
-    def testInsertTask(self):
-        result = [i.serialize for i in schema.Task.query.all()]
-        self.assertEqual(len(result) , 4)
+    def testBaseTask(self):
+        result = self.app_client.get('/get_all_tasks', follow_redirects=True)
+        print result.data
+        self.assertEqual(len(result.data) , num_base_tasks)
 
-    def testInsertUser(self):
+    def testBaseUser(self):
         result = [i.serialize for i in schema.Account.query.all()]
-        self.assertEqual(len(result) , 1)
+        self.assertEqual(len(result) , num_base_users)
+
+    def testAddUser(self):
+
+        user_data = {}
+        user_data['phone'] = "9543838691"
+        user_data['email'] = "whos@karen.com"
+        user_data['verification_address'] = hashlib.sha224(user_data['email'] + self.app.config["SECRET_KEY"]).hexdigest()
+        user_data['phone_carrier'] = "AT&T"
+        user_data['pwd'] = "pwd"
+        user_data['first_name'] = 'Joe'
+        user_data['last_name'] = 'Schmoe'
+
+        #TODO: Not sure this is the right way to do this
+
 
     def addBaseTasks(self):
         task1 = schema.Task(
