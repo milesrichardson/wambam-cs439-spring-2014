@@ -24,20 +24,6 @@
         center: new google.maps.LatLng(lat, lon)
         };
 
-        // // cancel button stuff
-        // var cancel_buttons = document.getElementsByClassName('cancel_button')
-        // for (button in cancel_buttons) {
-        //   var task_id_button = button.getElementsByName("task_id");
-        //   if (task_id_button) {
-        //     console.debug("found one!");
-        //     console.debug(task_id_button);
-        //   }
-
-
-        }
-
-
-
         map = new google.maps.Map(document.getElementById(id),
                                   mapOptions);
 
@@ -56,6 +42,56 @@
             map: map,
           });
         }
+  </script>
+  <script>
+  // cancel button stuff
+  $(".cancel_button").on("click",function(){
+    // if (!confirm("Are you sure you want to cancel?")) {
+    //   return false;
+    // }
+    // $.ajax({
+    //   type: "POST",
+    //   url: '/cancel_task?task_id=' this.task_id
+    //   data: task_id =
+    // })
+    // var task_id = $("input[name=task_id]").val();
+    // if(task_id) {
+    //   console.log("Task ID: " + task_id);
+    // }
+    //console.log("Task ID: " + task_id);
+    // $.each(task_id, function(key, element){
+    //   console.log("HI");
+    //   console.log("key: " + key + '\n' + 'value: ' + element);
+    // });
+  });
+
+    // $(".cancel_button").on("click", function(){
+    //   console.debug("HELLOOOOO");
+    //   event.preventDefault();
+    //   var task_id = $("input[name=task_id]");//.val();
+    //   console.log("Task ID: " + task_id);
+    //   // $.ajax(
+    //   //   url: window.location + "cancel?task_id=" +  )
+    // });
+    // var cancel_buttons = document.getElementsByClassName('cancel_button')
+    // for (button in cancel_buttons) {
+    //   var task_id_button = button.getElementsByName("task_id");
+    //   if (task_id_button) {
+    //     console.debug("found one!");
+    //     console.debug(task_id_button);
+    //   }
+    // }
+    // $(".cancel_button").on("click", function(){
+    //   event.preventDefault();
+    //   $.ajax({
+    //     url: ,
+    //     type: 'get',
+    //     complete : function(qXHR, textStatus){
+    //       var data = qXHR.responseText
+    //       console.log(data)
+    //     }
+    //   })
+    // })
   </script>
   <script>
   $(function() {

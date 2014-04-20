@@ -248,7 +248,8 @@ def get_all_claimed_tasks():
 
     return flask.jsonify(items=[dict(i) for i in results])
 
-@app.route("/cancel_task")
+#@app.route("/cancel_task/<int:task_id>")
+@app.route("/cancel_task/")
 def cancel_task(task_id):
     task_id = request.form(["task_id"])
     task = schema.Task.query.get(int(task_id))
@@ -350,6 +351,7 @@ def getTextRecipient(phone_number, phone_carrier):
     return emailaddress
 
 
+#@app.route("/set_online", methods=["POST"])
 @app.route("/set_online", methods=["POST"])
 def set_online():
     app.logger.debug("Start set_online")
