@@ -1,9 +1,9 @@
 import os
 
+postgres = None
 if "DATABASE_URL" in os.environ:
     postgres = os.environ["DATABASE_URL"]
     del os.environ["DATABASE_URL"]
-
 
 from wambam import app
 
