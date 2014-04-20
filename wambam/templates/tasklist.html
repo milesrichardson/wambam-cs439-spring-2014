@@ -4,145 +4,47 @@
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-  <style>
-#accordion .ui-accordion-header {  
-    background-color: white;  
-    margin: 0px;  
-}  
-  </style>
+    <style>
+      #accordion .ui-accordion-header {  
+          background-color: white;  
+          margin: 0px;  
+      }  
+    </style>
     <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='tasklist.css') }}">
     <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='tasklist_mobile.css') }}">
-<<<<<<< HEAD
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
-  <script>
-      function createMap(lat, lon, id) {
-        var map;
-        var mapOptions = {
-        zoom: 15,
-        center: new google.maps.LatLng(lat, lon)
-        };
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+    <script src="{{ url_for('static', filename='accordion.js') }}"></script>
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <div id="contents">
 
-        map = new google.maps.Map(document.getElementById(id),
-                                  mapOptions);
-
-	      map.setOptions({styles: [
-	         {
-	           featureType: "poi",
-             elementType: "labels",
-	           stylers: [
-	             { visibility: "off" }
-	           ]
-	         }
-	       ]});
-          var myLatLng = new google.maps.LatLng(lat, lon);
-          var marker = new google.maps.Marker({
-            position: myLatLng,
-            map: map,
-          });
-        }
-  </script>
-  <script>
-  // cancel button stuff
-  $(".cancel_button").on("click",function(){
-    // if (!confirm("Are you sure you want to cancel?")) {
-    //   return false;
-    // }
-    // $.ajax({
-    //   type: "POST",
-    //   url: '/cancel_task?task_id=' this.task_id
-    //   data: task_id =
-    // })
-    // var task_id = $("input[name=task_id]").val();
-    // if(task_id) {
-    //   console.log("Task ID: " + task_id);
-    // }
-    //console.log("Task ID: " + task_id);
-    // $.each(task_id, function(key, element){
-    //   console.log("HI");
-    //   console.log("key: " + key + '\n' + 'value: ' + element);
-    // });
-  });
-
-    // $(".cancel_button").on("click", function(){
-    //   console.debug("HELLOOOOO");
-    //   event.preventDefault();
-    //   var task_id = $("input[name=task_id]");//.val();
-    //   console.log("Task ID: " + task_id);
-    //   // $.ajax(
-    //   //   url: window.location + "cancel?task_id=" +  )
-    // });
-    // var cancel_buttons = document.getElementsByClassName('cancel_button')
-    // for (button in cancel_buttons) {
-    //   var task_id_button = button.getElementsByName("task_id");
-    //   if (task_id_button) {
-    //     console.debug("found one!");
-    //     console.debug(task_id_button);
-    //   }
-    // }
-    // $(".cancel_button").on("click", function(){
-    //   event.preventDefault();
-    //   $.ajax({
-    //     url: ,
-    //     type: 'get',
-    //     complete : function(qXHR, textStatus){
-    //       var data = qXHR.responseText
-    //       console.log(data)
-    //     }
-    //   })
-    // })
-  </script>
-  <script>
-  $(function() {
-    $( "#accordion" ).accordion();
-    $( "#accordion input[type=submit]" ).click(
-        function(event) {
-            var form = $(this).parents('form:first');
-            console.debug(form.attr("id"));
-            form.submit();
-//console.debug($(event.target).parent());
-          
- //         $($(event.target).parent()).sumbit()
-     })
-  });
-  </script>
-=======
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
-  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
-  <script src="{{ url_for('static', filename='accordion.js') }}"></script>
->>>>>>> 0cd3b4ea406d1b5d7c42bb0fdd76daa51cb70327
-</head>
-<body>
-  {% include 'header.html' %}
-  <div id="contents">
-
-    <div id="page_title"> My Tasks </div>
-    <div id="tabs">
-      <a href="my_requester_tasks">As Requester</a>
-      <span> | </span>
-      <a href="my_fulfiller_tasks">As Fulfiller</a>
-      {% if requestor_score %}
-      <div id="requestor_score">
-        Your Positive Feedback Percentage: {{requestor_score}}
+      <div id="page_title"> My Tasks </div>
+      <div id="tabs">
+        <a href="my_requester_tasks">As Requester</a>
+        <span> | </span>
+        <a href="my_fulfiller_tasks">As Fulfiller</a>
+        {% if requestor_score %}
+        <div id="requestor_score">
+          Your Positive Feedback Percentage: {{requestor_score}}
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
-    </div>
 
-    <div id="accordion">
-      
-    {% for task in tasks %}
-        {% include 'accordion_entry.html' %}
-    {% endfor %}
-    </div>
+      <div id="accordion">
+        
       {% for task in tasks %}
-        <script> 
-            addStuff({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}");
-        </script>
+          {% include 'accordion_entry.html' %}
       {% endfor %}
-  </div>
-</body>
+      </div>
+        {% for task in tasks %}
+          <script> 
+              addStuff({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}");
+          </script>
+        {% endfor %}
+    </div>
+  </body>
 </html>
