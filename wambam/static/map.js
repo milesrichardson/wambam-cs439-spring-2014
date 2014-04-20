@@ -53,7 +53,10 @@ function setupTaskMarkers() {
 
     var contentString = '<div id="info_window">'+
         '<h1> {0} ({1}) </h1>'+
-        '<table> <tr>'+
+        '<table>  <tr>'+
+        '<td id="info_label">Positive Feedback:</td>'+
+        '<td id="info_content">{7}</td>'+
+        '</tr> <tr>'+
         '<td id="info_label">Requester Email:</td>'+
         '<td id="info_content">{3}</td>'+
         '</tr> <tr>'+
@@ -82,6 +85,7 @@ function setupTaskMarkers() {
         for (var i = 0; i < activeTasks.length; i++) {
             var title = activeTasks[i]["short_title"];
             var bid = activeTasks[i]["bid"];
+            var requestor_score = activeTasks[i]["requestor_score"]
             var expiration = activeTasks[i]["expiration_datetime"];
             var email = activeTasks[i]["requestor_email"];
             var requestor = activeTasks[i]["requestor_id"];
@@ -91,7 +95,7 @@ function setupTaskMarkers() {
             var lat = parseFloat(activeTasks[i]["latitude"]);
             var lng = parseFloat(activeTasks[i]["longitude"]);
             var myLatLng = new google.maps.LatLng(lat, lng);
-            var info = contentString.format(title,bid,expiration,email, location, description, id);
+            var info = contentString.format(title,bid,expiration,email, location, description, id, requestor_score);
             console.debug(lat + " " + lng);
             var marker = new google.maps.Marker({
                 position: myLatLng,
