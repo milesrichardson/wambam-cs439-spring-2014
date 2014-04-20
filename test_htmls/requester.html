@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+  <style>
+#accordion .ui-accordion-header {  
+    background-color: white;  
+    margin: 0px;  
+}  
+  </style>
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="/static/tasklist.css">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="/static/tasklist_mobile.css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+  <script src="/static/accordion.js"></script>
+</head>
+<body>
+  <!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="/static/header.css">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="/static/header_mobile.css">
+  </head>
+  <body>
+    <div id="header">
+      <div id="title">Wambam!<a href="/home"></a></div>
+      <div id="headerbuttons">
+        <form action="/my_requester_tasks">
+          <input type="submit" id="historybutton" value="My History"></input>
+        </form>
+        <form action="/logout">
+          <input type="submit" id="logoutbutton" value="Log Out"></input>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+  <div id="contents">
+
+    <div id="page_title"> My Tasks </div>
+    <div id="tabs">
+      <a href="my_requester_tasks">As Requester</a>
+      <span> | </span>
+      <a href="my_fulfiller_tasks">As Fulfiller</a>
+    </div>
+
+    <div id="accordion">
+      
+    
+        <!DOCTYPE html>
+
+    <!DOCTYPE html>
+<h3 class="open_header">
+  <table id="task_table">
+    <tr>
+      <td id="left_col">
+        Title 2
+      </td>
+      <td id="right_col">
+        <form action="/cancel_task" id="cancel_form" class="cancel_button" method="POST">
+          <input type="submit" class="button" id="i2" value="Cancel"></input>
+          <input type="hidden" name="task_id" value="2"></input>
+        </form>
+      </td>
+    </tr>
+  </table>
+</h3>
+
+    <!DOCTYPE html>
+<div id="d2" class="task_entry">
+  <p>
+    <table id="task_details">
+      
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>Saybrook</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>$5.00</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>Sunday 04:03 AM EDT</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>This is description 2</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas2"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>
+    
+        <!DOCTYPE html>
+
+    <!DOCTYPE html>
+<h3 class="open_header">
+  <table id="task_table">
+    <tr>
+      <td id="left_col">
+        test_submit_task
+      </td>
+      <td id="right_col">
+        <form action="/cancel_task" id="cancel_form" class="cancel_button" method="POST">
+          <input type="submit" class="button" id="i5" value="Cancel"></input>
+          <input type="hidden" name="task_id" value="5"></input>
+        </form>
+      </td>
+    </tr>
+  </table>
+</h3>
+
+    <!DOCTYPE html>
+<div id="d5" class="task_entry">
+  <p>
+    <table id="task_details">
+      
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>Branford</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>$3.00</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>10:33 PM EDT</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>N/A</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas5"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>
+    
+        <!DOCTYPE html>
+
+    <!DOCTYPE html>
+<h3 class="closed_header">
+        Title 3
+</h3>
+
+    <!DOCTYPE html>
+<div id="d3" class="task_entry">
+  <p>
+    <table id="task_details">
+      
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>There</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>$10.00</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>Passed</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>This is description 3</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas3"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>
+    
+        <!DOCTYPE html>
+
+    <!DOCTYPE html>
+<h3 class="closed_header">
+        Title 4
+</h3>
+
+    <!DOCTYPE html>
+<div id="d4" class="task_entry">
+  <p>
+    <table id="task_details">
+      
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>Here</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>$15.00</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>Passed</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>This is description 4</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas4"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>
+    
+    </div>
+      
+        <script> 
+            addStuff(41.3121, -72.9277, "map-canvas2");
+        </script>
+      
+        <script> 
+            addStuff(41.3084304, -72.9284356, "map-canvas5");
+        </script>
+      
+        <script> 
+            addStuff(41.3101, -72.9257, "map-canvas3");
+        </script>
+      
+        <script> 
+            addStuff(41.3131, -72.9287, "map-canvas4");
+        </script>
+      
+  </div>
+</body>
+</html>
