@@ -790,10 +790,10 @@ def view_task_details(taskid):
                                 lon = task_decrypted["longitude"],
                                 title = task_decrypted["short_title"],
                                 location = task_decrypted["delivery_location"],
-                                bid = "$%(bid).2f" % {"bid": task_decrypted["bid"]},
+                                bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])},
                                 expiration = schema.dump_datetime(task.expiration_datetime),
                                 description = task_decrypted["long_title"],
-                                email = fulfiller.email)
+                                email = email)
 
 
 def redirect_to_venmo():

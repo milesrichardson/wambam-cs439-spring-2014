@@ -220,7 +220,26 @@ class TestWambam(unittest.TestCase):
     def testViewTaskJSON(self):
         self.login()
         result = self.app_client.get('/viewtaskjson/1')
+        expected = {
+            "bid": "5.0",
+            "delivery_location": "Saybrook",
+            "latitude": "41.3121",
+            "long_title": "This is a task that will be claimed",
+            "longitude": "-72.9277",
+            "serialize_requestor_email": "michael.hopkins@yale.edu",
+            "short_title": "Claim task",
+            "status": "completed",
+            "venmo_status": "unpaid"
+        }
+        task = ast.literal_eval(result.data)
+        self.assertEqual(expected, task)
+
+"""
+    def testViewTaskDetails(self):
+        self.login()
+        result = self.app_client.get('/viewtaskdetails/2')
         print result.data
+        """
 
 
 
