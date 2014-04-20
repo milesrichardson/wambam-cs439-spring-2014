@@ -730,7 +730,16 @@ def my_requester_tasks():
     requester_objects_open = map(create_requester_object, tasks_open)
     requester_objects_in_progress = map(create_requester_object, tasks_in_progress)
     requester_objects_old = map(create_requester_object, tasks_old)
+
+    num_tasks = len(schema.Feedback.query.filter_by(account_id = user_id).all())
+    num_positive = len(schema.Feedback.query.filter_by(account_id = user_id, rating = "positive").all())
+    if num_tasks == 0:
+        score = "none"
+    else:
+        score = str(int(num_positive * 100 / num_tasks)) + "%"
+
     return render_template("tasklist.html",
+                            requestor_score= score,
                             tasks= (requester_objects_open +
                                     requester_objects_in_progress +
                                     requester_objects_old))

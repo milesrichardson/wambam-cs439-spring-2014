@@ -59,6 +59,15 @@ body {
     margin-bottom: 10px;
 }
 
+#tabs > * {
+    display: inline;
+}
+
+#requestor_score {
+    text-align: right;
+    float: right;
+}
+
 #task_table {
     width: 100%;
 }
@@ -124,7 +133,7 @@ body {
 }
 
 #task_details tr td {
-    text-align: left;
+    text-align: right;
 }
 
 .thumb {
