@@ -1,6 +1,18 @@
-from wambam import app
-import unittest
 import os
+
+if "DATABASE_URL" in os.environ:
+    postgres = os.environ["DATABASE_URL"]
+    del os.environ["DATABASE_URL"]
+
+
+from wambam import app
+
+if postgres is not None:
+    os.environ["DATABASE_URL"] = postgres
+
+
+import unittest
+
 import ast
 port = int(os.environ.get('PORT', 5000))
 
@@ -184,3 +196,4 @@ class TestWambam(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
