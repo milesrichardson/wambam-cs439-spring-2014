@@ -51,14 +51,14 @@ def create_account_table(db):
         encrypted_columns = ["password", "email", "phone", "phone_carrier", "first_name", "last_name"]
         id = db.Column(db.Integer, primary_key=True)
         activated = db.Column(db.Boolean)
-        password = db.Column(db.String(255))                #encrypted
-        email = db.Column(db.String(255), unique=True)      #encrypted
+        password = db.Column(db.String(360))                #encrypted
+        email = db.Column(db.String(360), unique=True)      #encrypted
         email_hash = db.Column(db.String(64), unique=True)
         phone = db.Column(db.String(64), unique=True)       #encrypted
-        phone_carrier = db.Column(db.String(255))           #encrypted
+        phone_carrier = db.Column(db.String(360))           #encrypted
         online = db.Column(db.Boolean)
-        first_name = db.Column(db.String(255))              #encrypted
-        last_name = db.Column(db.String(255))               #encrypted
+        first_name = db.Column(db.String(360))              #encrypted
+        last_name = db.Column(db.String(360))               #encrypted
         last_request = db.Column(db.Integer, default=0)        
         venmo_token = db.Column(db.String(255), default="") #encrypted
         venmo_id = db.Column(db.String(255), default="")    #encrypted
@@ -79,6 +79,7 @@ def create_account_table(db):
                "phone" : decrypt_string(self.phone),
                "phone_carrier" : decrypt_string(self.phone_carrier),
                "online" : str(self.online),
+               "email" : str(self.email),
                "first_name" : decrypt_string(self.first_name),
                "last_name" : decrypt_string(self.last_name),
                "fulfiller_tasks" : self.serialize_fulfiller_tasks
@@ -147,8 +148,8 @@ def create_task_table(db):
         requestor_id = db.Column(db.Integer, db.ForeignKey("account.id"))
         latitude = db.Column(db.String())                  #encrypted
         longitude = db.Column(db.String())                 #encrypted
-        delivery_location = db.Column(db.String(255))      #encrypted
-        short_title = db.Column(db.String(255))            #encrypted
+        delivery_location = db.Column(db.String(360))      #encrypted
+        short_title = db.Column(db.String(360))            #encrypted
         long_title = db.Column(db.String())                #encrypted
         bid = db.Column(db.String())                       #encrypted
         expiration_datetime = db.Column(db.DateTime)
@@ -170,10 +171,19 @@ def create_task_table(db):
 
         @property
         def serialize(self):
+            # calculate score to serialize
+            num_tasks = len(Feedback.query.filter_by(account_id = self.requestor_id).all())
+            num_positive = len(Feedback.query.filter_by(account_id = self.requestor_id, rating = "positive").all())
+            if num_tasks == 0:
+                score = Account.query.get(self.requestor_id).first_name + " doesn't have any feedback yet!"
+            else:
+                score = str(int(num_positive * 100 / num_tasks)) + "%"
+
             #Return object data in easily serializeable format
             return {
                 "id" : str(self.id),
                 "requestor_id" : self.requestor_id,
+                "requestor_score" : score,
                 "requestor_email": self.serialize_requestor_email,
                 "latitude" : decrypt_string(self.latitude),
                 "longitude" : decrypt_string(self.longitude),
@@ -232,11 +242,11 @@ def encrypt_string(plain):
 def decrypt_string(enc):
     #remove spaces from end of string
     return enc
-"""    try:
-        return encrypter.decrypt(b64decode(enc)).rstrip()
-    except:
-        return enc
-"""
+#    try:
+#        return encrypter.decrypt(b64decode(enc)).rstrip()
+#    except:
+#        return enc
+
 
 def encrypt_dictionary(plaintext):
     keys = plaintext.keys()

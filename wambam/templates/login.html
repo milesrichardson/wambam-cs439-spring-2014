@@ -29,16 +29,19 @@
                 <tr>
                   <form action="/login" method="POST">
                     <td>
-                      <input class="logininput" type="text" name="userfield">
+                      <input class="logininput" type="text" name="userfield" maxlength="255">
                     </td>
                     <td>
-                      <input class="logininput" type="password" name="passwordfield">
+                      <input class="logininput" type="password" name="passwordfield" maxlength="255">
                     </td>
                     <td>
                       <input id="loginbutton" type="submit" name="loginbutton" value="Log In">
                       <input name="next" type="hidden" value="{{pre_login_url}}"/>
                     </td>
                   </form>
+                </tr>
+                <tr>
+                  <td colspan="2"><label id="error_login">{{error_msg}}</label></td>
                 </tr>
               </table>
             </div>         
@@ -52,12 +55,12 @@
           <tr>
             <td colspan="2"> <div id="registertitle"> New to WamBam!? </div> </td>
           </tr>
-	  <tr>
+	        <tr>
             <td>
               <label for="firstname">First Name</label>
             </td>
             <td>
-              <input type="text" name="firstname">
+              <input type="text" name="firstname" maxlength="255">
             </td>
             <td>
               <div id="firstnameerror"> </div>
@@ -68,7 +71,7 @@
               <label for="lastname">Last Name</label>
             </td>
             <td>
-              <input type="text" name="lastname">
+              <input type="text" name="lastname" maxlength="255">
             </td>
             <td>
               <div id="lastnameerror"> </div>
@@ -107,7 +110,7 @@
               <label for="email">Email Address</label>
             </td>
             <td>
-              <input type="text" name="email">
+              <input type="text" name="email" maxlength="254">
             </td>
             <td>
               <div id="emailerror"> </div>
@@ -118,7 +121,7 @@
               <label for="password">Password</label>
             </td>
             <td>
-              <input type="password" name="password" id="password">
+              <input type="password" name="password" id="password" maxlength="255">
             </td>
             <td>
               <div id="passworderror"> </div>
@@ -129,7 +132,7 @@
               <label for="passwordconfirm">Confirm Password</label>
             </td>
             <td>
-              <input type="password" name="passwordconfirm">
+              <input type="password" name="passwordconfirm" maxlength="255">
             </td>
             <td>
               <div id="passwordconfirmerror"> </div>

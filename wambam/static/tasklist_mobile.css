@@ -4,19 +4,116 @@ input, select, textarea {
     -webkit-box-sizing: border-box;
 }
 
-html { 
-    height: 100%; 
-    width: 300px;
-}
-
 body {
-    height: 100%; 
     margin: 0;
     padding: 0;
     border: 0
 }
 
-#accordion .ui-accordion-header {  
-    background-color: white;  
-    margin: 0px;  
+#accordion {
+    width: 100%;
+}
+
+#accordion .ui-accordion-content {
+    padding: 10px 10px 10px 10px; 
+    margin: 0;
+}
+#contents {
+    width: 100%;
+}
+
+#accordion .ui-accordion-header.open_header {  
+    background: #90EE90;
+    word-wrap: break-word;
 }  
+
+#accordion .ui-accordion-header.in_progress_header {  
+    background: #FFFF66;
+    word-wrap: break-word;
+}  
+
+#accordion .ui-accordion-header.closed_header {  
+    background: #FFB6C1;
+    word-wrap: break-word;
+    
+}
+
+#page_title {
+    text-align: center;
+    font-size:40px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#tabs {
+    font-size: 20px;
+    margin-bottom: 10px;
+    margin-left: 10px
+}
+
+#requestor_score {
+    text-align: right;
+}
+
+#task_table {
+    width: 100%;
+}
+
+#left_col {
+    text-align: left;
+    width: 50%;
+    max-width: 100%;
+}
+
+
+#right_col {
+    text-align: right;
+    width: 50%;
+}
+
+#button { 
+    font-size:15px;
+    padding: 5px 10px;
+    color: white;
+    font-weight: bold;
+    background: #0F4D92;
+    text-align: center;
+}
+
+#button_dull { 
+    font-size:15px;
+    padding: 5px 10px;
+    color: white;
+    font-weight: bold;
+    background: #84b6cd;
+    text-align: center;
+}
+
+#task_details {
+    width: 100%;
+}
+
+#task_details tr td:first-child {
+
+}
+
+#task_details tr td {
+    text-align: left;
+    vertical-align: top;
+}
+
+.thumb {
+    width: 30px;
+    height: 30px;
+}
+
+#in_progress_buttons div {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.map-canvas {
+    height: 150px;
+    width: 100%;
+    text-align: center;
+}

@@ -5,7 +5,7 @@ input, select, textarea {
 }
 
 html {
-    min-width: 700px;
+    min-width: 1000px;
     height: 100%
 }
 
@@ -31,31 +31,18 @@ body {
 #buttonbar { 
     text-align: center;
     padding-top: 10px;
-    padding-bottom: 20px
+    padding-bottom: 20px;
 }
 
-#buttonbar input[type="submit"] {
+#buttonbar form {
+    display: inline;
+}
+
+#buttonbar input[type="submit"], #toggle_work {
     height: 50px;
-    width: 350px;
-    font-size:20px;
+    width: 325px;
+    font-size:15px;
     color: white;
     background: #0F4D92; 
     text-align: center;
-    margin: 0 15px;
-}
-
-#slider { 
-    display: inline-block;
-    position: absolute
-}
-
-#buttonbar label {
-    position: relative;
-    top: -25px;
-}
-
-#buttonbar  form > * { 
-    margin: 0;
-    padding: 0;
-    display:inline
 }

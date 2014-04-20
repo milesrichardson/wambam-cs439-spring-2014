@@ -6,7 +6,7 @@ input, select, textarea {
 
 html { 
     height: 100%;
-    min-width: 700px
+    min-width: 1000px
 }
 
 body {
@@ -18,39 +18,28 @@ body {
 
 #accordion {
     margin-bottom: 50px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-#accordion .ui-accordion-header#open_header {  
-    background-color: #90EE90; /* Old browsers */  
-    background-image: -moz-linear-gradient(top, #90EE90 0%, #90EE90 100%); /* FF3.6+ */  
-    background-image: -webkit-gradient(linear, left top, left bottombottom, color-stop(0%,#90EE90), color-stop(100%,#90EE90)); /* Chrome,Safari4+ */  
-    background-image: -webkit-linear-gradient(top, #90EE90 0%,#90EE90 100%); /* Chrome10+,Safari5.1+ */  
-    background-image: -o-linear-gradient(top, #90EE90 0%,#90EE90 100%); /* Opera 11.10+ */  
-    background-image: -ms-linear-gradient(top,  #90EE90 0%,#90EE90 100%); /* IE10+ */  
-    background-image: linear-gradient(to bottombottom,  #90EE90 0%,#90EE90 100%); /* W3C */  
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#90EE90', endColorstr='#90EE90',GradientType=0 ); /* IE6-9 */  
+#tabs {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#accordion .ui-accordion-header.open_header {  
+    background: #90EE90 !important;
+    word-wrap: break-word;
 }  
 
-#accordion .ui-accordion-header#in_progress_header {  
-    background-color: #FFFF66; /* Old browsers */  
-    background-image: -moz-linear-gradient(top, #FFFF66 0%, #FFFF66 100%); /* FF3.6+ */  
-    background-image: -webkit-gradient(linear, left top, left bottombottom, color-stop(0%,#FFFF66), color-stop(100%,#FFFF66)); /* Chrome,Safari4+ */  
-    background-image: -webkit-linear-gradient(top, #FFFF66 0%,#FFFF66 100%); /* Chrome10+,Safari5.1+ */  
-    background-image: -o-linear-gradient(top, #FFFF66 0%,#FFFF66 100%); /* Opera 11.10+ */  
-    background-image: -ms-linear-gradient(top,  #FFFF66 0%,#FFFF66 100%); /* IE10+ */  
-    background-image: linear-gradient(to bottombottom, #FFFF66 0%,#FFFF66 100%); /* W3C */  
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFF66', endColorstr='#FFFF66',GradientType=0 ); /* IE6-9 */  
+#accordion .ui-accordion-header.in_progress_header {  
+    background: #FFFF66 !important;
+    word-wrap: break-word;
 }  
 
-#accordion .ui-accordion-header#closed_header {  
-    background-color: #FFB6C1; /* Old browsers */  
-    background-image: -moz-linear-gradient(top, #FFB6C1 0%, #FFB6C1 100%); /* FF3.6+ */  
-    background-image: -webkit-gradient(linear, left top, left bottombottom, color-stop(0%,#FFB6C1), color-stop(100%,#FFB6C1)); /* Chrome,Safari4+ */  
-    background-image: -webkit-linear-gradient(top, #FFB6C1 0%,#FFB6C1 100%); /* Chrome10+,Safari5.1+ */  
-    background-image: -o-linear-gradient(top, #FFB6C1 0%,#FFB6C1 100%); /* Opera 11.10+ */  
-    background-image: -ms-linear-gradient(top,  #FFB6C1 0%,#FFB6C1 100%); /* IE10+ */  
-    background-image: linear-gradient(to bottombottom,  #FFB6C1 0%,#FFB6C1 100%); /* W3C */  
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFB6C1', endColorstr='#FFB6C1',GradientType=0 ); /* IE6-9 */  
+#accordion .ui-accordion-header.closed_header {  
+    background: #FFB6C1 !important;
+    word-wrap: break-word;
 }
 
 #contents {
@@ -66,17 +55,31 @@ body {
 }
 
 #tabs {
-	  font-size: 20px;
+    font-size: 20px;
     margin-bottom: 10px;
+}
+
+#tabs > * {
+    display: inline;
+}
+
+#requestor_score {
+    text-align: right;
+    float: right;
 }
 
 #task_table {
     width: 100%;
 }
 
-#left_col {
+.in_progress_header #left_col {
     text-align: left;
-    width: 50%;
+    max-width: 350px;
+}
+
+.open_header #left_col {
+    text-align: left;
+    max-width: 600px;
 }
 
 #right_col {
@@ -85,11 +88,20 @@ body {
     width: 50%;
 }
 
-#task_entry {
+.task_entry {
     overflow: hidden;
 }
 
 #button { 
+    font-size:15px;
+    padding: 5px 10px;
+    color: white;
+    font-weight: bold;
+    background: #0F4D92;
+    text-align: center;
+}
+
+.button { 
     font-size:15px;
     padding: 5px 10px;
     color: white;
@@ -115,11 +127,16 @@ body {
     padding-right: 30px;
 }
 
-#task_details tr td {
-    text-align: left;
+#task_details tr td:nth-child(2) {
+    max-width: 550px;
+    word-wrap: break-word;
 }
 
-#thumb {
+#task_details tr td {
+    text-align: right;
+}
+
+.thumb {
     width: 30px;
     height: 30px;
 }

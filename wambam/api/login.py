@@ -3,6 +3,7 @@ import flask.ext.login
 import sqlalchemy
 import phonenumbers
 import time
+from flask import render_template
 
 login_manager = None
 db = None
@@ -37,9 +38,12 @@ def create_login_manager(app, db):
                 password = flask.request.form["password"]
             
             if "@"  not in username:
-                #phone number
-                number_object = phonenumbers.parse(username, "US")
-                username = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
+                try:
+                    #phone number
+                    number_object = phonenumbers.parse(username, "US")
+                    username = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
+                except:
+                    return render_template("login.html", error_msg="Invalid email or phone number")
 
             username = schema.encrypt_string(username)
             password = schema.encrypt_string(password)
@@ -48,7 +52,7 @@ def create_login_manager(app, db):
                     
             if user is None:
                 app.logger.debug("abort")
-                flask.abort(401)
+                return render_template("login.html", error_msg="Invalid login")
             else:
                 flask.ext.login.login_user(user, remember=True)
                 user.last_request = int(time.time())

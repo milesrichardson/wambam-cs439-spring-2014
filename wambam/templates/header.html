@@ -9,12 +9,15 @@
   </head>
   <body>
     <div id="header">
-      <div id="title">Wambam!</div>
-      <span id="logoutdiv">
+      <div id="title">Wambam!<a href="/home"></a></div>
+      <div id="headerbuttons">
+        <form action="/my_requester_tasks">
+          <input type="submit" id="historybutton" value="My History"></input>
+        </form>
         <form action="/logout">
           <input type="submit" id="logoutbutton" value="Log Out"></input>
         </form>
-      </span>
+      </div>
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
 
 html { 
     height: 100%; 
-    min-width: 700px
+    min-width: 1000px
 }
 
 body {
@@ -106,4 +106,9 @@ label {
 label.error {
     color: red;
     font-size: 12px; 
+}
+
+#error_login {
+    color: red;
+    font-size: 14px; 
 }

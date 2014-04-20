@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<div id="d{{task.task_id}}" class="task_entry">
+  <p>
+    <table id="task_details">
+      {% if task.other_phone != None %}
+      <tr>
+        <td>
+          <label><b>Phone number</b></label>
+        </td>
+        <td>
+          <label>{{task.other_phone}}</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Email</b></label>
+        </td>
+        <td>
+          <label>{{task.other_email}}</label>
+        </td>
+      </tr>
+      {% endif %}
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>{{task.delivery_location}}</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>{{task.bid}}</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>{{task.expiration_date}}</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>{{task.description}}</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas{{task.task_id}}"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>

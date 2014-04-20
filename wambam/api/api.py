@@ -36,8 +36,6 @@ def register_events():
     def receive_load(target, context):
         for task in context.query.all():
             if datetime.datetime.now() > task.expiration_datetime and task.status == "unassigned":
-                app.logger.debug("Expiring task with id " + `task.id` + \
-                                 "(expired " + `task.expiration_datetime` + "'")
                 task.status = 'expired'
 
                 db.session.add(task)
@@ -96,6 +94,28 @@ def create_database(app):
             first_name="Michael",
             last_name="Hopkins")
 
+        user2 = schema.Account(
+            activated=True,
+            phone="2034420233",
+            phone_carrier="AT&T",
+            email="miles.richardson@yale.edu",
+            password="blah",
+            online=True,
+            venmo_id="1020501350678528478",
+            first_name="Miles",
+            last_name="Richardson")
+
+        task1 = schema.Task(
+            requestor_id=2,
+            latitude = 41.3121,
+            longitude = -72.9277,
+            short_title="Claim task",
+            bid=float(5),
+            expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
+            long_title="This is a task that will be claimed",
+            delivery_location="Saybrook",
+            status="unassigned")
+
         task2 = schema.Task(
             requestor_id=1,
             latitude = 41.3121,
@@ -130,6 +150,9 @@ def create_database(app):
             status="expired")
 
         db.session.add(user)
+        db.session.add(user2)
+        db.session.commit()
+        db.session.add(task1)
         db.session.add(task2)
         db.session.add(task3) 
         db.session.add(task4) 
@@ -249,44 +272,50 @@ def get_all_claimed_tasks():
     return flask.jsonify(items=[dict(i) for i in results])
 
 #@app.route("/cancel_task/<int:task_id>")
-@app.route("/cancel_task/")
+@app.route("/cancel_task/<int:task_id>", methods=["POST"])
 def cancel_task(task_id):
-    task_id = request.form(["task_id"])
-    task = schema.Task.query.get(int(task_id))
-    task.status = 'canceled'
+    task = schema.Task.query.get(task_id)
+    
+    # Only cancel the task if it is still in_progress
+    if (task.status == "unassigned"):
+        task.status = "canceled"
+
     db.session.add(task)
     db.session.commit()
-    app.logger.debug("Canceled task with ID %d" % int(task_id))
-    return ""
 
-@app.route("/finish_task")
+    if "requester" in request.referrer:
+        returnObject = create_requester_object(task)
+    else: 
+        returnObject = create_fulfiller_object(task)    
+
+    return render_template("accordion_entry.html", task=returnObject)
+
+@app.route("/finish_task/<int:task_id>", methods=["POST"])
 def finish_task(task_id):
-    task_id = request.form(["task_id"])
-    task = schema.Task.query.get(int(task_id))
+    task = schema.Task.query.get(task_id)
     # mark task "done" when both people say it's done
-    task.status = 'done'
+    task.status = 'completed'
     db.session.add(task)
     db.session.commit()
-    app.logger.debug("Marked task 'done' with ID %d" % int(task_id))
     return ""
 
-@app.route("/add_feedback")
-def add_feedback(methods=["GET"]):
+@app.route("/add_feedback/<int:task_id>/<string:rating>", methods=["POST"])
+def add_feedback(task_id, rating):
     try:
-        task_id = int(request.args.get('task_id'))
+        task = schema.Task.query.get(int(task_id))
 
-        role = request.args.get('role')
-        if role not in ['requestor', 'fulfiller']:
-            raise Exception('Invalid role')
-
-        rating = request.args.get('rating') 
         if rating not in ['positive', 'negative']:
+            app.logger.debug("RATING: " + rating)
             raise Exception('Invalid rating')
         
         user_id = int(current_user.get_id())
 
+        if user_id == task.requestor_id:
+            role = "requestor"
+        else:
+            role = "fulfiller"
+
     except Exception as e:
-        print e
         return "error"
 
     feedback = schema.Feedback(
@@ -296,6 +325,9 @@ def add_feedback(methods=["GET"]):
         rating = rating,
     )
 
+    task.status = "completed"
+
+    db.session.add(task)
     db.session.add(feedback)
     db.session.commit()
 
@@ -323,6 +355,13 @@ def tasks_as_requestor():
 def tasks_as_fulfiller():
     return tasks_for_fulfiller(current_user.get_id())    
 
+@app.route("/get_user")
+def user():
+    if not current_user.is_authenticated():
+        return flask.jsonify([])
+
+    return flask.jsonify(current_user.serialize)
+
 
 def getTextRecipient(phone_number, phone_carrier):
     emailaddress = phone_number
@@ -345,7 +384,7 @@ def getTextRecipient(phone_number, phone_carrier):
         emailaddress += "@email.uscc.net"
     elif phone_carrier == "Virgin Mobile":
         emailaddress += "@vmobl.com"
-    else:                                  #else we assume Verizon Wirless
+    else:                                  #else we assume Verizon Wireless
         emailaddress += "@vtext.com"
 
     return emailaddress
@@ -354,7 +393,6 @@ def getTextRecipient(phone_number, phone_carrier):
 #@app.route("/set_online", methods=["POST"])
 @app.route("/set_online", methods=["POST"])
 def set_online():
-    app.logger.debug("Start set_online")
     # Get current user
     user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
@@ -365,13 +403,11 @@ def set_online():
     # add and commit changes
     db.session.add(flask_user)
     db.session.commit()
-    app.logger.debug("End set_online")
     return ""
 
 @app.route("/set_offline", methods=["POST"])
 def set_offline():
 
-    app.logger.debug("Start set_offline")
     # Get current user
     user_id = int(current_user.get_id())
     flask_user = schema.Account.query.get(user_id)
@@ -382,7 +418,6 @@ def set_offline():
     # add and commit changes
     db.session.add(flask_user)
     db.session.commit()
-    app.logger.debug("End set_offline")
     return ""
 
 @app.route("/get_online")
@@ -397,7 +432,6 @@ def get_online():
 def submit():
     title = request.form["title"]
     if not ("lat" in session) or not ("lng" in session):
-        app.logger.debug("No lat/lng for task")
         return redirect(url_for("working"))
 
     bid = request.form["bid"]
@@ -407,12 +441,10 @@ def submit():
     # format for timedelta is (days, seconds, microseconds, 
     # milliseconds, minutes, hours, weeks)
     expirationdate = datetime.datetime.now()
-    app.logger.debug(expiration)
     if (expiration == "30min"):
         expirationdate += datetime.timedelta(0,0,0,0,30)
     elif (expiration == "1hr"):
         expirationdate += datetime.timedelta(0,0,0,0,0,1)
-        app.logger.debug("1 hour")
     elif (expiration == "1day"):
         expirationdate += datetime.timedelta(1)
     elif (expiration == "1wk"):
@@ -453,13 +485,15 @@ def submit():
     phone_carrier = schema.decrypt_string(current_user.phone_carrier)
     text_recipient = map(getTextRecipient, [phone_number], [phone_carrier])
 
+
+
     # Construct message for requester
     msg_subject = "Order Submitted"
     msg_body = "Your task request for '" + title + " has been placed! We'll text you when someone claims your task."
-    app.logger.debug("Email address: " + text_recipient[0])
 
     # Mail message to requester asynchronously
-    emails.send_email(msg_subject, text_recipient, msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, text_recipient, msg_body, msg_body)
 
     # Send alert text to all online fulfillers 
     # Probably want to do this asynchronously eventually
@@ -484,9 +518,9 @@ def submit():
     msg_body = first_name + " " + last_name + " has created a task for '" + title + "'. Click the following link for more details: http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + " ."
 
     # Mail message to potential fulfillers
-    emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
 
-    app.logger.debug("Sent confirmation text")
     return redirect("/confirm")
 
 def is_session_valid():
@@ -499,7 +533,8 @@ def before_request():
     exempt_files = ["/check_email", "/check_phone", "/favicon.ico",
                     url_for("static", filename="login.css"), 
                     url_for("static", filename="login_mobile.css"),
-                    url_for("static", filename="login_validator.js")]
+                    url_for("static", filename="login_validator.js"),
+                    "/get_user"]
 
     for f in exempt_files:
         if request.path == f:
@@ -511,7 +546,7 @@ def before_request():
 
     #trying to access an unprotected page
     if request.path == "/" or request.path == "/mobile" or \
-       request.path == "/login" or request.path == "/register":
+        request.path == "/login" or request.path == "/register":  
 
         #no need for them to access, go home
         if not current_user.is_anonymous() and is_session_valid():
@@ -586,39 +621,36 @@ def claim():
     # db.session.add(temp)
     db.session.commit()
 
-    app.logger.debug("Before confirmation text")    
 
     # Send confirmation text to fulfiller
     fulfiller_number = decrypted_fulfiller["phone"]
     fulfiller_carrier = decrypted_fulfiller["phone_carrier"]
     text_fulfiller = getTextRecipient(fulfiller_number, fulfiller_carrier)
-    app.logger.debug("Email address: " + text_fulfiller)
 
     # Construct message to send to fulfiller
     msg_subject = "Task Claimed"
     msg_body = "You have claimed the task '" + title + "'. Get in touch with " + decrypted_requestor["first_name"] + " " + decrypted_requestor["last_name"] + " at " + decrypted_requestor["phone"] + "."
 
     # Send message to fulfiller
-    emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
 
     # Send confirmation text to requestor
     requestor_number = decrypted_requestor["phone"]
     requestor_carrier = decrypted_requestor["phone_carrier"]
     text_requestor = getTextRecipient(requestor_number, requestor_carrier)
-    app.logger.debug("Email address: " + text_requestor)
 
     # Construct message to send to requestor
     msg_subject = "Your task has been claimed!"
     msg_body = decrypted_fulfiller["first_name"] + " " + decrypted_fulfiller["last_name"] + " has claimed your task '" + title + "'. You can get in touch with " + decrypted_fulfiller["first_name"] + " at " + decrypted_fulfiller["phone"] + "."
 
     # Send confirmation message to requestor
-    emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
+    if request.referrer and request.referrer != '/test':
+        emails.send_email(msg_subject, [text_requestor], msg_body, msg_body)
 
     # Get confirmation word
     cool_word = get_cool_word()
 
-    app.logger.debug("Sent confirmation texts")   
-    app.logger.debug("end claimtask")
     return render_template("confirmationwambam.html",
                             cool_word = cool_word,
                             title = title,
@@ -641,7 +673,6 @@ def create_fulfiller_object(task):
 
     expiration_date = schema.dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
-    app.logger.debug(task.status)
     return {
         "object_type": "fulfiller",
         "task_id": task.id,
@@ -675,7 +706,6 @@ def create_requester_object(task):
     
     expiration_date = schema.dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
-    app.logger.debug(task.status)
     return {
         "object_type": "requester",
         "task_id": task.id,
@@ -702,7 +732,16 @@ def my_requester_tasks():
     requester_objects_open = map(create_requester_object, tasks_open)
     requester_objects_in_progress = map(create_requester_object, tasks_in_progress)
     requester_objects_old = map(create_requester_object, tasks_old)
+
+    num_tasks = len(schema.Feedback.query.filter_by(account_id = user_id).all())
+    num_positive = len(schema.Feedback.query.filter_by(account_id = user_id, rating = "positive").all())
+    if num_tasks == 0:
+        score = "none"
+    else:
+        score = str(int(num_positive * 100 / num_tasks)) + "%"
+
     return render_template("tasklist.html",
+                            requestor_score= score,
                             tasks= (requester_objects_open +
                                     requester_objects_in_progress +
                                     requester_objects_old))
@@ -734,10 +773,19 @@ def my_fulfiller_tasks():
                             tasks= (fulfiller_objects_in_progress +
                                     fulfiller_objects_old))
 
+@app.route("/viewtaskjson/<int:taskid>") 
+def view_task_json(taskid):
+    task = schema.Task.query.get(taskid)
+    task_decrypted = schema.decrypt_object(task)
+    if (task is None):
+        return flask.jsonify([])
+    else:
+        return flask.jsonify(task_decrypted)
+
 @app.route("/viewtaskdetails/<int:taskid>")
 def view_task_details(taskid):
     task = schema.Task.query.get(taskid)
-    task_decrypted = decrypt_object(task)
+    task_decrypted = schema.decrypt_object(task)
     if (task is None):
         return redirect("/home")
     else:
