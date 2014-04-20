@@ -51,6 +51,10 @@ body {
     margin-left: 10px
 }
 
+#requestor_score {
+    text-align: right;
+}
+
 #task_table {
     width: 100%;
 }
