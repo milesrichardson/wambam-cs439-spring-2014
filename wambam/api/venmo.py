@@ -117,3 +117,8 @@ def can_use_venmo(task_id):
     if schema.Account.query.get(fulfiller_account.id).venmo_id == "":
         return "false"
     return "true"
+
+def get_account_from_account_task(account_task):
+    account_id = account_task.account_id
+    account = schema.Account.query.get(account_id)
+    return account

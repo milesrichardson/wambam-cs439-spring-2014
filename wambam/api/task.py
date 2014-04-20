@@ -56,15 +56,15 @@ def setup_task_endpoints(app, database, eng):
 
     @app.route("/viewtaskdetails/<int:taskid>")
     def task_details_endpoint(taskid):
-        view_task_details(taskid)
+        return view_task_details(taskid)
 
     @app.route("/cancel_task/<int:task_id>", methods=["POST"])
     def cancel_endpoint(task_id):
-        cancel_task(task_id)
+        return cancel_task(task_id)
 
     @app.route("/finish_task/<int:task_id>", methods=["POST"])
     def finish_endpoint(task_id):
-        finish_task(task_id)
+        return finish_task(task_id)
 
     @app.route("/submittask", methods=["POST"])
     def submit_endpoint():

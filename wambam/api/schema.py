@@ -9,7 +9,7 @@ import pytz
 from wambam import app
 
 import encryption
-
+import venmo
 
 current_schema_version = 5
 
@@ -232,12 +232,12 @@ def create_fulfiller_object(task):
     task_decrypted = encryption.decrypt_object(task)
     task_id = task.id
     requester_id = task.requestor_id
-    requester = schema.Account.query.get(requester_id)
+    requester = Account.query.get(requester_id)
     requester_decrypted = encryption.decrypt_object(requester)
     requester_email = requester_decrypted["email"]
     requester_phone = requester_decrypted["phone"]
 
-    expiration_date = schema.dump_datetime(task.expiration_datetime)
+    expiration_date = dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
     return {
         "object_type": "fulfiller",
@@ -264,13 +264,13 @@ def create_requester_object(task):
     if (task.status == "in_progress" or task.status == "completed"):
         #I am not sure if this is correct...
         fulfiller_id = task.fulfiller_accounts[0].id
-        fulfiller = schema.Account.query.get(fulfiller_id)
+        fulfiller = Account.query.get(fulfiller_id)
         fulfiller_decrypted = encryption.decrypt_object(fulfiller)
         fulfiller_email = fulfiller_decrypted["email"]
         fulfiller_phone = fulfiller_decrypted["phone"]
         fulfiller_has_venmo = venmo.can_use_venmo(task.id)
     
-    expiration_date = schema.dump_datetime(task.expiration_datetime)
+    expiration_date = dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
     return {
         "object_type": "requester",

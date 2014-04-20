@@ -110,7 +110,7 @@ def create_database(app):
             last_name="Richardson")
 
         task1 = schema.Task(
-            requestor_id=2,
+            requestor_id=1,
             latitude = 41.3121,
             longitude = -72.9277,
             short_title="Claim task",
@@ -278,9 +278,6 @@ def before_request():
                not (request.path == "/home" or request.path == "/logout" or request.path.endswith(".css") or request.path.endswith(".js")):
                 return redirect("/home")
                 
-
-
-
 app.config["SECRET_KEY"] = "I have a secret."
 app.config["REMEMBER_COOKIE_DURATION"] = datetime.timedelta(days=14)
 

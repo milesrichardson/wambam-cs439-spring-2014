@@ -27,6 +27,11 @@
       <a href="my_requester_tasks">As Requester</a>
       <span> | </span>
       <a href="my_fulfiller_tasks">As Fulfiller</a>
+      {% if requestor_score %}
+      <div id="requestor_score">
+        Your Positive Feedback Percentage: {{requestor_score}}
+      </div>
+      {% endif %}
     </div>
 
     <div id="accordion">
