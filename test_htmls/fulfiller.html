@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+  <style>
+#accordion .ui-accordion-header {  
+    background-color: white;  
+    margin: 0px;  
+}  
+  </style>
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="/static/tasklist.css">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="/static/tasklist_mobile.css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+  <script src="/static/accordion.js"></script>
+</head>
+<body>
+  <!DOCTYPE html>
+<html>
+  <head>
+    <title>WamBam!</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="/static/header.css">
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="/static/header_mobile.css">
+  </head>
+  <body>
+    <div id="header">
+      <div id="title">Wambam!<a href="/home"></a></div>
+      <div id="headerbuttons">
+        <form action="/my_requester_tasks">
+          <input type="submit" id="historybutton" value="My History"></input>
+        </form>
+        <form action="/logout">
+          <input type="submit" id="logoutbutton" value="Log Out"></input>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+  <div id="contents">
+
+    <div id="page_title"> My Tasks </div>
+    <div id="tabs">
+      <a href="my_requester_tasks">As Requester</a>
+      <span> | </span>
+      <a href="my_fulfiller_tasks">As Fulfiller</a>
+    </div>
+
+    <div id="accordion">
+      
+    
+        <!DOCTYPE html>
+
+    <!DOCTYPE html>
+<h3 class="in_progress_header">
+  <table id="task_table">
+    <tr>
+      <td id="left_col">
+        Claim task
+      </td>
+      <td id="right_col">
+        <div id="in_progress_buttons">
+          
+          <div>
+            <form id="thumbs_up_form">
+              <input class="thumb" id="tu1" type="image" src="/static/thumbs_up.png" alt="Submit"> </input>
+              <input type="hidden" id="task_id" value="1"></input>
+            </form>
+          </div>
+          <div>
+            <form id="thumbs_down_form">
+              <input class="thumb" id="td1" type="image" src="/static/thumbs_down.png" alt="Submit"> </input>
+              <input type="hidden" id="task_id" value="1"></input>
+            </form>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</h3>
+
+    <!DOCTYPE html>
+<div id="d1" class="task_entry">
+  <p>
+    <table id="task_details">
+      
+      <tr>
+        <td>
+          <label><b>Phone number</b></label>
+        </td>
+        <td>
+          <label>2034420233</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Email</b></label>
+        </td>
+        <td>
+          <label>miles.richardson@yale.edu</label>
+        </td>
+      </tr>
+      
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>Saybrook</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>$5.00</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>Sunday 03:50 AM EDT</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>This is a task that will be claimed</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas1"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>
+    
+    </div>
+      
+        <script> 
+            addStuff(41.3121, -72.9277, "map-canvas1");
+        </script>
+      
+  </div>
+</body>
+</html>

@@ -106,8 +106,8 @@ class TestWambam(unittest.TestCase):
         tasks = ast.literal_eval(result.data)['items']
         self.assertEqual(len(tasks) , self.num_tasks['active'])
 
-        #Cancel task ID = 1
-        result = self.app_client.post('/cancel_task/1', data=dict(
+        #Cancel task ID = 2
+        result = self.app_client.post('/cancel_task/2', data=dict(
                 referrer="TestClient"), headers={'Referer': '/test'}, 
                 follow_redirects=True) 
 
@@ -183,13 +183,44 @@ class TestWambam(unittest.TestCase):
         result = self.app_client.get('/get_online')
         self.assertEqual('{\n  "online": true\n}', result.data)
 
+    def testMyFulfillerTasks(self):
+        self.login()
+        result = self.app_client.get('/my_fulfiller_tasks')
 
+        expected = open('./test_htmls/fulfiller.html', 'r')
+        for line in result.data.split('\n'):
+            test_line = expected.readline().strip()
+            if test_line == "<label>Sunday 03:50 AM EDT</label>":
+                continue
+            self.assertEqual(test_line.strip(), line.strip())
 
+        expected.close()
+
+    def testMyRequesterTasks(self):
+        self.login()
+        result = self.app_client.get('/my_requester_tasks')
+        time_strings = ["<label>Sunday 04:03 AM EDT</label>",
+                        "<label>Sunday 10:33 PM EDT</label>",
+                        "<label>10:33 PM EDT</label>"]
+                        
+
+        expected = open('./test_htmls/requester.html', 'r')
+        for line in result.data.split('\n'):
+            test_line = expected.readline().strip()
+            if test_line in time_strings:
+                continue
+            self.assertEqual(test_line.strip(), line.strip())
+
+        expected.close()
+
+    def testViewTaskJSON(self):
+        self.login()
+        result = self.app_client.get('/viewtaskjson/1')
+        print result.data
 
 
 
     ##TODO FEEDBACK TESTS (285 in api.py)
-    ##TODO MY REQUESTOR/FULFILLER TESTS (750ish in api.py)
     ##TODO MY VIEWTASKJSON/DETAILS TESTS (780ish in api.py)
     ##TODO VENMO TESTS (850ish in api.py)
 
