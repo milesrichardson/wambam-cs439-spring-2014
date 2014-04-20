@@ -151,6 +151,7 @@ def create_database(app):
 
         db.session.add(user)
         db.session.add(user2)
+        db.session.commit()
         db.session.add(task1)
         db.session.add(task2)
         db.session.add(task3) 
