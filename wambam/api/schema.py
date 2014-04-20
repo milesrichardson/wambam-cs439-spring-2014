@@ -6,11 +6,9 @@ import datetime
 from pytz import timezone
 import pytz
 
-from Crypto.Cipher import AES
-from base64 import b64encode, b64decode
-
 from wambam import app
 
+import encryption
 
 
 current_schema_version = 5
@@ -76,12 +74,12 @@ def create_account_table(db):
         def serialize(self):
             return {
                "id" : str(self.id),
-               "phone" : decrypt_string(self.phone),
-               "phone_carrier" : decrypt_string(self.phone_carrier),
+               "phone" : encryption.decrypt_string(self.phone),
+               "phone_carrier" : encryption.decrypt_string(self.phone_carrier),
                "online" : str(self.online),
                "email" : str(self.email),
-               "first_name" : decrypt_string(self.first_name),
-               "last_name" : decrypt_string(self.last_name),
+               "first_name" : encryption.decrypt_string(self.first_name),
+               "last_name" : encryption.decrypt_string(self.last_name),
                "fulfiller_tasks" : self.serialize_fulfiller_tasks
             }
 
@@ -120,7 +118,7 @@ def create_account_table(db):
             return self.id
 
         def verify_password(self, password):
-            return password == decrypt_string(self.password)
+            return password == encryption.decrypt_string(self.password)
 
 def dump_datetime(value):
     # Deserialize datetime object into string form for JSON processing.
@@ -185,12 +183,12 @@ def create_task_table(db):
                 "requestor_id" : self.requestor_id,
                 "requestor_score" : score,
                 "requestor_email": self.serialize_requestor_email,
-                "latitude" : decrypt_string(self.latitude),
-                "longitude" : decrypt_string(self.longitude),
-                "delivery_location" : decrypt_string(self.delivery_location),
-                "short_title" : decrypt_string(self.short_title),
-                "long_title" : decrypt_string(self.long_title),
-                "bid" : "$%(bid).2f" % {"bid": float(decrypt_string(self.bid))},
+                "latitude" : encryption.decrypt_string(self.latitude),
+                "longitude" : encryption.decrypt_string(self.longitude),
+                "delivery_location" : encryption.decrypt_string(self.delivery_location),
+                "short_title" : encryption.decrypt_string(self.short_title),
+                "long_title" : encryption.decrypt_string(self.long_title),
+                "bid" : "$%(bid).2f" % {"bid": float(encryption.decrypt_string(self.bid))},
                 "expiration_datetime" : dump_datetime(self.expiration_datetime),
                 "status" : self.status,
                 "fulfiller_accounts" : self.serialize_fulfiller_accounts,
@@ -203,7 +201,7 @@ def create_task_table(db):
         
         @property
         def serialize_requestor_email(self):
-            return decrypt_string(Account.query.get(self.requestor_id).email)
+            return encryption.decrypt_string(Account.query.get(self.requestor_id).email)
 
 def create_feedback_table(db):
     global Feedback
@@ -221,8 +219,6 @@ def create_tables(app, db):
     token_serializer = Serializer(app.config["SECRET_KEY"])
     global token_duration
     token_duration = app.config["REMEMBER_COOKIE_DURATION"].total_seconds()
-    global encrypter
-    encrypter = AES.new(app.config["SECRET_KEY"])
 
     create_schema_version_table(db)
     create_account_task_join_table(db)
@@ -231,41 +227,64 @@ def create_tables(app, db):
     create_feedback_table(db)
 
 
-def pad_string(raw):
-    return raw + (16 - (len(raw)%16)) * ' '
 
-def encrypt_string(plain):
-    #add characters until the string has a length multiple of 16
-    return plain
-#    return b64encode(encrypter.encrypt(pad_string(plain)))
+def create_fulfiller_object(task):
+    task_decrypted = encryption.decrypt_object(task)
+    task_id = task.id
+    requester_id = task.requestor_id
+    requester = schema.Account.query.get(requester_id)
+    requester_decrypted = encryption.decrypt_object(requester)
+    requester_email = requester_decrypted["email"]
+    requester_phone = requester_decrypted["phone"]
 
-def decrypt_string(enc):
-    #remove spaces from end of string
-    return enc
-#    try:
-#        return encrypter.decrypt(b64decode(enc)).rstrip()
-#    except:
-#        return enc
+    expiration_date = schema.dump_datetime(task.expiration_datetime)
+    bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
+    return {
+        "object_type": "fulfiller",
+        "task_id": task.id,
+        "other_email": requester_email,
+        "other_phone": requester_phone,
+        "expiration_date": expiration_date,
+        "bid": bid,
+        "lat": task_decrypted["latitude"],
+        "lon": task_decrypted["longitude"],
+        "delivery_location": task_decrypted["delivery_location"],
+        "title": task_decrypted["short_title"],
+        "description": task_decrypted["long_title"],
+        "status": task.status,
+    }
 
+def create_requester_object(task):
+    task_decrypted = encryption.decrypt_object(task)
+    task_id = task.id
+    fulfiller_email = None
+    fulfiller_phone = None
+    fulfiller_has_venmo = "false"
 
-def encrypt_dictionary(plaintext):
-    keys = plaintext.keys()
-    encrypted = {}
-    for k in keys:
-        if isinstance(plaintext[k], basestring):
-            encrypted[k] = encrypt_string(plaintext[k])
-        elif isinstance(plaintext[k], float):
-            encrypted[k] = encrypt_string(str(plaintext[k]))
-    return encrypted
-
-def decrypt_object(encrypted):
-    keys = [key for key in dir(encrypted) if not key.startswith('__')]
-    plaintext = {}
-    for k in keys:
-        try:
-            value = getattr(encrypted, k)
-            if isinstance(value, basestring):
-                plaintext[k] = decrypt_string(value)
-        except:
-            pass
-    return plaintext
+    if (task.status == "in_progress" or task.status == "completed"):
+        #I am not sure if this is correct...
+        fulfiller_id = task.fulfiller_accounts[0].id
+        fulfiller = schema.Account.query.get(fulfiller_id)
+        fulfiller_decrypted = encryption.decrypt_object(fulfiller)
+        fulfiller_email = fulfiller_decrypted["email"]
+        fulfiller_phone = fulfiller_decrypted["phone"]
+        fulfiller_has_venmo = venmo.can_use_venmo(task.id)
+    
+    expiration_date = schema.dump_datetime(task.expiration_datetime)
+    bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
+    return {
+        "object_type": "requester",
+        "task_id": task.id,
+        "other_email": fulfiller_email,
+        "other_phone": fulfiller_phone,
+        "expiration_date": expiration_date,
+        "bid": bid,
+        "lat": task_decrypted["latitude"],
+        "lon": task_decrypted["longitude"],
+        "delivery_location": task_decrypted["delivery_location"],
+        "title": task_decrypted["short_title"],
+        "description": task_decrypted["long_title"],
+        "status": task.status,
+        "venmo_status": task.venmo_status,
+        "fulfiller_has_venmo": fulfiller_has_venmo
+    }

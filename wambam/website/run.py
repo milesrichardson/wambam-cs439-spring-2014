@@ -10,8 +10,10 @@ import hashlib
 
 from wambam import app
 import api
+import cool_word
 import schema
 import emails
+import wambam_user
 
 flask_pos = []
 
@@ -36,7 +38,7 @@ def hello_mobile():
 
 @app.route("/home")
 def home():
-    return render_template("index1.html", activated=api.is_user_activated())
+    return render_template("index1.html", activated=wambam_user.is_user_activated())
 
 @app.route("/working")
 def working():
@@ -106,9 +108,9 @@ def execute():
 
 @app.route("/confirm")
 def confirm():
-    cool_word = api.get_cool_word()
+    word = cool_word.get_cool_word()
     return render_template("confirmation.html",
-                            cool_word = cool_word)
+                            cool_word = word)
 @app.route("/tasklist")
 def tasklist():
     return render_template('tasklist.html')

@@ -1,9 +1,12 @@
 import schema
 import flask.ext.login
+from flask.ext.login import current_user
 import sqlalchemy
 import phonenumbers
 import time
-from flask import render_template
+from flask import render_template, session
+
+import encryption
 
 login_manager = None
 db = None
@@ -45,8 +48,8 @@ def create_login_manager(app, db):
                 except:
                     return render_template("login.html", error_msg="Invalid email or phone number")
 
-            username = schema.encrypt_string(username)
-            password = schema.encrypt_string(password)
+            username = encryption.encrypt_string(username)
+            password = encryption.encrypt_string(password)
 
             user = schema.Account.query.filter(sqlalchemy.or_(schema.Account.email==username, schema.Account.phone==username)).filter_by(password=password).first()
                     
@@ -80,3 +83,9 @@ def create_login_manager(app, db):
 
     login_manager.login_view = "/login"
     return login_manager
+
+
+def is_session_valid():
+    if current_user.last_request == 0 or "request_time" not in session or session["request_time"] + 36000000 < current_user.last_request:
+        return False
+    return True
