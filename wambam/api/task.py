@@ -1,19 +1,17 @@
-import datetime
-import time
-import json
-
 import flask
 from flask import session, request, redirect, url_for, render_template
 from flask.ext import sqlalchemy, restless, login as flask_login
 from flask_login import current_user
 from sqlalchemy import create_engine, select, event
 
+import datetime
+import time
+import json
 import phonenumbers
 
 import schema
 import emails
 import encryption
-
 import cool_word
 
 db = None
@@ -34,17 +32,17 @@ def setup_task_endpoints(app, database, eng):
     #returns json with all of the tasks that have not been assigned
     @app.route("/get_all_active_tasks")
     def get_all_active_tasks():
-        return flask.jsonify(items=[i.serialize for i in schema.Task.query.filter_by(status="unassigned").all()])
+        return flask.jsonify(items=[i.serialize for i in 
+                                    schema.Task.query.filter_by(status="unassigned").all()])
 
+    #returns json with all of the tasks that have not been assigned
     @app.route("/get_all_claimed_tasks")
     def get_all_claimed_tasks():
-        #I don't think this works, but it's never used
-        conn = engine.connect()
-        query = select([schema.account_task])
-        results = conn.execute(query)
-        
-        return flask.jsonify(items=[dict(i) for i in results])
+        return flask.jsonify(items=[i.serialize for i in 
+                                    schema.Task.query.filter_by(status="in_progress").filter_by(
+                                        status="completed").all()])
 
+    #Establish endpoints
     @app.route("/viewtaskjson/<int:taskid>") 
     def view_task_json(taskid):
         task = schema.Task.query.get(taskid)
@@ -74,13 +72,16 @@ def setup_task_endpoints(app, database, eng):
     def claim_endpoint():
         return claim()
 
-
+#Returns decrypted task object in json.
 def view_task_details(taskid):
     task = schema.Task.query.get(taskid)
     task_decrypted = encryption.decrypt_object(task)
+
+    #If user tries to request task that does not exist, then they are rerouted to home page.
     if (task is None):
         return redirect("/home")
     else:
+        #If the task is no longer available to be claimed, redirect user to concillatory page.
         if (task.status != "unassigned"):
           return redirect("/sorry")
 
@@ -103,11 +104,11 @@ def view_task_details(taskid):
 def cancel_task(task_id):
     task = schema.Task.query.get(task_id)
 
+    #Someone other than task creator is trying to cancel the task!
     if task.requestor_id is not current_user.id:
-        #this isn't your task
         return redirect("/")
 
-    # Only cancel the task if it is still in_progress
+    #Only cancel the task if it is still in_progress
     if (task.status == "unassigned"):
         task.status = "canceled"
 
@@ -119,27 +120,30 @@ def cancel_task(task_id):
     else: 
         returnObject = schema.create_fulfiller_object(task)    
 
+    #Return updated entry for task history page that will be loaded asyncronously on the page.
     return render_template("accordion_entry.html", task=returnObject)
 
+#Mark task as complete
 def finish_task(task_id):
     task = schema.Task.query.get(task_id)
-    # mark task "done" when both people say it's done
     task.status = 'completed'
     db.session.add(task)
     db.session.commit()
     return ""
 
+#Submit a new task
 def submit():
-    title = request.form["title"]
+    #Redirect user to home page if they did not specify a location that task is to occur at.
     if not ("lat" in session) or not ("lng" in session):
-        return redirect(url_for("working"))
+        return redirect(url_for("home"))
 
+    title = request.form["title"]
     bid = request.form["bid"]
     bid = bid.replace("$","");
     expiration = request.form["expiration"]
 
-    # format for timedelta is (days, seconds, microseconds, 
-    # milliseconds, minutes, hours, weeks)
+    #format for timedelta is (days, seconds, microseconds, 
+    #milliseconds, minutes, hours, weeks)
     expirationdate = datetime.datetime.now()
     if (expiration == "30min"):
         expirationdate += datetime.timedelta(0,0,0,0,30)
@@ -150,14 +154,15 @@ def submit():
     elif (expiration == "1wk"):
         expirationdate += datetime.timedelta(0,0,0,0,0,0,1)
 
-    # Get requestor id 
     requestor_id = int(current_user.get_id())
-    
+
+    #Encrypt user data    
     encrypted = encryption.encrypt_dictionary(request.form)
     lat_encrypted = encryption.encrypt_string(session["lat"])
     lng_encrypted = encryption.encrypt_string(session["lng"])
     bid_encrypted = encryption.encrypt_string(bid)
 
+    #Create task object
     task = schema.Task(
         requestor_id=requestor_id,
         latitude = lat_encrypted,
@@ -185,18 +190,16 @@ def submit():
     phone_carrier = encryption.decrypt_string(current_user.phone_carrier)
     text_recipient = map(getTextRecipient, [phone_number], [phone_carrier])
 
-
-
-    # Construct message for requester
+    # Construct confirmation message for requester
     msg_subject = "Order Submitted"
-    msg_body = "Your task request for '" + title + " has been placed! We'll text you when someone claims your task."
+    msg_body = "Your task request for '" + title + \
+               "' has been placed! We'll text you when someone claims your task."
 
-    # Mail message to requester asynchronously
+    # Send text message to requester asynchronously
     if request.referrer and request.referrer != '/test':
         emails.send_email(msg_subject, text_recipient, msg_body, msg_body)
 
     # Send alert text to all online fulfillers 
-    # Probably want to do this asynchronously eventually
     fulfillers = schema.Account.query.filter(schema.Account.online == True).all()
     def getPhone(fulfiller):
         return encryption.decrypt_string(fulfiller.phone)
@@ -215,9 +218,11 @@ def submit():
 
     # Construct message for potential fulfillers
     msg_subject = "New Task Alert"
-    msg_body = first_name + " " + last_name + " has created a task for '" + title + "'. Click the following link for more details: http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + " ."
+    msg_body = first_name + " " + last_name + " has created a task for '" + title + \
+              "'. Click the following link for more details: " + \
+              "http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + " ."
 
-    # Mail message to potential fulfillers
+    # Send text message to potential fulfillers
     if request.referrer and request.referrer != '/test':
         emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
 
@@ -225,11 +230,11 @@ def submit():
 
 
 def claim():
-  
-    #make task_num equal to the actual number of the task
+    #Get task that was claimed
     task_num = int(request.form["id"])
     task = schema.Task.query.get(task_num)
 
+    #Someone beat the potential fulfiller to the task!
     if (task.status != "unassigned"):
       return redirect("/sorry")
 
@@ -263,31 +268,33 @@ def claim():
     temp.status = "in_progress"
 
     # commit changes
-    # db.session.add(temp)
     db.session.commit()
 
-
-    # Send confirmation text to fulfiller
+    # Get information on fulfiller to send confirmation text.
     fulfiller_number = decrypted_fulfiller["phone"]
     fulfiller_carrier = decrypted_fulfiller["phone_carrier"]
     text_fulfiller = getTextRecipient(fulfiller_number, fulfiller_carrier)
 
     # Construct message to send to fulfiller
     msg_subject = "Task Claimed"
-    msg_body = "You have claimed the task '" + title + "'. Get in touch with " + decrypted_requestor["first_name"] + " " + decrypted_requestor["last_name"] + " at " + decrypted_requestor["phone"] + "."
+    msg_body = "You have claimed the task '" + title + "'. Get in touch with " + \
+               decrypted_requestor["first_name"] + " " + decrypted_requestor["last_name"] + \
+               " at " + decrypted_requestor["phone"] + "."
 
     # Send message to fulfiller
     if request.referrer and request.referrer != '/test':
         emails.send_email(msg_subject, [text_fulfiller], msg_body, msg_body)
 
-    # Send confirmation text to requestor
+    # Get information on requester to send confirmation text.
     requestor_number = decrypted_requestor["phone"]
     requestor_carrier = decrypted_requestor["phone_carrier"]
     text_requestor = getTextRecipient(requestor_number, requestor_carrier)
 
     # Construct message to send to requestor
     msg_subject = "Your task has been claimed!"
-    msg_body = decrypted_fulfiller["first_name"] + " " + decrypted_fulfiller["last_name"] + " has claimed your task '" + title + "'. You can get in touch with " + decrypted_fulfiller["first_name"] + " at " + decrypted_fulfiller["phone"] + "."
+    msg_body = decrypted_fulfiller["first_name"] + " " + decrypted_fulfiller["last_name"] + \
+               " has claimed your task '" + title + "'. You can get in touch with " + \
+               decrypted_fulfiller["first_name"] + " at " + decrypted_fulfiller["phone"] + "."
 
     # Send confirmation message to requestor
     if request.referrer and request.referrer != '/test':
@@ -308,7 +315,10 @@ def claim():
                             desktop_client=request.cookies.get("mobile"))
 
 
+#Helper method to get email address associated with user's phone number.
+#We are using SMTP to SMS for our text messaging service because it's free :)
 def getTextRecipient(phone_number, phone_carrier):
+    #Cleanup the phone number
     emailaddress = phone_number
     emailaddress = emailaddress.replace(" ", "")
     emailaddress = emailaddress.replace("(", "")
@@ -329,7 +339,7 @@ def getTextRecipient(phone_number, phone_carrier):
         emailaddress += "@email.uscc.net"
     elif phone_carrier == "Virgin Mobile":
         emailaddress += "@vmobl.com"
-    else:                                  #else we assume Verizon Wireless
+    else:                                  #The only other option is Verizon Wireless
         emailaddress += "@vtext.com"
 
     return emailaddress

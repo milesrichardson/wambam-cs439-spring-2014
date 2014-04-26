@@ -63,11 +63,6 @@ def create_database(app):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///tmp/' + uuid.uuid1().hex + '.db'
         using_sqllite = True
 
-    
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://adit:@localhost/wambam'
-
-    # sqlite fallback if you don't have postgresql installed
-
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
     
     # get the database object
@@ -77,94 +72,23 @@ def create_database(app):
     #update the schema to the current version if necessary
     def initialize_database():
         print "Migrating database"
+
         #need to have a clean session before dropping tables
         db.session.commit()
         db.drop_all()
         db.create_all()
+
         # Add the version to the database
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
         db.session.commit()
 
-    # REMOVE THIS SOON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        user = schema.Account(
-            activated=True,
-            phone="7703629815",
-            phone_carrier="AT&T",
-            email="michael.hopkins@yale.edu",
-            password="blah",
-            online=True,
-            venmo_id="1020501350678528475",
-            first_name="Michael",
-            last_name="Hopkins")
-
-        user2 = schema.Account(
-            activated=True,
-            phone="2034420233",
-            phone_carrier="AT&T",
-            email="miles.richardson@yale.edu",
-            password="blah",
-            online=True,
-            venmo_id="1020501350678528478",
-            first_name="Miles",
-            last_name="Richardson")
-
-        task1 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3121,
-            longitude = -72.9277,
-            short_title="Claim task",
-            bid=float(5),
-            expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
-            long_title="This is a task that will be claimed",
-            delivery_location="Saybrook",
-            status="unassigned")
-
-        task2 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3121,
-            longitude = -72.9277,
-            short_title="Title 2",
-            bid=float(5),
-            expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
-            long_title="This is description 2",
-            delivery_location="Saybrook",
-            status="unassigned")
-
-        task3 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3101,
-            longitude = -72.9257,
-            short_title="Title 3",
-            bid=float(10),
-            expiration_datetime=datetime.datetime.now(),
-            long_title="This is description 3",
-            delivery_location="There",
-            status="canceled")
-
-        task4 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3131,
-            longitude = -72.9287,
-            short_title="Title 4",
-            bid=float(15),
-            expiration_datetime=datetime.datetime.now(),
-            long_title="This is description 4",
-            delivery_location="Here",
-            status="expired")
-
-        db.session.add(user)
-        db.session.add(user2)
-        db.session.commit()
-        db.session.add(task1)
-        db.session.add(task2)
-        db.session.add(task3) 
-        db.session.add(task4) 
-        db.session.commit()
         print "Done Migrating"
 
     try:
-        if using_sqllite or schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+        if using_sqllite or \
+           schema.SchemaVersion.query.first().version is not schema.current_schema_version:
+           
             initialize_database()
     except:
         initialize_database()
@@ -173,53 +97,6 @@ def create_database(app):
     register_events()
 
     return db
-
-
-"""
-        task1 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3111,
-            longitude = -72.9267,
-            short_title="Title 1",
-            bid=float(1),
-            expiration_datetime=datetime.datetime.now(),
-            long_title="This is description 1",
-            delivery_location="CEID",
-            status="in_progress")
-
-        task2 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3121,
-            longitude = -72.9277,
-            short_title="Title 2",
-            bid=float(5),
-            expiration_datetime=datetime.datetime.now(),
-            long_title="This is description 2",
-            delivery_location="Saybrook",
-            status="unassigned")
-
-        task3 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3101,
-            longitude = -72.9257,
-            short_title="Title 3",
-            bid=float(10),
-            expiration_datetime=datetime.datetime.now(),
-            long_title="This is description 3",
-            delivery_location="There",
-            status="completed")
-
-        task4 = schema.Task(
-            requestor_id=1,
-            latitude = 41.3131,
-            longitude = -72.9287,
-            short_title="Title 4",
-            bid=float(15),
-            expiration_datetime=datetime.datetime.now(),
-            long_title="This is description 4",
-            delivery_location="Here",
-            status="expired")
-"""
 
 def create_api(app, db):
     # Create the Flask-Restless API manager.
@@ -267,15 +144,20 @@ def before_request():
                 session["pre_login_url"] = request.path
             return redirect("/")
 
-        else: #session is valid
+        #session is valid
+        else:
             #update their token
             current_user.last_request = int(time.time())
             session["request_time"] = current_user.last_request
             db.session.commit()
             
             #if they"re not activated dont let them go anywhere
-            if not current_user.activated and \
-               not (request.path == "/home" or request.path == "/logout" or request.path.endswith(".css") or request.path.endswith(".js")):
+            if not current_user.activated and    \
+               not (request.path == "/home" or   \
+               request.path == "/logout" or      \
+               request.path.endswith(".css") or  \
+               request.path.endswith(".js")):
+                
                 return redirect("/home")
                 
 app.config["SECRET_KEY"] = "I have a secret."
@@ -284,6 +166,7 @@ app.config["REMEMBER_COOKIE_DURATION"] = datetime.timedelta(days=14)
 db = create_database(app)
 api_manager = create_api(app,db)
 login_manager = login.create_login_manager(app, db)
+
 #encryption.setup_encyrption(app)
 venmo.setup_venmo_endpoints(app, db, engine)
 task.setup_task_endpoints(app, db, engine)

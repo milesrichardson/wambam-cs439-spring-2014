@@ -1,9 +1,19 @@
+String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
 
 jQuery.validator.addMethod("passwordmatch",
 			   function(value) {
 			       return value === $("#password").val();
 			   }, "Passwords don't match."
 			  );
+
+jQuery.validator.addMethod("yaleemail",
+			   function(value) {
+			       return value.endsWith("@yale.edu")
+			   }, "Must register with Yale email address."
+			  );
+
 jQuery.validator.addMethod("emailused",
 			   function(value) {
 			       var email_used = false;
@@ -57,7 +67,8 @@ $("#registerform").validate({
         email: {
             required: true,
             email: true,
-            emailused: true
+            emailused: true,
+            yaleemail: true
         },
         password: {
 
@@ -88,4 +99,4 @@ $("#registerform").validate({
 
 $.validator.messages.required = 'WamBam! needs this information!';
 $.validator.messages.phoneUS = 'Please specify a valid phone number';
-$.validator.messages.email = 'Please specify a valid email address';
+$.validator.messages.email = 'Please specify a valid Yale email address';

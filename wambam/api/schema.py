@@ -42,11 +42,13 @@ def create_account_task_join_table(db):
                          db.Column("status", db.Enum("active", "inactive", name="status_enum")),  
                          )
 
-
+#Table to manage WamBam! accounts. Sensitive information in the table is encrypted
+#The encrypted columns are noted in a list below.
 def create_account_table(db):
     global Account
     class Account(db.Model):
-        encrypted_columns = ["password", "email", "phone", "phone_carrier", "first_name", "last_name"]
+        encrypted_columns = ["password", "email", "phone",
+                             "phone_carrier", "first_name", "last_name"]
         id = db.Column(db.Integer, primary_key=True)
         activated = db.Column(db.Boolean)
         password = db.Column(db.String(360))                #encrypted
@@ -64,6 +66,7 @@ def create_account_table(db):
         fulfiller_tasks = db.relationship("Task", secondary=account_task,
                                           backref=db.backref("accounts", lazy="dynamic"))
 
+        #Serialize methods for sending data to the frontend.
         @property
         def serialize_id(self):
             return {
@@ -87,6 +90,7 @@ def create_account_table(db):
         def serialize_fulfiller_tasks(self):
             return [account.serialize_id for account in self.fulfiller_tasks]
         
+        #Methods to ensure that user is properly logged in.
         def get_auth_token(self):
             token = token_serializer.dumps([str(self.id), self.password])
             return token
@@ -101,7 +105,8 @@ def create_account_table(db):
                 return None
             user = Account.query.get(int(data[0]))
         
-            if user.verify_password(data[1]): # make sure the passwords match
+            #Make sure the passwords match
+            if user.verify_password(data[1]):
                 return user
             return None
 
@@ -120,14 +125,17 @@ def create_account_table(db):
         def verify_password(self, password):
             return password == encryption.decrypt_string(self.password)
 
+# Serialize datetime object into string form for JSON processing.
 def dump_datetime(value):
-    # Deserialize datetime object into string form for JSON processing.
     if value is None:
         return None
+    
+    #Ensure time zone is calculated as EST
     currentTime = datetime.datetime.now()
     delta = value - currentTime
     eastern = timezone("US/Eastern")
     valueEST = (datetime.datetime.now(pytz.utc) + delta).astimezone(eastern)
+
     # days will be negative if expiration date is in past
     if ((value - currentTime).days < 0):
         return "Passed"
@@ -138,10 +146,13 @@ def dump_datetime(value):
     
     return valueEST.strftime("%B %d, %Y")
 
+#Table to manage WamBam! tasks. Sensitive information in the table is encrypted
+#The encrypted columns are noted in a list below.
 def create_task_table(db):
     global Task
     class Task(db.Model):
-        encrypted_columns = ["latitude", "longitude", "delivery_location", "short_title", "long_title", "bid"]
+        encrypted_columns = ["latitude", "longitude", "delivery_location",
+                             "short_title", "long_title", "bid"]
         id = db.Column(db.Integer, primary_key=True)
         requestor_id = db.Column(db.Integer, db.ForeignKey("account.id"))
         latitude = db.Column(db.String())                  #encrypted
@@ -154,13 +165,12 @@ def create_task_table(db):
         status = db.Column(db.Enum("unassigned", "in_progress", "canceled",
                                    "completed", "expired",
                                    name="task_status_types"))
-        
         fulfiller_accounts = db.relationship("Account", secondary=account_task,
                                             backref=db.backref("tasks", lazy="dynamic"))
         venmo_status = db.Column(db.Enum("paid", "unpaid",\
                                  name="venmo_status"), default="unpaid")
 
-
+        #Serialize methods for sending data to the frontend.
         @property
         def serialize_id(self):
             return {
@@ -169,11 +179,13 @@ def create_task_table(db):
 
         @property
         def serialize(self):
-            # calculate score to serialize
+            # Calculate WamBam! score (c) of requester for a task to serialize
             num_tasks = len(Feedback.query.filter_by(account_id = self.requestor_id).all())
-            num_positive = len(Feedback.query.filter_by(account_id = self.requestor_id, rating = "positive").all())
+            num_positive = len(Feedback.query.filter_by(account_id = 
+                                             self.requestor_id, rating = "positive").all())
             if num_tasks == 0:
-                score = Account.query.get(self.requestor_id).first_name + " doesn't have any feedback yet!"
+                score = Account.query.get(self.requestor_id).first_name + \
+                                          " doesn't have any feedback yet!"
             else:
                 score = str(int(num_positive * 100 / num_tasks)) + "%"
 
@@ -203,6 +215,7 @@ def create_task_table(db):
         def serialize_requestor_email(self):
             return encryption.decrypt_string(Account.query.get(self.requestor_id).email)
 
+#Feedback table contains information on how fulfiller rates requester in transactions.
 def create_feedback_table(db):
     global Feedback
     class Feedback(db.Model):
@@ -212,7 +225,6 @@ def create_feedback_table(db):
         role = db.Column(db.Enum("fulfiller", "requestor", name="feedback_role"))
         rating = db.Column(db.Enum("positive", "negative",\
                            name="feedback_ratings"), nullable=True)
-
 
 def create_tables(app, db):
     global token_serializer
@@ -226,9 +238,10 @@ def create_tables(app, db):
     create_task_table(db)
     create_feedback_table(db)
 
-
-
+#Method used to gather all information needed for a particular task in the get_fulfiller_tasks
+#endpoint.
 def create_fulfiller_object(task):
+    #For encrypted values of a task, must use task_decrypted.
     task_decrypted = encryption.decrypt_object(task)
     task_id = task.id
     requester_id = task.requestor_id
@@ -254,7 +267,10 @@ def create_fulfiller_object(task):
         "status": task.status,
     }
 
+#Method used to gather all information needed for a particular task in the get_requester_tasks
+#endpoint.
 def create_requester_object(task):
+    #For encrypted values of a task, must use task_decrypted.
     task_decrypted = encryption.decrypt_object(task)
     task_id = task.id
     fulfiller_email = None
@@ -262,7 +278,6 @@ def create_requester_object(task):
     fulfiller_has_venmo = "false"
 
     if (task.status == "in_progress" or task.status == "completed"):
-        #I am not sure if this is correct...
         fulfiller_id = task.fulfiller_accounts[0].id
         fulfiller = Account.query.get(fulfiller_id)
         fulfiller_decrypted = encryption.decrypt_object(fulfiller)
