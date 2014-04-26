@@ -12,6 +12,8 @@ if postgres is not None:
 
 
 import unittest
+import schema
+import datetime
 
 import ast
 port = int(os.environ.get('PORT', 5000))
@@ -22,6 +24,7 @@ class TestWambam(unittest.TestCase):
     def setUp(self):
         self.app = app
         self.app_client = app.test_client()
+
 
         #There are 4 tasks in the DB initially. 
         #Two are unclaimed. AddClaimTask is the first test which will
@@ -234,20 +237,100 @@ class TestWambam(unittest.TestCase):
         task = ast.literal_eval(result.data)
         self.assertEqual(expected, task)
 
-"""
     def testViewTaskDetails(self):
         self.login()
         result = self.app_client.get('/viewtaskdetails/2')
-        print result.data
-        """
+        #finish it
+
+def addBaseTasks():
+
+    task1 = schema.Task(
+        requestor_id=1,
+        latitude = 41.3121,
+        longitude = -72.9277,
+        short_title="Claim task",
+        bid=float(5),
+        expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
+        long_title="This is a task that will be claimed",
+        delivery_location="Saybrook",
+        status="unassigned")
+
+    task2 = schema.Task(
+        requestor_id=1,
+        latitude = 41.3121,
+        longitude = -72.9277,
+        short_title="Title 2",
+        bid=float(5),
+        expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
+        long_title="This is description 2",
+        delivery_location="Saybrook",
+        status="unassigned")
+
+    task3 = schema.Task(
+        requestor_id=1,
+        latitude = 41.3101,
+        longitude = -72.9257,
+        short_title="Title 3",
+        bid=float(10),
+        expiration_datetime=datetime.datetime.now(),
+        long_title="This is description 3",
+        delivery_location="There",
+        status="canceled")
+
+    task4 = schema.Task(
+        requestor_id=1,
+        latitude = 41.3131,
+        longitude = -72.9287,
+        short_title="Title 4",
+        bid=float(15),
+        expiration_datetime=datetime.datetime.now(),
+        long_title="This is description 4",
+        delivery_location="Here",
+        status="expired")
+
+    app.db.session.add(task1) 
+    app.db.session.add(task2)
+    app.db.session.add(task3) 
+    app.db.session.add(task4) 
+    app.db.session.commit()
 
 
+def addBaseUsers():
 
-    ##TODO FEEDBACK TESTS (285 in api.py)
-    ##TODO MY VIEWTASKJSON/DETAILS TESTS (780ish in api.py)
-    ##TODO VENMO TESTS (850ish in api.py)
+    user = schema.Account(
+        activated=True,
+        phone="7703629815",
+        phone_carrier="AT&T",
+        email="michael.hopkins@yale.edu",
+        password="blah",
+        online=True,
+        venmo_id="1020501350678528475",
+        first_name="Michael",
+        last_name="Hopkins")
+
+    user2 = schema.Account(
+        activated=True,
+        phone="2034420233",
+        phone_carrier="AT&T",
+        email="miles.richardson@yale.edu",
+        password="blah",
+        online=True,
+        venmo_id="1020501350678528478",
+        first_name="Miles",
+        last_name="Richardson")
+
+    app.db.session.add(user)
+    app.db.session.add(user2)
+    app.db.session.commit()
+
+
+##TODO FEEDBACK TESTS (285 in api.py)
+##TODO MY VIEWTASKJSON/DETAILS TESTS (780ish in api.py)
+##TODO VENMO TESTS (850ish in api.py)
 
 
 if __name__ == "__main__":
+    addBaseUsers()
+    addBaseTasks()
     unittest.main()
 

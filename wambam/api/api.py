@@ -164,6 +164,7 @@ app.config["SECRET_KEY"] = "I have a secret."
 app.config["REMEMBER_COOKIE_DURATION"] = datetime.timedelta(days=14)
 
 db = create_database(app)
+app.db = db
 api_manager = create_api(app,db)
 login_manager = login.create_login_manager(app, db)
 
