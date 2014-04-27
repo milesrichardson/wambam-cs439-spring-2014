@@ -3,11 +3,15 @@ function setMapSize() {
     $("#map-canvas").height(mapHeight);
 }
 
-$(window).on('resize', function() { setMapSize(); });
+
 
 //create a map that will take up most of the screen
 var map;
-function initialize(center_lat, center_lng) {
+function initialize(center_lat, center_lng, resize) {
+    if (resize) {
+        $(window).on('resize', function() { setMapSize(); });
+    }
+
     var mapOptions = {
         zoom: 15,
         center: new google.maps.LatLng(center_lat, center_lng)
