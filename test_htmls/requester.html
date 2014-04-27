@@ -49,6 +49,11 @@
       <a href="my_requester_tasks">As Requester</a>
       <span> | </span>
       <a href="my_fulfiller_tasks">As Fulfiller</a>
+      
+      <div id="requestor_score">
+        Your Positive Feedback Percentage: 100%
+      </div>
+      
     </div>
 
     <div id="accordion">
@@ -99,7 +104,7 @@
           <label><b>Task Expiration:</b></label>
         </td>
         <td>
-          <label>Sunday 04:03 AM EDT</label>
+          <label>Sunday 03:34 AM EDT</label>
         </td>
       </tr>
       <tr>
@@ -169,7 +174,7 @@
           <label><b>Task Expiration:</b></label>
         </td>
         <td>
-          <label>10:33 PM EDT</label>
+          <label>10:04 PM EDT</label>
         </td>
       </tr>
       <tr>
@@ -188,6 +193,81 @@
         <td id="map_col" colspan="2">
           <br>
           <div class="map-canvas" id="map-canvas5"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>
+    
+        <!DOCTYPE html>
+
+    <!DOCTYPE html>
+<h3 class="closed_header">
+        Claim task
+</h3>
+
+    <!DOCTYPE html>
+<div id="d1" class="task_entry">
+  <p>
+    <table id="task_details">
+      
+      <tr>
+        <td>
+          <label><b>Phone number</b></label>
+        </td>
+        <td>
+          <label>7703629815</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Email</b></label>
+        </td>
+        <td>
+          <label>michael.hopkins@yale.edu</label>
+        </td>
+      </tr>
+      
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>Saybrook</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>$5.00</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>Sunday 03:34 AM EDT</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>This is a task that will be claimed</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas1"></div>
         </td>
       </tr>
     </table>
@@ -321,6 +401,10 @@
         </script>
       
         <script> 
+            addStuff(41.3121, -72.9277, "map-canvas1");
+        </script>
+      
+        <script> 
             addStuff(41.3101, -72.9257, "map-canvas3");
         </script>
       
@@ -328,6 +412,10 @@
             addStuff(41.3131, -72.9287, "map-canvas4");
         </script>
       
+
+    <form action="/home">
+      <input type="submit" id="returnhomebutton" value="Return Home"></input>
+    </form>
   </div>
 </body>
 </html>

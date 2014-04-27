@@ -83,7 +83,8 @@ def create_account_table(db):
                "email" : str(self.email),
                "first_name" : encryption.decrypt_string(self.first_name),
                "last_name" : encryption.decrypt_string(self.last_name),
-               "fulfiller_tasks" : self.serialize_fulfiller_tasks
+               "fulfiller_tasks" : self.serialize_fulfiller_tasks,
+               "venmo_token" : str(self.venmo_token)
             }
 
         @property

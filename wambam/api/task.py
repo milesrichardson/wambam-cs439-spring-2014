@@ -39,8 +39,7 @@ def setup_task_endpoints(app, database, eng):
     @app.route("/get_all_claimed_tasks")
     def get_all_claimed_tasks():
         return flask.jsonify(items=[i.serialize for i in 
-                                    schema.Task.query.filter_by(status="in_progress").filter_by(
-                                        status="completed").all()])
+                                    schema.Task.query.filter_by(status="in_progress").all()])
 
     #Establish endpoints
     @app.route("/viewtaskjson/<int:taskid>") 
@@ -94,10 +93,10 @@ def view_task_details(taskid):
                                 lon = task_decrypted["longitude"],
                                 title = task_decrypted["short_title"],
                                 location = task_decrypted["delivery_location"],
-                                bid = "$%(bid).2f" % {"bid": task_decrypted["bid"]},
+                                bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])},
                                 expiration = schema.dump_datetime(task.expiration_datetime),
                                 description = task_decrypted["long_title"],
-                                email = fulfiller.email)
+                                email = email)
 
 
 
@@ -115,7 +114,7 @@ def cancel_task(task_id):
     db.session.add(task)
     db.session.commit()
 
-    if "requester" in request.referrer:
+    if request.referrer and "requester" in request.referrer:
         returnObject = schema.create_requester_object(task)
     else: 
         returnObject = schema.create_fulfiller_object(task)    
