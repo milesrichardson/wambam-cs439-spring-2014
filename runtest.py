@@ -1,4 +1,8 @@
+import ast
+import datetime
 import os
+import re
+import unittest
 
 postgres = None
 if "DATABASE_URL" in os.environ:
@@ -11,11 +15,7 @@ if postgres is not None:
     os.environ["DATABASE_URL"] = postgres
 
 
-import unittest
 import schema
-import datetime
-
-import ast
 port = int(os.environ.get('PORT', 5000))
 
 
@@ -187,38 +187,38 @@ class TestWambam(unittest.TestCase):
         self.assertEqual('{\n  "online": true\n}', result.data)
 
     #TODO: FINISH AFTER REFACTORING 
-    """
     def testMyFulfillerTasks(self):
         self.login()
         result = self.app_client.get('/my_fulfiller_tasks')
 
-        print result.data
+        #Check if the string uses a time zone
+        time_regex = re.compile(".*[0-9]+:[0-9]+ (AM|PM) EDT</label>")
+
         expected = open('./test_htmls/fulfiller.html', 'r')
         for line in result.data.split('\n'):
             test_line = expected.readline().strip()
-            if test_line == "<label>Sunday 03:50 AM EDT</label>":
+            if time_regex.match(test_line):
                 continue
-            self.assertEqual(test_line.strip(), line.strip())
+            self.assertEqual(test_line, line.strip())
 
         expected.close()
 
     def testMyRequesterTasks(self):
         self.login()
         result = self.app_client.get('/my_requester_tasks')
-        time_strings = ["<label>Sunday 04:03 AM EDT</label>",
-                        "<label>Sunday 10:33 PM EDT</label>",
-                        "<label>10:33 PM EDT</label>"]
+
+        #Check if the string uses a time zone
+        time_regex = re.compile(".*[0-9]+:[0-9]+ (AM|PM) EDT</label>")
                         
 
         expected = open('./test_htmls/requester.html', 'r')
         for line in result.data.split('\n'):
             test_line = expected.readline().strip()
-            if test_line in time_strings:
+            if time_regex.match(test_line):
                 continue
-            self.assertEqual(test_line.strip(), line.strip())
+            self.assertEqual(test_line, line.strip())
 
         expected.close()
-    """
 
     def testViewTaskJSON(self):
         self.login()
@@ -240,7 +240,18 @@ class TestWambam(unittest.TestCase):
     def testViewTaskDetails(self):
         self.login()
         result = self.app_client.get('/viewtaskdetails/2')
-        #finish it
+
+        #Check if the string uses a time zone
+        time_regex = re.compile(".*[0-9]+:[0-9]+ (AM|PM) EDT</label>")
+
+        expected = open('./test_htmls/taskdetails.html', 'r')
+        for line in result.data.split('\n'):
+            test_line = expected.readline().strip()
+            if time_regex.match(test_line):
+                continue
+            self.assertEqual(test_line, line.strip())
+
+        expected.close()
 
 def addBaseTasks():
 
