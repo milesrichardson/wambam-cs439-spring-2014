@@ -25,14 +25,13 @@ class TestWambam(unittest.TestCase):
         self.app = app
         self.app_client = app.test_client()
 
-
         #There are 4 tasks in the DB initially. 
         #Two are unclaimed. AddClaimTask is the first test which will
         #claim a task. AddSubmittedTask will create a new task, so
         #the num_tasks variable reflects these stats for the other tests
         self.num_tasks = {'all':5, 
                           'active':2,
-                          'claimed':1,
+                          'claimed':0,
                           'as_requestor':5,
                           'as_fulfiller':1}
         self.username = "michael.hopkins@yale.edu"
@@ -51,7 +50,21 @@ class TestWambam(unittest.TestCase):
             id=1), headers={'Referer': '/test'},
             follow_redirects=True)
 
-        #This'll be tested in claim task later
+    #This tests AddClaimTask as well
+    def testAddFeedback(self):
+        self.login()
+        result = self.app_client.post('/add_feedback/1/positive', headers={'Referer': '/test'})
+
+        time_regex = re.compile(".*[0-9]+:[0-9]+ (AM|PM) EDT</label>")
+
+        expected = open('./test_htmls/feedback.html', 'r')
+        for line in result.data.split('\n'):
+            test_line = expected.readline().strip()
+            if time_regex.match(test_line):
+                continue
+            self.assertEqual(test_line, line.strip())
+
+        expected.close()
 
     #Forced to happen first
     def testAddSubmitTask(self):
@@ -210,7 +223,6 @@ class TestWambam(unittest.TestCase):
         #Check if the string uses a time zone
         time_regex = re.compile(".*[0-9]+:[0-9]+ (AM|PM) EDT</label>")
                         
-
         expected = open('./test_htmls/requester.html', 'r')
         for line in result.data.split('\n'):
             test_line = expected.readline().strip()
@@ -252,6 +264,7 @@ class TestWambam(unittest.TestCase):
             self.assertEqual(test_line, line.strip())
 
         expected.close()
+
 
 def addBaseTasks():
 
@@ -335,9 +348,6 @@ def addBaseUsers():
     app.db.session.commit()
 
 
-##TODO FEEDBACK TESTS (285 in api.py)
-##TODO MY VIEWTASKJSON/DETAILS TESTS (780ish in api.py)
-##TODO VENMO TESTS (850ish in api.py)
 
 
 if __name__ == "__main__":

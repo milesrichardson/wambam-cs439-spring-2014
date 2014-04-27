@@ -114,7 +114,7 @@ def cancel_task(task_id):
     db.session.add(task)
     db.session.commit()
 
-    if "requester" in request.referrer:
+    if request.referrer and "requester" in request.referrer:
         returnObject = schema.create_requester_object(task)
     else: 
         returnObject = schema.create_fulfiller_object(task)    
