@@ -265,6 +265,21 @@ class TestWambam(unittest.TestCase):
 
         expected.close()
 
+    #Note: Venmo payment left untested as that is mainly sending requests
+    #to the Venmo API
+    def testVenmoAuth(self):
+        self.login()
+        with self.app_client.session_transaction() as sess:
+            sess['post_venmo_url'] = '/my_requester_tasks'
+        result = self.app_client.get('/venmo_auth', query_string=dict(
+            access_token='abcdefgh1234567'), headers={'Referer': '/test'})
+
+        current_user = self.app_client.get('/get_user') 
+        user = ast.literal_eval(current_user.data)
+        self.assertTrue('venmo_token' in user)
+        self.assertEqual(user['venmo_token'], 'abcdefgh1234567')
+
+
 
 def addBaseTasks():
 

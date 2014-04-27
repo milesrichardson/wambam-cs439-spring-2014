@@ -40,6 +40,10 @@ def setup_venmo_endpoints(app, database, eng):
 #Get user's venmo access token after they complete transaction on Venmo.
 def get_venmo_token():
     token = request.args.get("access_token", None)
+    if "post_venmo_url" not in session:
+        print "Non-existent venmo URL in Session!"
+        return redirect("/my_requester_tasks")
+
     redirect_to = session["post_venmo_url"]
     del session["post_venmo_url"]
 
