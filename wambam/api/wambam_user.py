@@ -214,7 +214,7 @@ def get_task_from_account_task(account_task):
 
 #Get all entries with the current user as a fulfiller for 
 #the task history page for the current user.
-def  filler_tasks():
+def my_fulfiller_tasks():
     user_id = flask.ext.login.current_user.get_id()
 
     conn = engine.connect()
