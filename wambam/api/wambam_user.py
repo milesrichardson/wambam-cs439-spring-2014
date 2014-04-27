@@ -149,7 +149,7 @@ def tasks_for_fulfiller(fulfiller):
                                       schema.Account.id == fulfiller)).all()
     return flask.jsonify(items=[item.serialize for item in data])
 
-
+#turn on text messages for a user for new tasks
 def set_online():
     # Get current user
     user_id = int(current_user.get_id())
@@ -162,7 +162,7 @@ def set_online():
     db.session.commit()
     return ""
 
-
+#turn off text messages for a user for new tasks
 def set_offline():
     # Get current user
     user_id = int(current_user.get_id())
@@ -214,7 +214,7 @@ def get_task_from_account_task(account_task):
 
 #Get all entries with the current user as a fulfiller for 
 #the task history page for the current user.
-def my_fulfiller_tasks():
+def  filler_tasks():
     user_id = flask.ext.login.current_user.get_id()
 
     conn = engine.connect()
@@ -239,10 +239,13 @@ def my_fulfiller_tasks():
 def activate_user(verification_address):
     account = schema.Account.query.filter_by(email_hash=verification_address).first()
     if account is None:
+        #if theres no account, then you can't activate
         return None
     else:
+        #account has already been activated
         if account.activated:
             return False
+        #activate the account
         else:
             account.activated = True
             db.session.add(account)
@@ -260,6 +263,7 @@ def is_phone_used(phone):
     number_formatted = phonenumbers.format_number(number_object, phonenumbers.PhoneNumberFormat.NATIONAL)
     result = schema.Account.query.filter_by(phone=encryption.encrypt_string(number_formatted)).first() is not None
     return flask.jsonify(used=str(result))
+
 
 def is_user_activated():
     return current_user.activated

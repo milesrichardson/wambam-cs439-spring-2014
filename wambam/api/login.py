@@ -20,11 +20,14 @@ def create_login_manager(app, db):
 
     @login_manager.user_loader
     def load_user(userid):
+        #return a User object based on an id
         return schema.Account.query.get(int(userid))
 
     @login_manager.token_loader
     def load_token(token):
         try:
+            #return a user object based on an authentication token
+            #used with the "Remember Me" tokens
             user = schema.Account.verify_auth_token(token)
             return user
         except:
@@ -50,7 +53,7 @@ def create_login_manager(app, db):
                 try:
                     #Assume it is a phone number and try to parse.
                     number_object = phonenumbers.parse(username, "US")
-                    username = phonenumbers.format_number(number_object,
+                    username = phonenumbers.format_number(number_object, \
                                                           phonenumbers.PhoneNumberFormat.NATIONAL)
                 except:
                     #Parse failed. Not a valid phone number or email address.
@@ -73,6 +76,7 @@ def create_login_manager(app, db):
                 flask.ext.login.login_user(user, remember=True)
                 user.last_request = int(time.time())
                 flask.session["request_time"] = user.last_request
+                db.session.add(user)
                 db.session.commit()
 
                 #Redirect the user to a mobile task details page if they originally requested it
@@ -84,15 +88,19 @@ def create_login_manager(app, db):
 
                 return flask.redirect(next)
         else:
-            return flask.abort(401)
+            #tried to access the login page with a GET request, send to the login page
+            return flask.redirect("/")
 
     #Logout user and reroute user to login page.
     @app.route("/logout")
     def user_logout():
         user = flask.ext.login.current_user
         if not user.is_anonymous():
+            #reset the last request time
             user.last_request = 0
+            db.session.add(user)
             db.session.commit()
+        #clear all session variables
         flask.session.clear() 
         flask.ext.login.logout_user()
         return flask.redirect("/")
@@ -106,6 +114,9 @@ def is_session_valid():
     if current_user.last_request == 0 or \
       "request_time" not in session or \
        session["request_time"] + 36000000 < current_user.last_request:
-       
+        #this function could be used to ensure that the sesion token that is being passed with
+        #a request is as new as we'd expect it to be based on the user's last request
+        #however, this would have the side effect of only allowing the user to log in from one
+        #device at a time
         return False
     return True

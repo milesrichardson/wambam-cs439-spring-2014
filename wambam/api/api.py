@@ -60,6 +60,7 @@ def create_database(app):
     try:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
     except KeyError:
+        # if it not found, create a new sqlite database
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///tmp/' + uuid.uuid1().hex + '.db'
         using_sqllite = True
 
@@ -91,6 +92,8 @@ def create_database(app):
            
             initialize_database()
     except:
+        #exception caused by version table not being in the database, which means we are working
+        #with a clean postgres database
         initialize_database()
 
     # Register SQLAlchemy event hooks
@@ -114,6 +117,7 @@ def create_api(app, db):
 
 @app.before_request
 def before_request():
+    #exempt files are url's that do not require any authentication to access
     exempt_files = ["/check_email", "/check_phone", "/favicon.ico",
                     url_for("static", filename="login.css"), 
                     url_for("static", filename="login_mobile.css"),
@@ -124,11 +128,12 @@ def before_request():
         if request.path == f:
             return None
 
-    #trying to access the verification page
+    #trying to access an account activation page
     if request.path.startswith("/v/"):
         return None
 
-    #trying to access an unprotected page
+
+    #trying to access an page only accessible if you are not logged in
     if request.path == "/" or request.path == "/mobile" or \
         request.path == "/login" or request.path == "/register":  
 
@@ -140,6 +145,8 @@ def before_request():
     else:
         #user is not valid
         if current_user.is_anonymous() or not login.is_session_valid():
+            #we want to save the URL theyre trying to go to so we can
+            #redirect them there after they log in
             if request.path.startswith("/viewtaskdetails/"):
                 session["pre_login_url"] = request.path
             return redirect("/")
@@ -152,11 +159,11 @@ def before_request():
             db.session.commit()
             
             #if they"re not activated dont let them go anywhere
-            if not current_user.activated and    \
-               not (request.path == "/home" or   \
-               request.path == "/logout" or      \
-               request.path.endswith(".css") or  \
-               request.path.endswith(".js")):
+            if not current_user.activated and \
+               not (request.path == "/home" or \
+                request.path == "/logout" or \
+                request.path.endswith(".css") or  \
+                request.path.endswith(".js")):
                 
                 return redirect("/home")
                 

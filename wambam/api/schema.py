@@ -88,16 +88,22 @@ def create_account_table(db):
 
         @property
         def serialize_fulfiller_tasks(self):
+            #we don't want to end up in a recursion where a an account serializes its
+            #tasks which in turn serializes accounts associated with it so we just
+            #serialize the id here
             return [account.serialize_id for account in self.fulfiller_tasks]
         
         #Methods to ensure that user is properly logged in.
         def get_auth_token(self):
+            #return an encrypted token with the id and password hash
             token = token_serializer.dumps([str(self.id), self.password])
             return token
 
         @staticmethod
         def verify_auth_token(token):
             try:
+                #try to load the token, if there is an exception then it is invalid
+                #for some reason
                 data = token_serializer.loads(token, max_age=token_duration)
             except SignatureExpired:
                 return None
@@ -110,6 +116,7 @@ def create_account_table(db):
                 return user
             return None
 
+        #the implementation of the next 4 functions defines a logged in user
         def is_active(self):
             return True
 
