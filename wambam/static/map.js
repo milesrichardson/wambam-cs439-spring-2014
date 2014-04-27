@@ -5,11 +5,12 @@ function setMapSize() {
 
 $(window).on('resize', function() { setMapSize(); });
 
+//create a map that will take up most of the screen
 var map;
-function initialize() {
+function initialize(center_lat, center_lng) {
     var mapOptions = {
         zoom: 15,
-        center: new google.maps.LatLng(41.3111, -72.9267)
+        center: new google.maps.LatLng(center_lat, center_lng)
     };
 
     map = new google.maps.Map(document.getElementById('map-canvas'),
@@ -27,6 +28,8 @@ function initialize() {
     setMapSize();
 }
 
+//set up a listener that will put a marker at a click location
+//for the purpose of creating new tasks
 function setupMarkerListener() {
     var marker = null;
 
@@ -47,9 +50,23 @@ function setupMarkerListener() {
     });
 }
 
-function setupTaskMarkers() {
-    console.debug("hi");
 
+
+//sets up the markers for the working page
+function setupTaskMarkers() {
+    //defines a function that is used to insert the values for the task
+    //into a string.  The string contains the html to properly display
+    //the box that open when a task marker is clicked.
+    if (!String.prototype.format) {
+        String.prototype.format = function() {
+            var args = arguments;
+            return this.replace(/{(\d+)}/g, //replace a number 
+                                function(match, number) { 
+                                    //with an argument passed into the function else the placeholder used
+                                    return (typeof args[number] != 'undefined') ? args[number] : match;
+                                });
+        };
+    }
 
     var contentString = '<div id="info_window">'+
         '<h1> {0} ({1}) </h1>'+
@@ -81,7 +98,6 @@ function setupTaskMarkers() {
     
     $.get('get_all_active_tasks', function(data) {
         var activeTasks = data["items"];
-        console.debug(activeTasks.length);
         for (var i = 0; i < activeTasks.length; i++) {
             var title = activeTasks[i]["short_title"];
             var bid = activeTasks[i]["bid"];
@@ -96,7 +112,6 @@ function setupTaskMarkers() {
             var lng = parseFloat(activeTasks[i]["longitude"]);
             var myLatLng = new google.maps.LatLng(lat, lng);
             var info = contentString.format(title,bid,expiration,email, location, description, id, requestor_score);
-            console.debug(lat + " " + lng);
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,

@@ -212,18 +212,19 @@ def submit():
     text_fulfillers = map(getTextRecipient, fulfiller_phones, fulfiller_carriers)
 
     # Remove task requestor from list of potential fulfillers
-    if (text_fulfillers.count(text_recipient[0]) > 0):
+    if text_recipient[0] in text_fulfillers:
         text_fulfillers.remove(text_recipient[0])
+        
+    if len(text_fulfillers) > 0:
+        # Construct message for potential fulfillers
+        msg_subject = "New Task Alert"
+        msg_body = first_name + " " + last_name + " has created a task for '" + title + \
+                  "'. Click the following link for more details: " + \
+                  "http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + " ."
 
-    # Construct message for potential fulfillers
-    msg_subject = "New Task Alert"
-    msg_body = first_name + " " + last_name + " has created a task for '" + title + \
-              "'. Click the following link for more details: " + \
-              "http://wambam.herokuapp.com/viewtaskdetails/" + str(task.id) + " ."
-
-    # Send text message to potential fulfillers
-    if request.referrer and request.referrer != '/test':
-        emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
+        # Send text message to potential fulfillers
+        if request.referrer and request.referrer != '/test':
+            emails.send_email(msg_subject, text_fulfillers, msg_body, msg_body)
 
     return redirect("/confirm")
 

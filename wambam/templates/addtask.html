@@ -13,6 +13,9 @@
 
     <div id="addtaskdiv">
 
+    <!--  this is used so that in the desktop layout we can display all errors in a third column
+          while in the mobile layout we display the errors in the same column as the input
+          because the screen is narrower -->
     {% macro desktop_table_layout() -%}
       {% if desktop_client %}
         </td>

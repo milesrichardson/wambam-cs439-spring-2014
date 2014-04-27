@@ -4,51 +4,45 @@
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-  <style>
-#accordion .ui-accordion-header {  
-    background-color: white;  
-    margin: 0px;  
-}  
-  </style>
     <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='tasklist.css') }}">
     <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='tasklist_mobile.css') }}">
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
-  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
-  <script src="{{ url_for('static', filename='accordion.js') }}"></script>
-</head>
-<body>
-  {% include 'header.html' %}
-  <div id="contents">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+    <script src="{{ url_for('static', filename='accordion.js') }}"></script>
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <div id="contents">
 
-    <div id="page_title"> My Tasks </div>
-    <div id="tabs">
-      <a href="my_requester_tasks">As Requester</a>
-      <span> | </span>
-      <a href="my_fulfiller_tasks">As Fulfiller</a>
-      {% if requestor_score %}
-      <div id="requestor_score">
-        Your Positive Feedback Percentage: {{requestor_score}}
+      <div id="page_title"> My Tasks </div>
+      <div id="tabs">
+        <a href="my_requester_tasks">As Requester</a>
+        <span> | </span>
+        <a href="my_fulfiller_tasks">As Fulfiller</a>
+        {% if requestor_score %}
+        <div id="requestor_score">
+          Your Positive Feedback Percentage: {{requestor_score}}
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
-    </div>
 
-    <div id="accordion">
-      
-    {% for task in tasks %}
-        {% include 'accordion_entry.html' %}
-    {% endfor %}
-    </div>
+      <div id="accordion">
+        
       {% for task in tasks %}
-        <script> 
-            addStuff({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}");
-        </script>
+        {% include 'accordion_entry.html' %}
       {% endfor %}
+      </div>
+        {% for task in tasks %}
+          <script>
+            addStuff({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}");
+          </script>
+        {% endfor %}
 
-    <form action="/home">
-      <input type="submit" id="returnhomebutton" value="Return Home"></input>
-    </form>
-  </div>
-</body>
+      <form action="/home">
+        <input type="submit" id="returnhomebutton" value="Return Home"></input>
+      </form>
+    </div>
+  </body>
 </html>

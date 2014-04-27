@@ -25,8 +25,7 @@ $.ajax({
     contentType: 'application/json',
     async: false,
     success: function(data) {
-        console.debug(data["online"]);
-        setToggleWork(data["online"] == "true", false);
+        setToggleWork(data["online"], false);
     }
 });
 

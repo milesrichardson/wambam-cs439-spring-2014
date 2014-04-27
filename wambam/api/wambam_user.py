@@ -57,9 +57,7 @@ def setup_user_endpoints(app, database, eng):
     @app.route("/get_online")
     def get_online():
         #Get current user
-        user_id = int(current_user.get_id())
-        flask_user = schema.Account.query.get(user_id)
-        return flask.jsonify(online=flask_user.online);
+        return flask.jsonify(online=current_user.online);
 
     @app.route("/my_requester_tasks")
     def my_requester_tasks_endpoint():
@@ -151,12 +149,8 @@ def tasks_for_fulfiller(fulfiller):
 
 #turn on text messages for a user for new tasks
 def set_online():
-    # Get current user
-    user_id = int(current_user.get_id())
-    flask_user = schema.Account.query.get(user_id)
-
     # Set user to be online
-    flask_user.online = True;
+    current_user.online = True;
 
     # add and commit changes
     db.session.commit()
@@ -164,12 +158,8 @@ def set_online():
 
 #turn off text messages for a user for new tasks
 def set_offline():
-    # Get current user
-    user_id = int(current_user.get_id())
-    flask_user = schema.Account.query.get(user_id)
-
     # Set user to be offline
-    flask_user.online = False;
+    current_user.online = False;
 
     # add and commit changes
     db.session.commit()

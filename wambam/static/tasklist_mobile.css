@@ -22,6 +22,11 @@ body {
     width: 100%;
 }
 
+#accordion .ui-accordion-header {
+    background-color: white;  
+    margin: 0px;
+}
+
 #accordion .ui-accordion-header.open_header {  
     background: #90EE90;
     word-wrap: break-word;
