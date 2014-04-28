@@ -83,7 +83,6 @@ def create_database(app):
         version = schema.SchemaVersion(version=schema.current_schema_version)
         db.session.add(version)
         db.session.commit()
-
         print "Done Migrating"
 
     try:

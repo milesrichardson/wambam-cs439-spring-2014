@@ -167,7 +167,7 @@ $(function() {
                     }
                 })
             }
-            else if (form.attr("id") != "thumbs_down_form" and form.attr("id") != "thumbs_up_form") {                
+            else if (form.attr("id") != "thumbs_down_form" && form.attr("id") != "thumbs_up_form") {                
                 form.submit();
             }
         })
