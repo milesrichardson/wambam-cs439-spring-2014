@@ -202,7 +202,6 @@ class TestWambam(unittest.TestCase):
         result = self.app_client.get('/get_online')
         self.assertEqual('{\n  "online": true\n}', result.data)
 
-    #TODO: FINISH AFTER REFACTORING 
     def testMyFulfillerTasks(self):
         self.login()
         result = self.app_client.get('/my_fulfiller_tasks')
