@@ -24,9 +24,15 @@
 
       <div id="page_title"> My Tasks </div>
       <div id="tabs">
-        <a href="my_requester_tasks">As Requester</a>
-        <span> | </span>
-        <a href="my_fulfiller_tasks">As Fulfiller</a>
+        {% if is_requestor == True %}
+          <b><a href="my_requester_tasks">As Requester</a></b>
+          <span> | </span>
+          <a href="my_fulfiller_tasks">As Fulfiller</a>
+        {% else %}
+          <a href="my_requester_tasks">As Requester</a>
+          <span> | </span>
+          <b><a href="my_fulfiller_tasks">As Fulfiller</a></b>
+        {% endif %}
         {% if requestor_score %}
         <div id="requestor_score">
           Your Positive Feedback Percentage: {{requestor_score}}
@@ -37,14 +43,18 @@
       <div id="accordion">
         
       {% for task in tasks %}
-          {% include 'accordion_entry.html' %}
+        {% include 'accordion_entry.html' %}
       {% endfor %}
       </div>
         {% for task in tasks %}
-          <script> 
-              addStuff({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}");
+          <script>
+            addStuff({{task.lat}}, {{task.lon}}, "map-canvas{{task.task_id}}");
           </script>
         {% endfor %}
+     
+      <form action="/home">
+        <input type="submit" id="returnhomebutton" value="Return Home"></input>
+      </form>
     </div>
   </body>
 </html>

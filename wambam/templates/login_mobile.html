@@ -3,7 +3,7 @@
   <head>
     <script type="text/javascript">
       if (screen.width >= 700) {
-	document.location="login.html";
+        document.location="login.html";
       }
       document.cookie = "mobile=true;path=/";
     </script>
@@ -18,69 +18,69 @@
 
     <form action="/login" method="POST" id="loginform">
       <table>
-	<tr>
-	  <td>Email or Phone</td>
-	  <td><input id="userfield" type="text" name="userfield" maxlength="255"></td>
-	</tr>
-	<tr>
+        <tr>
+          <td>Email or Phone</td>
+          <td><input id="userfield" type="text" name="userfield" maxlength="255"></td>
+        </tr>
+        <tr>
           <td>Password</td>
           <td>
-            <input id="passwordfield" type="password" name="passwordfield" maxlength="255">
+          <input id="passwordfield" type="password" name="passwordfield" maxlength="255">
           </td>
-	</tr>
-	<tr>
+        </tr>
+        <tr>
           <td colspan=2>
-            <label id="error_login">{{error_msg}}</label>
+          <label id="error_login">{{error_msg}}</label>
           </td>
-	</tr>
-	<tr>
+        </tr>
+        <tr>
           <td colspan="2">
             <input id="loginbutton" type="submit" name="loginbutton" value="Log In">
             <input name="next" type="hidden" value="{{pre_login_url}}"/>
           </td>
-	</tr>
-      </table>
-    </form>
+        </tr>
+       </table>
+      </form>
 
-    <form id="registerform" action="/register" method="POST">
-      <table>
-	<tr>
-	  <td colspan="2"><h2>or new to Wambam!?</h2></td>
-	</tr>
-	
-	<tr>
-	  <td>
-	    <label for="firstname">First Name</label>
-	  </td>
-	  <td>
-	    <input type="text" name="firstname" maxlength="255">
-	    <div id="firstnameerror"> </div>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	    <label for="lastname">Last Name</label>
-	  </td>
-	  <td>
-	    <input type="text" name="lastname" maxlength="255">
-	    <div id="lastnameerror"> </div>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	    <label for="phone">Phone Number</label>
-	  </td>
-	  <td>
-	    <input type="text" name="phone">
-	    <div id="phoneerror"> </div>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	    <label for="phonecarrier">Phone Carrier</label>
-	  </td>
-	  <td>
-	    <select id="phonecarrier" name="phonecarrier" form="registerform">
+      <form id="registerform" action="/register" method="POST">
+       <table>
+        <tr>
+          <td colspan="2"><h2>or new to Wambam!?</h2></td>
+        </tr>
+        
+        <tr>
+          <td>
+            <label for="firstname">First Name</label>
+          </td>
+          <td>
+            <input type="text" name="firstname" maxlength="255">
+            <div id="firstnameerror"> </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="lastname">Last Name</label>
+          </td>
+          <td>
+            <input type="text" name="lastname" maxlength="255">
+            <div id="lastnameerror"> </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="phone">Phone Number</label>
+          </td>
+          <td>
+            <input type="text" name="phone">
+            <div id="phoneerror"> </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="phonecarrier">Phone Carrier</label>
+          </td>
+          <td>
+            <select id="phonecarrier" name="phonecarrier" form="registerform">
               <option selected="selected" value="AT&T">AT&T</option>
               <option value="Boost Mobile">Boost Mobile</option>
               <option value="MetroPCS">MetroPCS</option>
@@ -90,40 +90,40 @@
               <option value="Virgin Mobile">Virgin Mobile</option>
               <option value="Verizon Wireless">Verizon Wireless</option>
             </select>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	    <label for="email">Email Address</label>
-	  </td>
-	  <td>
-	    <input type="text" name="email" maxlength="254">
-	    <div id="emailerror"> </div>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	    <label for="password">Password</label>
-	  </td>
-	  <td>
-	    <input type="password" name="password" id="password" maxlength="255">
-	    <div id="passworderror"> </div>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	    <label for="passwordconfirm">Confirm Password</label>
-	  </td>
-	  <td>
-	    <input type="password" name="passwordconfirm" maxlength="255">
-	    <div id="passwordconfirmerror"> </div>
-	  </td>
-	</tr>
-	<tr>
-	  <td id="submitcol" colspan="2">
-	    <input type="submit" id="register" name="register" value="Register">
-	  </td>
-	</tr>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="email">Email Address</label>
+          </td>
+          <td>
+            <input type="text" name="email" maxlength="254">
+            <div id="emailerror"> </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="password">Password</label>
+          </td>
+          <td>
+            <input type="password" name="password" id="password" maxlength="255">
+            <div id="passworderror"> </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="passwordconfirm">Confirm Password</label>
+          </td>
+          <td>
+            <input type="password" name="passwordconfirm" maxlength="255">
+            <div id="passwordconfirmerror"> </div>
+          </td>
+        </tr>
+        <tr>
+          <td id="submitcol" colspan="2">
+            <input type="submit" id="register" name="register" value="Register">
+          </td>
+        </tr>
       </table>
     </form>
 

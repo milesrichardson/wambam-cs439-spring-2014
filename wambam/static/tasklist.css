@@ -27,6 +27,11 @@ body {
     margin: 0 auto;
 }
 
+#accordion .ui-accordion-header {
+    background-color: white;  
+    margin: 0px;
+}
+
 #accordion .ui-accordion-header.open_header {  
     background: #90EE90 !important;
     word-wrap: break-word;
@@ -70,6 +75,19 @@ body {
 
 #task_table {
     width: 100%;
+}
+
+#returnhomebutton { 
+    font-size:15px;
+    padding: 3px 10px;
+    color: white;
+    font-weight: bold;
+    background: #0F4D92;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+    display: block;
+    margin: 0 auto;
 }
 
 .in_progress_header #left_col {
@@ -133,7 +151,7 @@ body {
 }
 
 #task_details tr td {
-    text-align: right;
+    text-align: left;
 }
 
 .thumb {

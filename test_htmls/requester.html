@@ -4,22 +4,17 @@
     <title>WamBam!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-  <style>
-#accordion .ui-accordion-header {  
-    background-color: white;  
-    margin: 0px;  
-}  
-  </style>
     <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="/static/tasklist.css">
     <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="/static/tasklist_mobile.css">
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
-  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
-  <script src="/static/accordion.js"></script>
-</head>
-<body>
-  <!DOCTYPE html>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+    <script src="/static/accordion.js"></script>
+  </head>
+  <body>
+    <!DOCTYPE html>
+<!-- Heading found at the top of all screens when logged in -->
 <html>
   <head>
     <title>WamBam!</title>
@@ -42,21 +37,29 @@
     </div>
   </body>
 </html>
-  <div id="contents">
+    <div id="contents">
 
-    <div id="page_title"> My Tasks </div>
-    <div id="tabs">
-      <a href="my_requester_tasks">As Requester</a>
-      <span> | </span>
-      <a href="my_fulfiller_tasks">As Fulfiller</a>
-    </div>
+      <div id="page_title"> My Tasks </div>
+      <div id="tabs">
+        
+          <b><a href="my_requester_tasks">As Requester</a></b>
+          <span> | </span>
+          <a href="my_fulfiller_tasks">As Fulfiller</a>
+        
+        
+        <div id="requestor_score">
+          Your Positive Feedback Percentage: 100%
+        </div>
+        
+      </div>
 
-    <div id="accordion">
+      <div id="accordion">
+        
       
-    
         <!DOCTYPE html>
 
-    <!DOCTYPE html>
+    <!DOCTYPE html> 
+<!--  The header for a task that has not been claimed in the task history page -->
 <h3 class="open_header">
   <table id="task_table">
     <tr>
@@ -74,6 +77,8 @@
 </h3>
 
     <!DOCTYPE html>
+<!--  This file holds the content when an entry in the 
+      task history page is expanded -->
 <div id="d2" class="task_entry">
   <p>
     <table id="task_details">
@@ -99,7 +104,7 @@
           <label><b>Task Expiration:</b></label>
         </td>
         <td>
-          <label>Sunday 04:03 AM EDT</label>
+          <label>09:35 PM EDT</label>
         </td>
       </tr>
       <tr>
@@ -123,10 +128,11 @@
     </table>
   </p>
 </div>
-    
+      
         <!DOCTYPE html>
 
-    <!DOCTYPE html>
+    <!DOCTYPE html> 
+<!--  The header for a task that has not been claimed in the task history page -->
 <h3 class="open_header">
   <table id="task_table">
     <tr>
@@ -144,6 +150,8 @@
 </h3>
 
     <!DOCTYPE html>
+<!--  This file holds the content when an entry in the 
+      task history page is expanded -->
 <div id="d5" class="task_entry">
   <p>
     <table id="task_details">
@@ -169,7 +177,7 @@
           <label><b>Task Expiration:</b></label>
         </td>
         <td>
-          <label>10:33 PM EDT</label>
+          <label>04:05 PM EDT</label>
         </td>
       </tr>
       <tr>
@@ -193,15 +201,96 @@
     </table>
   </p>
 </div>
-    
+      
         <!DOCTYPE html>
 
-    <!DOCTYPE html>
+    <!DOCTYPE html> 
+<!--  The header for a task that has been completed in the task history page -->
 <h3 class="closed_header">
-        Title 3
+  Claim task
 </h3>
 
     <!DOCTYPE html>
+<!--  This file holds the content when an entry in the 
+      task history page is expanded -->
+<div id="d1" class="task_entry">
+  <p>
+    <table id="task_details">
+      
+      <tr>
+        <td>
+          <label><b>Phone number</b></label>
+        </td>
+        <td>
+          <label>7703629815</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Email</b></label>
+        </td>
+        <td>
+          <label>michael.hopkins@yale.edu</label>
+        </td>
+      </tr>
+      
+      <tr>
+        <td>
+          <label><b>Delivery Location:</b></label>
+        </td>
+        <td>
+          <label>Saybrook</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Bid Amount:</b></label>
+        </td>
+        <td>
+          <label>$5.00</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><b>Task Expiration:</b></label>
+        </td>
+        <td>
+          <label>09:35 PM EDT</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+          <label><b>Description:</b></label>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>This is a task that will be claimed</label>
+        </td>
+      </tr>
+      <tr>
+        <td id="map_col" colspan="2">
+          <br>
+          <div class="map-canvas" id="map-canvas1"></div>
+        </td>
+      </tr>
+    </table>
+  </p>
+</div>
+      
+        <!DOCTYPE html>
+
+    <!DOCTYPE html> 
+<!--  The header for a task that has been completed in the task history page -->
+<h3 class="closed_header">
+  Title 3
+</h3>
+
+    <!DOCTYPE html>
+<!--  This file holds the content when an entry in the 
+      task history page is expanded -->
 <div id="d3" class="task_entry">
   <p>
     <table id="task_details">
@@ -251,15 +340,18 @@
     </table>
   </p>
 </div>
-    
+      
         <!DOCTYPE html>
 
-    <!DOCTYPE html>
+    <!DOCTYPE html> 
+<!--  The header for a task that has been completed in the task history page -->
 <h3 class="closed_header">
-        Title 4
+  Title 4
 </h3>
 
     <!DOCTYPE html>
+<!--  This file holds the content when an entry in the 
+      task history page is expanded -->
 <div id="d4" class="task_entry">
   <p>
     <table id="task_details">
@@ -309,25 +401,33 @@
     </table>
   </p>
 </div>
-    
-    </div>
       
-        <script> 
+      </div>
+        
+          <script>
             addStuff(41.3121, -72.9277, "map-canvas2");
-        </script>
-      
-        <script> 
+          </script>
+        
+          <script>
             addStuff(41.3084304, -72.9284356, "map-canvas5");
-        </script>
-      
-        <script> 
+          </script>
+        
+          <script>
+            addStuff(41.3121, -72.9277, "map-canvas1");
+          </script>
+        
+          <script>
             addStuff(41.3101, -72.9257, "map-canvas3");
-        </script>
-      
-        <script> 
+          </script>
+        
+          <script>
             addStuff(41.3131, -72.9287, "map-canvas4");
-        </script>
-      
-  </div>
-</body>
+          </script>
+        
+
+      <form action="/home">
+        <input type="submit" id="returnhomebutton" value="Return Home"></input>
+      </form>
+    </div>
+  </body>
 </html>

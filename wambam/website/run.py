@@ -10,11 +10,14 @@ import hashlib
 
 from wambam import app
 import api
+import cool_word
 import schema
 import emails
+import wambam_user
 
 flask_pos = []
 
+#Route user to the login page if they are not logged in.
 @app.route("/")
 def hello():
     try:
@@ -22,9 +25,9 @@ def hello():
     except:
         pre_login_url = "/"
 
-
     return render_template("login.html", pre_login_url=pre_login_url)
 
+#Route user to the mobile login page if they are not logged in and on a mobile device
 @app.route("/mobile")
 def hello_mobile():
     try:
@@ -34,33 +37,38 @@ def hello_mobile():
 
     return render_template("login_mobile.html", pre_login_url=pre_login_url)
 
+#Page for creating tasks
 @app.route("/home")
 def home():
-    return render_template("index1.html", activated=api.is_user_activated())
+    return render_template("index1.html", activated=wambam_user.is_user_activated())
 
+#Page for fulfilling tasks
 @app.route("/working")
 def working():
     return render_template("working.html")
 
+#Actually perform login
 @app.route("/login", methods=["POST"])
 def login():
     user = request.form["userfield"]
     password = request.form["passwordfield"]
     return redirect(url_for("home"))
 
+#Determine if email address is unique
 @app.route("/check_email", methods=["POST"])
 def check_email():
     email = request.get_json()["email"]
-    return api.is_email_used(email)
+    return wambam_user.is_email_used(email)
 
+#Determine if phone number is unique
 @app.route("/check_phone", methods=["POST"])
 def check_phone():
     phone = request.get_json()["phone"]
-    return api.is_phone_used(phone)
+    return wambam_user.is_phone_used(phone)
 
+#Create a new user
 @app.route("/register", methods=["POST"])
 def register():
-
     user = {}
     user["phone"] = request.form["phone"]
     user["phone_carrier"] = request.form["phonecarrier"]
@@ -78,24 +86,31 @@ def register():
     subject = "Complete Your WamBam! Registration"
     recipients = [user["email"]]
 
-    body = "Welcome to WamBam!<br><br>You're almost good to go. Just follow this link to activate your account: http://wambam.herokuapp.com/v/"+ verification_address + "<br><br>Yours truly,<br>The WamBam! Team"
+    #Text version of email to send to activate account
+    body = "Welcome to WamBam!<br><br>You're almost good to go." + \
+           " Just follow this link to activate your account: http://wambam.herokuapp.com/v/"+ \
+            verification_address + "<br><br>Yours truly,<br>The WamBam! Team"
 
-    html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br> <div style='padding-left: 20px'>" +\
+    #HTML version
+    html = "<div style='background: #0F4D92; color: white; font-size:20px; padding-top: 10px;" + \
+           " padding-bottom: 10px; padding-left: 20px'> WamBam! </div><br>" + \
+           " <div style='padding-left: 20px'>" + \
            body + \
            "</div>"
 
     emails.send_email(subject, recipients, body, html)
 
-    app.logger.debug("Before adding user after registration")    
-    api.add_user(user)
+    wambam_user.add_user(user)
     return redirect("/login", code=307)
-      
+
+#First stage in creating a task.      
 @app.route("/addtask", methods=["POST"])
 def index():
     session["lat"] = request.form["lat"]
     session["lng"] = request.form["lng"]
     return redirect(url_for("construct"))
 
+#Finished second stage of creating a task
 @app.route("/constructtask")
 def construct():
     return render_template("addtask.html", desktop_client=request.cookies.get("mobile"))
@@ -104,53 +119,25 @@ def construct():
 def execute():
     return render_template("taskserver.html")
 
+#Confirmation page
 @app.route("/confirm")
 def confirm():
-    cool_word = api.get_cool_word()
+    word = cool_word.get_cool_word()
     return render_template("confirmation.html",
-                            cool_word = cool_word)
+                            cool_word = word)
 @app.route("/tasklist")
 def tasklist():
     return render_template('tasklist.html')
 
-def create_requester_object(task):
-    task_id = task.id
-    fulfiller_email = None
-    fulfiller_phone = None
-
-    if (task.status == "in_progress" or task.status == "completed"):
-        #I am not sure if this is correct...
-        fulfiller_id = task.fulfiller_accounts[0].id
-        fulfiller = schema.Account.query.get(fulfiller_id)
-        fulfiller_email = fulfiller.email
-        fulfiller_phone = fulfiller.phone
-    
-    expiration_date = schema.dump_datetime(task.expiration_datetime)
-    bid = "$%(bid).2f" % {"bid": task.bid}
-    app.logger.debug(task.status)
-    return {
-        'task_id' : task.id,
-        'other_email': fulfiller_email,
-        'other_phone': fulfiller_phone,
-        'expiration_date': expiration_date,
-        'bid': bid,
-        'lat': task.latitude,
-        'lon': task.longitude,
-        'delivery_location': task.delivery_location,
-        'title': task.short_title,
-        'description': task.long_title,
-        'status': task.status,
-        'venmo_status': task.venmo_status
-    }
-
-
+#Page to tell user task has already been claimed.
 @app.route("/sorry")
 def sorry():
     return render_template("alreadyclaimed.html")
 
+#Endpoint to activate an acocunt
 @app.route("/v/<verification_address>", methods=["GET"])
 def verify(verification_address):
-    result = api.activate_user(verification_address)
+    result = wambam_user.activate_user(verification_address)
     if result is None:
         return redirect("/home")
     if result:

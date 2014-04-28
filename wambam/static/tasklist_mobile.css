@@ -22,6 +22,11 @@ body {
     width: 100%;
 }
 
+#accordion .ui-accordion-header {
+    background-color: white;  
+    margin: 0px;
+}
+
 #accordion .ui-accordion-header.open_header {  
     background: #90EE90;
     word-wrap: break-word;
@@ -91,6 +96,19 @@ body {
 
 #task_details {
     width: 100%;
+}
+
+#returnhomebutton { 
+    font-size:15px;
+    padding: 3px 10px;
+    color: white;
+    font-weight: bold;
+    background: #0F4D92;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+    display: block;
+    margin: 0 auto;
 }
 
 #task_details tr td:first-child {
