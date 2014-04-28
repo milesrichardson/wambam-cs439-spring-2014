@@ -13,7 +13,7 @@
               {% if task.fulfiller_has_venmo == "true" %}
                 <div>
                   <form id="form{{task.task_id}}" action="/venmo_make_payment" method="POST">
-                    <input type="submit"  id="button" value="Pay with Venmo"></input>
+                    <input type="submit"  id="button" value="Pay with Venmo" disabled></input>
                     <input type="hidden"  name="task_id" id="task_id" value="{{task.task_id}}"></input>
                   </form>
                 </div>
@@ -26,7 +26,7 @@
           {% elif task.fulfiller_has_venmo == "false" %}
             <div>
               <form id="form{{task.task_id}}" action="/setup_venmo_id" method="POST">
-                <input type="submit"  id="button" value="Link your Venmo"></input>
+                <input type="submit"  id="button" value="Link your Venmo" disabled></input>
                 <input type="hidden"  name="task_id" id="task_id" value="{{task.task_id}}"></input>
               </form>
             </div>
