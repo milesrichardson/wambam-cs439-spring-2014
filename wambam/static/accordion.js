@@ -167,7 +167,7 @@ $(function() {
                     }
                 })
             }
-            else {                
+            else if (form.attr("id") != "thumbs_down_form" and form.attr("id") != "thumbs_up_form") {                
                 form.submit();
             }
         })

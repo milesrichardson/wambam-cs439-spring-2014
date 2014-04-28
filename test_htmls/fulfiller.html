@@ -6,14 +6,14 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="/static/tasklist.css">
     <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="/static/tasklist_mobile.css">
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
-  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
-  <script src="/static/accordion.js"></script>
-</head>
-<body>
-  <!DOCTYPE html>  
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
+    <script src="/static/accordion.js"></script>
+  </head>
+  <body>
+    <!DOCTYPE html>
 <!-- Heading found at the top of all screens when logged in -->
 <html>
   <head>
@@ -37,29 +37,31 @@
     </div>
   </body>
 </html>
-  <div id="contents">
+    <div id="contents">
 
-    <div id="page_title"> My Tasks </div>
-    <div id="tabs">
-      <a href="my_requester_tasks">As Requester</a>
-      <span> | </span>
-      <a href="my_fulfiller_tasks">As Fulfiller</a>
-      
-    </div>
+      <div id="page_title"> My Tasks </div>
+      <div id="tabs">
+        
+          <a href="my_requester_tasks">As Requester</a>
+          <span> | </span>
+          <b><a href="my_fulfiller_tasks">As Fulfiller</a></b>
+        
+        
+      </div>
 
-    <div id="accordion">
+      <div id="accordion">
+        
       
-    
         <!DOCTYPE html>
 
-    <!DOCTYPE html>
-    <!--  The header for a task that has been completed in the task history page -->
+    <!DOCTYPE html> 
+<!--  The header for a task that has been completed in the task history page -->
 <h3 class="closed_header">
-        Claim task
+  Claim task
 </h3>
 
     <!DOCTYPE html>
-    <!--  This file holds the content when an entry in the 
+<!--  This file holds the content when an entry in the 
       task history page is expanded -->
 <div id="d1" class="task_entry">
   <p>
@@ -103,7 +105,7 @@
           <label><b>Task Expiration:</b></label>
         </td>
         <td>
-          <label>Sunday 03:34 AM EDT</label>
+          <label>10:03 PM EDT</label>
         </td>
       </tr>
       <tr>
@@ -127,17 +129,19 @@
     </table>
   </p>
 </div>
-    
-    </div>
       
-        <script> 
+      </div>
+        
+          <script>
             addStuff(41.3121, -72.9277, "map-canvas1");
-        </script>
-      
+          </script>
+        
 
-    <form action="/home">
-      <input type="submit" id="returnhomebutton" value="Return Home"></input>
-    </form>
-  </div>
-</body>
+      <div id="returnhomebutton">
+        <form action="/home">
+          <input type="submit" id="returnhomebutton" value="Return Home"></input>
+        </form>
+      </div>
+    </div>
+  </body>
 </html>

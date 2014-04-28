@@ -194,7 +194,8 @@ def my_requester_tasks():
                             requestor_score= score,
                             tasks= (requester_objects_open +
                                     requester_objects_in_progress +
-                                    requester_objects_old))
+                                    requester_objects_old),
+                            is_requestor = True)
 
 #Get task associated with an account_task entry
 def get_task_from_account_task(account_task):
@@ -223,7 +224,8 @@ def my_fulfiller_tasks():
 
     return render_template("tasklist.html",
                             tasks= (fulfiller_objects_in_progress +
-                                    fulfiller_objects_old))
+                                    fulfiller_objects_old),
+                            is_requestor = False)
 
 #Called to activate user after user clicks verification link in email.
 def activate_user(verification_address):

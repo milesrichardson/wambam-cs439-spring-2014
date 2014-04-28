@@ -210,13 +210,14 @@ class TestWambam(unittest.TestCase):
         #Check if the string uses a time zone
         time_regex = re.compile(".*[0-9]+:[0-9]+ (AM|PM) EDT</label>")
 
+        #expected = open('./test_htmls/fulfiller.html', 'w')
+        #expected.write(result.data)
         expected = open('./test_htmls/fulfiller.html', 'r')
         for line in result.data.split('\n'):
             test_line = expected.readline().strip()
             if time_regex.match(test_line):
                 continue
             self.assertEqual(test_line, line.strip())
-
         expected.close()
 
     def testMyRequesterTasks(self):
@@ -226,13 +227,14 @@ class TestWambam(unittest.TestCase):
         #Check if the string uses a time zone
         time_regex = re.compile(".*[0-9]+:[0-9]+ (AM|PM) EDT</label>")
                         
+        #expected = open('./test_htmls/requester.html', 'w')
+        #expected.write(result.data)
         expected = open('./test_htmls/requester.html', 'r')
         for line in result.data.split('\n'):
             test_line = expected.readline().strip()
             if time_regex.match(test_line):
                 continue
             self.assertEqual(test_line, line.strip())
-
 
         expected.close()
 

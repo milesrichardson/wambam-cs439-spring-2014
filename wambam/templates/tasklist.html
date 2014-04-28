@@ -18,9 +18,15 @@
 
       <div id="page_title"> My Tasks </div>
       <div id="tabs">
-        <a href="my_requester_tasks">As Requester</a>
-        <span> | </span>
-        <a href="my_fulfiller_tasks">As Fulfiller</a>
+        {% if is_requestor == True %}
+          <b><a href="my_requester_tasks">As Requester</a></b>
+          <span> | </span>
+          <a href="my_fulfiller_tasks">As Fulfiller</a>
+        {% else %}
+          <a href="my_requester_tasks">As Requester</a>
+          <span> | </span>
+          <b><a href="my_fulfiller_tasks">As Fulfiller</a></b>
+        {% endif %}
         {% if requestor_score %}
         <div id="requestor_score">
           Your Positive Feedback Percentage: {{requestor_score}}
@@ -40,9 +46,11 @@
           </script>
         {% endfor %}
 
-      <form action="/home">
-        <input type="submit" id="returnhomebutton" value="Return Home"></input>
-      </form>
+      <div id="returnhomebutton">
+        <form action="/home">
+          <input type="submit" id="returnhomebutton" value="Return Home"></input>
+        </form>
+      </div>
     </div>
   </body>
 </html>
