@@ -3,6 +3,7 @@ import datetime
 import os
 import re
 import unittest
+import sys
 
 postgres = None
 if "DATABASE_URL" in os.environ:
@@ -14,17 +15,19 @@ from wambam import app
 if postgres is not None:
     os.environ["DATABASE_URL"] = postgres
 
-
 import schema
 port = int(os.environ.get('PORT', 5000))
 
+sys.path.insert(0, "./wambam/api/")
+import encryption
 
 class TestWambam(unittest.TestCase):
 
     def setUp(self):
         self.app = app
         self.app_client = app.test_client()
-
+        self.app.config["SECRET_KEY"] = "I have a secret."
+        
         #There are 4 tasks in the DB initially. 
         #Two are unclaimed. AddClaimTask is the first test which will
         #claim a task. AddSubmittedTask will create a new task, so
@@ -70,10 +73,10 @@ class TestWambam(unittest.TestCase):
     def testAddSubmitTask(self):
         self.login()
         with self.app_client.session_transaction() as sess:
-            sess['lat'] = 41.3084304
-            sess['lng'] = -72.9284356
+            sess['lat'] = "41.3084304"
+            sess['lng'] = "-72.9284356"
         result = self.app_client.post('/submittask', data=dict(
-            title='test_submit_task', 
+            title='test_submit_task',
             bid='$3', 
             expiration='30min',
             description='N/A',
@@ -232,6 +235,7 @@ class TestWambam(unittest.TestCase):
             if time_regex.match(test_line):
                 continue
             self.assertEqual(test_line, line.strip())
+
         expected.close()
 
     def testViewTaskJSON(self):
@@ -248,6 +252,9 @@ class TestWambam(unittest.TestCase):
             "status": "completed",
             "venmo_status": "unpaid"
         }
+       # expected = encryption.encrypt_dictionary(expected)
+       # expected["status"] = "completed"
+       # expected["venmo_status"] = "unpaid"
         task = ast.literal_eval(result.data)
         self.assertEqual(expected, task)
 
@@ -279,54 +286,67 @@ class TestWambam(unittest.TestCase):
         current_user = self.app_client.get('/get_user') 
         user = ast.literal_eval(current_user.data)
         self.assertTrue('venmo_token' in user)
-        self.assertEqual(user['venmo_token'], 'abcdefgh1234567')
+        self.assertEqual(user['venmo_token'], encryption.encrypt_string('abcdefgh1234567'))
 
 
 
 def addBaseTasks():
-
+    task1dict = {"latitude": 41.3121, "longitude": -72.9277, "short_title": "Claim task", "bid": float(5), \
+                 "long_title": "This is a task that will be claimed", "delivery_location": "Saybrook"}
+    task2dict = {"latitude": 41.3121, "longitude": -72.9277, "short_title": "Title 2", "bid": float(5), \
+                 "long_title": "This is description 2", "delivery_location": "Saybrook"}
+    task3dict = {"latitude": 41.3101, "longitude": -72.9257, "short_title": "Title 3", "bid": float(10), \
+                 "long_title": "This is description 3", "delivery_location": "There"}
+    task4dict = {"latitude": 41.3131, "longitude": -72.9287, "short_title": "Title 4", "bid": float(15), \
+                 "long_title": "This is description 4", "delivery_location": "Here"}
+    
+    task1enc = encryption.encrypt_dictionary(task1dict)
+    task2enc = encryption.encrypt_dictionary(task2dict)
+    task3enc = encryption.encrypt_dictionary(task3dict)
+    task4enc = encryption.encrypt_dictionary(task4dict)
+    
     task1 = schema.Task(
         requestor_id=1,
-        latitude = 41.3121,
-        longitude = -72.9277,
-        short_title="Claim task",
-        bid=float(5),
+        latitude = task1enc["latitude"],
+        longitude = task1enc["longitude"],
+        short_title= task1enc["short_title"],
+        bid= task1enc["bid"],
         expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
-        long_title="This is a task that will be claimed",
-        delivery_location="Saybrook",
+        long_title= task1enc["long_title"],
+        delivery_location= task1enc["delivery_location"],
         status="unassigned")
 
     task2 = schema.Task(
         requestor_id=1,
-        latitude = 41.3121,
-        longitude = -72.9277,
-        short_title="Title 2",
-        bid=float(5),
+        latitude = task2enc["latitude"],
+        longitude = task2enc["longitude"],
+        short_title= task2enc["short_title"],
+        bid= task2enc["bid"],
         expiration_datetime=datetime.datetime.now() + datetime.timedelta(minutes=6*60),
-        long_title="This is description 2",
-        delivery_location="Saybrook",
+        long_title=task2enc["long_title"],
+        delivery_location=task2enc["delivery_location"],
         status="unassigned")
 
     task3 = schema.Task(
         requestor_id=1,
-        latitude = 41.3101,
-        longitude = -72.9257,
-        short_title="Title 3",
-        bid=float(10),
+        latitude = task3enc["latitude"],
+        longitude = task3enc["longitude"],
+        short_title= task3enc["short_title"],
+        bid= task3enc["bid"],
         expiration_datetime=datetime.datetime.now(),
-        long_title="This is description 3",
-        delivery_location="There",
+        long_title=task3enc["long_title"],
+        delivery_location=task3enc["delivery_location"],
         status="canceled")
 
     task4 = schema.Task(
         requestor_id=1,
-        latitude = 41.3131,
-        longitude = -72.9287,
-        short_title="Title 4",
-        bid=float(15),
+        latitude = task4enc["latitude"],
+        longitude = task4enc["longitude"],
+        short_title=task4enc["short_title"],
+        bid=task4enc["bid"],
         expiration_datetime=datetime.datetime.now(),
-        long_title="This is description 4",
-        delivery_location="Here",
+        long_title=task4enc["long_title"],
+        delivery_location=task4enc["delivery_location"],
         status="expired")
 
     app.db.session.add(task1) 
@@ -338,27 +358,38 @@ def addBaseTasks():
 
 def addBaseUsers():
 
+    user1dict = {"phone":"7703629815", "phone_carrier":"AT&T", "email":"michael.hopkins@yale.edu", \
+                 "password":"blah", "venmo_id":"1020501350678528475", "first_name":"Michael", \
+                 "last_name":"Hopkins"}
+
+    user2dict = {"phone":"2034420233", "phone_carrier":"AT&T", "email":"miles.richardson@yale.edu", \
+                 "password":"blah", "venmo_id":"1020501350678528478", "first_name":"Miles", \
+                 "last_name":"Richardson"}
+
+    user1enc = encryption.encrypt_dictionary(user1dict)
+    user2enc = encryption.encrypt_dictionary(user2dict)
+
     user = schema.Account(
         activated=True,
-        phone="7703629815",
-        phone_carrier="AT&T",
-        email="michael.hopkins@yale.edu",
-        password="blah",
+        phone=user1enc["phone"],
+        phone_carrier=user1enc["phone_carrier"],
+        email=user1enc["email"],
+        password=user1enc["password"],
         online=True,
-        venmo_id="1020501350678528475",
-        first_name="Michael",
-        last_name="Hopkins")
+        venmo_id=user1enc["venmo_id"],
+        first_name=user1enc["first_name"],
+        last_name=user1enc["last_name"])
 
     user2 = schema.Account(
         activated=True,
-        phone="2034420233",
-        phone_carrier="AT&T",
-        email="miles.richardson@yale.edu",
-        password="blah",
+        phone=user2enc["phone"],
+        phone_carrier=user2enc["phone_carrier"],
+        email=user2enc["email"],
+        password=user2enc["password"],
         online=True,
-        venmo_id="1020501350678528478",
-        first_name="Miles",
-        last_name="Richardson")
+        venmo_id=user2enc["venmo_id"],
+        first_name=user2enc["first_name"],
+        last_name=user2enc["last_name"])
 
     app.db.session.add(user)
     app.db.session.add(user2)

@@ -20,6 +20,7 @@ body {
     margin-bottom: 50px;
     max-width: 800px;
     margin: 0 auto;
+    margin-bottom: 15px;
 }
 
 #tabs {
@@ -78,15 +79,12 @@ body {
 }
 
 #returnhomebutton { 
-    font-size:15px;
-    padding: 3px 10px;
+    height: 50px;
+    width: 200px;
+    font-size:20px;
     color: white;
-    font-weight: bold;
-    background: #0F4D92;
+    background: #0F4D92; 
     text-align: center;
-    width: 100%;
-    max-width: 800px;
-    display: block;
     margin: 0 auto;
 }
 

@@ -175,7 +175,7 @@ app.db = db
 api_manager = create_api(app,db)
 login_manager = login.create_login_manager(app, db)
 
-#encryption.setup_encyrption(app)
+encryption.setup_encyrption(app)
 venmo.setup_venmo_endpoints(app, db, engine)
 task.setup_task_endpoints(app, db, engine)
 wambam_user.setup_user_endpoints(app, db, engine)

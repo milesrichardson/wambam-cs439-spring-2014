@@ -80,7 +80,7 @@ def create_account_table(db):
                "phone" : encryption.decrypt_string(self.phone),
                "phone_carrier" : encryption.decrypt_string(self.phone_carrier),
                "online" : str(self.online),
-               "email" : str(self.email),
+               "email" : encryption.decrypt_string(self.email),
                "first_name" : encryption.decrypt_string(self.first_name),
                "last_name" : encryption.decrypt_string(self.last_name),
                "fulfiller_tasks" : self.serialize_fulfiller_tasks,
@@ -258,6 +258,8 @@ def create_fulfiller_object(task):
     requester_email = requester_decrypted["email"]
     requester_phone = requester_decrypted["phone"]
 
+    fulfiller_has_venmo = venmo.can_use_venmo(task_id)
+
     expiration_date = dump_datetime(task.expiration_datetime)
     bid = "$%(bid).2f" % {"bid": float(task_decrypted["bid"])}
     return {
@@ -272,6 +274,7 @@ def create_fulfiller_object(task):
         "delivery_location": task_decrypted["delivery_location"],
         "title": task_decrypted["short_title"],
         "description": task_decrypted["long_title"],
+        "fulfiller_has_venmo": fulfiller_has_venmo,
         "status": task.status,
     }
 
