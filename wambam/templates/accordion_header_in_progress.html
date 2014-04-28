@@ -9,17 +9,19 @@
       <td id="right_col">
         <div id="in_progress_buttons">
           {% if task.object_type == "requester"%}
-            {% if task.fulfiller_has_venmo == "true" %}
-              <div>
-                <form id="form{{task.task_id}}" action="/venmo_make_payment" method="POST">
-                  <input type="submit"  id="button" value="Pay with Venmo"></input>
-                  <input type="hidden"  name="task_id" id="task_id" value="{{task.task_id}}"></input>
-                </form>
-              </div>
-            {% else %}
-              <div>
-                  <input type="submit" id="button_dull" value="Fulfiller Doesn't Have Venmo" disabled></input>
-              </div>
+            {% if task.venmo_status == "unpaid" %}
+              {% if task.fulfiller_has_venmo == "true" %}
+                <div>
+                  <form id="form{{task.task_id}}" action="/venmo_make_payment" method="POST">
+                    <input type="submit"  id="button" value="Pay with Venmo"></input>
+                    <input type="hidden"  name="task_id" id="task_id" value="{{task.task_id}}"></input>
+                  </form>
+                </div>
+              {% else %}
+                <div>
+                    <input type="submit" id="button_dull" value="Fulfiller Doesn't Have Venmo" disabled></input>
+                </div>
+              {% endif %}
             {% endif %}
           {% elif task.fulfiller_has_venmo == "false" %}
             <div>

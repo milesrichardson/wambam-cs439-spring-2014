@@ -44,14 +44,14 @@ Basic WamBam! workflows:
     -Wait until someone claims task.
     -Receive text message alert that someone has claimed your task with their phone number to get in touch.
     -After task has been fulfilled, requester can navigate to "My History" page and pay with Venmo 
-     optionally. Task is done once rated.
+     optionally.
 -Fulfill a task
     -Click "I want to work"
     -Click on a google maps pin
     -View the details and claim task
     -Text fulfiller that you are on it.
     -Rate requester's service and receive payment (optionally through Venmo if you have signed up)
-     through the "My History tab"
+     through the "My History tab" Task is done after rating.
 
 Key WamBam! Features
   -Data encryption on the backend
