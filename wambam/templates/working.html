@@ -11,10 +11,6 @@
     <link rel="stylesheet" type="text/css" media="screen and (min-device-width:700px)" href="{{ url_for('static', filename='infowindow.css') }}">
     <link rel="stylesheet" type="text/css" media="screen and (max-device-width:699px)" href="{{ url_for('static', filename='infowindow_mobile.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/toggles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-toggles-master/themes/toggles-iphone.css') }}">
-    <style>
-    </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3Y6rYtcBAnNDGa317n5bRdYAp3_fhgFU&sensor=false"></script>
     <script src="{{ url_for('static', filename='map.js') }}"></script>
@@ -30,7 +26,7 @@
     <div id="buttonbar">
       <button id="toggle_work"></button>
       <form id="form" action="/home">
-        <input id="button" type="submit" value="Actually, I don't want to work!">
+        <input id="button" type="submit" value="Actually, I don't want to work!"></input>
       </form>
     </div>
   <script src="{{ url_for('static', filename='toggle_working.js') }}"></script>

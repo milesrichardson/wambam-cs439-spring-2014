@@ -1,4 +1,4 @@
-idmport os
+import os
 import uuid
 import hashlib
 import unittest
@@ -16,6 +16,7 @@ sys.path.append("wambam/api")
 
 import api
 import schema
+import encryption
 
 num_base_users = 1
 num_base_tasks = 4
@@ -69,6 +70,9 @@ class TestWambam(unittest.TestCase):
 
 
     def addBaseTasks(self):
+        
+
+        
         task1 = schema.Task(
             requestor_id=1,
             latitude = 41.3111,
@@ -124,13 +128,13 @@ class TestWambam(unittest.TestCase):
 
         user = schema.Account(
             activated=True,
-            phone="7703629815",
-            phone_carrier="AT&T",
-            email="michael.hopkins@yale.edu",
-            password_hash="blah",
+            phone=encryption.encrypt_string("7703629815"),
+            phone_carrier=encryption.encrypt_string("AT&T"),
+            email=encryption.encrypt_string("michael.hopkins@yale.edu"),
+            password_hash=encryption.encrypt_string("blah"),
             online=True,
-            first_name="Michael",
-            last_name="Hopkins")
+            first_name=encryption.encrypt_string("Michael"),
+            last_name=encryption.encrypt_string("Hopkins")
 
         self.db.session.add(user)
         self.db.session.commit()

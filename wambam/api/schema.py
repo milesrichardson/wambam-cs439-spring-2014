@@ -80,7 +80,7 @@ def create_account_table(db):
                "phone" : encryption.decrypt_string(self.phone),
                "phone_carrier" : encryption.decrypt_string(self.phone_carrier),
                "online" : str(self.online),
-               "email" : str(self.email),
+               "email" : encryption.decrypt_string(self.email),
                "first_name" : encryption.decrypt_string(self.first_name),
                "last_name" : encryption.decrypt_string(self.last_name),
                "fulfiller_tasks" : self.serialize_fulfiller_tasks,
