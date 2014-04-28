@@ -11,7 +11,7 @@ from wambam import app
 import encryption
 import venmo
 
-current_schema_version = 5
+current_schema_version = 6
 
 SchemaVersion = None
 account_task = None
