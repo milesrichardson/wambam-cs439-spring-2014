@@ -1,3 +1,13 @@
+WHAT THIS IS
+=====
+
+This is the code for our CS 439 group project, "WamBam". Wambam is "uber for tasks". Drop a pin, fill task details, find someone to fulfill it.
+
+Team Members: (W)ill Childs-Klein, (A)dit Sinha, (M)iles Richardson, (B)randon Smith, (A)ayush Upadhyay, (M)ichael Hopkins
+
+continue
+===
+
 -Our code running live can be viewed at wambam.net
 -If you want to run the code locally, when you register for an account on WamBam! and have to 
  activate your account, you will need to change the base URL from wambam.herokuapp.com to localhost:5000.
